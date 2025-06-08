@@ -3,1685 +3,1359 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Darson Securities - Employee Management System</title>
+    <title>Next Gen Sites - Inventory Management</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
     <style>
-        :root {
-            --primary-color: #2c3e50;
-            --secondary-color: #3498db;
-            --accent-color: #e74c3c;
-            --light-color: #ecf0f1;
-            --dark-color: #34495e;
-        }
-        
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
-        
         body {
-            background-color: #f5f5f5;
-            color: #333;
+            font-family: 'Inter', sans-serif;
         }
-        
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 20px;
+        .sidebar-icon {
+            transition: all 0.3s ease;
         }
-        
-        header {
-            background-color: var(--primary-color);
+        .sidebar-icon:hover {
+            transform: scale(1.1);
+        }
+        .nav-item.active {
+            background-color: #4f46e5;
             color: white;
-            padding: 20px 0;
-            text-align: center;
-            border-radius: 5px 5px 0 0;
-            margin-bottom: 20px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
         }
-        
-        .login-container {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 80vh;
-        }
-        
-        .login-form {
-            background-color: white;
-            padding: 30px;
-            border-radius: 5px;
-            box-shadow: 0 0 10px rgba(0,0,0,0.1);
-            width: 400px;
-        }
-        
-        .login-form h2 {
-            text-align: center;
-            margin-bottom: 20px;
-            color: var(--primary-color);
-        }
-        
-        .form-group {
-            margin-bottom: 15px;
-        }
-        
-        .form-group label {
-            display: block;
-            margin-bottom: 5px;
-            font-weight: bold;
-        }
-        
-        .form-group input {
-            width: 100%;
-            padding: 10px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-        }
-        
-        .btn {
-            background-color: var(--secondary-color);
+        .nav-item.active i {
             color: white;
-            border: none;
-            padding: 10px 15px;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 16px;
-            transition: background-color 0.3s;
         }
-        
-        .btn:hover {
-            background-color: #2980b9;
-        }
-        
-        .btn-block {
-            display: block;
-            width: 100%;
-        }
-        
-        .dashboard {
-            display: none;
-        }
-        
-        .nav-tabs {
-            display: flex;
-            background-color: var(--dark-color);
-            border-radius: 5px 5px 0 0;
-        }
-        
-        .nav-tabs button {
-            background: none;
-            border: none;
-            color: white;
-            padding: 15px 20px;
-            cursor: pointer;
-            transition: background-color 0.3s;
-        }
-        
-        .nav-tabs button:hover {
-            background-color: var(--primary-color);
-        }
-        
-        .nav-tabs button.active {
-            background-color: var(--primary-color);
-            font-weight: bold;
-        }
-        
-        .tab-content {
-            background-color: white;
-            padding: 20px;
-            border-radius: 0 0 5px 5px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-            min-height: 500px;
-        }
-        
-        .tab-pane {
-            display: none;
-        }
-        
-        .tab-pane.active {
-            display: block;
-        }
-        
-        .search-bar {
-            display: flex;
-            margin-bottom: 20px;
-        }
-        
-        .search-bar input {
-            flex: 1;
-            padding: 10px;
-            border: 1px solid #ddd;
-            border-radius: 4px 0 0 4px;
-        }
-        
-        .search-bar button {
-            padding: 10px 15px;
-            background-color: var(--secondary-color);
-            color: white;
-            border: none;
-            border-radius: 0 4px 4px 0;
-            cursor: pointer;
-        }
-        
-        .employee-list {
-            list-style: none;
-        }
-        
-        .employee-item {
-            display: flex;
-            align-items: center;
-            padding: 15px;
-            border-bottom: 1px solid #eee;
-            cursor: pointer;
-            transition: background-color 0.3s;
-        }
-        
-        .employee-item:hover {
-            background-color: #f9f9f9;
-        }
-        
-        .employee-avatar {
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            background-color: #ddd;
-            margin-right: 15px;
-            overflow: hidden;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        
-        .employee-avatar img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-        
-        .employee-info {
-            flex: 1;
-        }
-        
-        .employee-name {
-            font-weight: bold;
-            margin-bottom: 5px;
-        }
-        
-        .employee-designation {
-            color: #777;
-            font-size: 14px;
-        }
-        
-        .employee-status {
-            padding: 5px 10px;
-            border-radius: 4px;
-            font-size: 12px;
-            font-weight: bold;
-        }
-        
-        .status-active {
-            background-color: #d4edda;
-            color: #155724;
-        }
-        
-        .status-inactive {
-            background-color: #f8d7da;
-            color: #721c24;
-        }
-        
-        .form-row {
-            display: flex;
-            flex-wrap: wrap;
-            margin: 0 -10px;
-        }
-        
-        .form-col {
-            flex: 1;
-            padding: 0 10px;
-            min-width: 250px;
-        }
-        
-        .profile-header {
-            display: flex;
-            align-items: center;
-            margin-bottom: 30px;
-            padding-bottom: 20px;
-            border-bottom: 1px solid #eee;
-        }
-        
-        .profile-avatar {
-            width: 100px;
-            height: 100px;
-            border-radius: 50%;
-            background-color: #ddd;
-            margin-right: 20px;
-            overflow: hidden;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        
-        .profile-avatar img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-        
-        .profile-info h2 {
-            margin-bottom: 5px;
-        }
-        
-        .profile-info p {
-            color: #777;
-            margin-bottom: 10px;
-        }
-        
-        .profile-status {
-            display: inline-block;
-            padding: 5px 10px;
-            border-radius: 4px;
-            font-size: 14px;
-            font-weight: bold;
-        }
-        
-        .profile-section {
-            margin-bottom: 30px;
-        }
-        
-        .profile-section h3 {
-            margin-bottom: 15px;
-            padding-bottom: 10px;
-            border-bottom: 1px solid #eee;
-        }
-        
-        .info-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-            gap: 20px;
-        }
-        
-        .info-item {
-            margin-bottom: 15px;
-        }
-        
-        .info-label {
-            font-weight: bold;
-            color: #555;
-            margin-bottom: 5px;
-        }
-        
-        .info-value {
-            padding: 8px;
-            background-color: #f9f9f9;
-            border-radius: 4px;
-        }
-        
-        .document-list {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-            gap: 15px;
-        }
-        
-        .document-item {
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            padding: 15px;
-            text-align: center;
-        }
-        
-        .document-icon {
-            font-size: 40px;
-            color: var(--secondary-color);
-            margin-bottom: 10px;
-        }
-        
-        .document-name {
-            font-weight: bold;
-            margin-bottom: 5px;
-        }
-        
-        .document-actions {
-            margin-top: 10px;
-        }
-        
-        .document-actions button {
-            background: none;
-            border: none;
-            color: var(--secondary-color);
-            cursor: pointer;
-            margin: 0 5px;
-        }
-        
-        .salary-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 20px;
-        }
-        
-        .salary-table th, .salary-table td {
-            padding: 12px 15px;
-            text-align: left;
-            border-bottom: 1px solid #ddd;
-        }
-        
-        .salary-table th {
-            background-color: #f2f2f2;
-            font-weight: bold;
-        }
-        
-        .salary-table tr:hover {
-            background-color: #f5f5f5;
-        }
-        
-        .leave-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 20px;
-        }
-        
-        .leave-table th, .leave-table td {
-            padding: 12px 15px;
-            text-align: left;
-            border-bottom: 1px solid #ddd;
-        }
-        
-        .leave-table th {
-            background-color: #f2f2f2;
-            font-weight: bold;
-        }
-        
-        .leave-table tr:hover {
-            background-color: #f5f5f5;
-        }
-        
-        .status-approved {
-            color: #28a745;
-        }
-        
-        .status-pending {
-            color: #ffc107;
-        }
-        
-        .status-rejected {
-            color: #dc3545;
-        }
-        
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0,0,0,0.5);
-            z-index: 1000;
-            justify-content: center;
-            align-items: center;
-        }
-        
-        .modal-content {
-            background-color: white;
-            padding: 30px;
-            border-radius: 5px;
-            width: 80%;
-            max-width: 800px;
-            max-height: 90vh;
-            overflow-y: auto;
-        }
-        
-        .modal-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-            padding-bottom: 10px;
-            border-bottom: 1px solid #eee;
-        }
-        
-        .modal-title {
-            font-size: 24px;
-            font-weight: bold;
-        }
-        
-        .close-modal {
-            background: none;
-            border: none;
-            font-size: 24px;
-            cursor: pointer;
-            color: #777;
-        }
-        
-        .form-actions {
-            display: flex;
-            justify-content: flex-end;
-            margin-top: 20px;
-        }
-        
-        .btn-cancel {
-            background-color: #6c757d;
-            margin-right: 10px;
-        }
-        
-        .btn-danger {
-            background-color: var(--accent-color);
-        }
-        
-        .btn-danger:hover {
-            background-color: #c0392b;
-        }
-        
-        .file-upload {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            padding: 20px;
-            border: 2px dashed #ddd;
-            border-radius: 4px;
-            margin-bottom: 20px;
-            cursor: pointer;
-        }
-        
-        .file-upload:hover {
-            border-color: var(--secondary-color);
-        }
-        
-        .file-upload input {
-            display: none;
-        }
-        
-        .file-upload-icon {
-            font-size: 40px;
-            color: var(--secondary-color);
-            margin-bottom: 10px;
-        }
-        
-        .alert {
-            padding: 15px;
-            border-radius: 4px;
-            margin-bottom: 20px;
-        }
-        
-        .alert-success {
-            background-color: #d4edda;
-            color: #155724;
-            border: 1px solid #c3e6cb;
-        }
-        
-        .alert-error {
-            background-color: #f8d7da;
-            color: #721c24;
-            border: 1px solid #f5c6cb;
-        }
-        
-        .empty-avatar {
-            width: 100%;
-            height: 100%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background-color: #eee;
-            color: #999;
-            font-size: 20px;
+        .low-stock-pulse {
+            animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+        @keyframes pulse {
+            0%, 100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: .5;
+            }
+        }
+        @media print {
+            body * {
+                visibility: hidden;
+            }
+            #bill-modal, #bill-modal * {
+                visibility: visible;
+            }
+            #bill-modal {
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 100%;
+            }
+            #bill-controls {
+                display: none;
+            }
         }
     </style>
 </head>
-<body>
-    <!-- Login Screen -->
-    <div class="login-container" id="loginScreen">
-        <div class="login-form">
-            <h2>Darson Securities Limited</h2>
-            <div class="form-group">
-                <label for="username">Username</label>
-                <input type="text" id="username" placeholder="Enter username">
-            </div>
-            <div class="form-group">
-                <label for="password">Password</label>
-                <input type="password" id="password" placeholder="Enter password">
-            </div>
-            <button class="btn btn-block" id="loginBtn">Login</button>
+<body class="bg-gray-100">
+
+    <div id="loading-overlay" class="fixed inset-0 bg-white bg-opacity-75 z-50 flex items-center justify-center">
+        <div class="flex items-center space-x-2">
+            <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600"></div>
+            <span class="text-lg font-medium text-gray-700">Initializing System...</span>
         </div>
     </div>
 
-    <!-- Main Dashboard -->
-    <div class="container dashboard" id="dashboard">
-        <header>
-            <h1>Darson Securities Limited</h1>
-            <p>Employee Management System</p>
-        </header>
-
-        <div class="nav-tabs">
-            <button class="active" data-tab="employees">Employees</button>
-            <button data-tab="addEmployee">Add Employee</button>
-            <button data-tab="reports">Reports</button>
-            <button id="logoutBtn" style="margin-left: auto;">Logout</button>
+    <div class="flex h-screen bg-gray-200">
+        <!-- Sidebar -->
+        <div class="fixed top-0 left-0 h-full w-20 lg:w-64 bg-gray-800 text-white flex flex-col z-30">
+            <div class="flex items-center justify-center lg:justify-start lg:pl-6 h-20 border-b border-gray-700">
+                 <div class="bg-indigo-600 p-2 rounded-lg">
+                    <i class="fa-solid fa-boxes-stacked fa-2x"></i>
+                </div>
+                <span class="hidden lg:inline ml-4 text-xl font-bold">Next Gen Sites</span>
+            </div>
+            <nav class="flex-grow mt-4">
+                <a href="#dashboard" class="nav-item flex items-center py-4 px-6 lg:px-6 text-gray-300 hover:bg-gray-700 active">
+                    <i class="fas fa-tachometer-alt fa-fw text-2xl lg:text-base"></i>
+                    <span class="hidden lg:inline ml-4 font-medium">Dashboard</span>
+                </a>
+                <a href="#billing" class="nav-item flex items-center py-4 px-6 lg:px-6 text-gray-300 hover:bg-gray-700">
+                    <i class="fas fa-file-invoice-dollar fa-fw text-2xl lg:text-base"></i>
+                    <span class="hidden lg:inline ml-4 font-medium">Billing</span>
+                </a>
+                <a href="#stocks" class="nav-item flex items-center py-4 px-6 lg:px-6 text-gray-300 hover:bg-gray-700">
+                    <i class="fas fa-warehouse fa-fw text-2xl lg:text-base"></i>
+                    <span class="hidden lg:inline ml-4 font-medium">Stocks</span>
+                </a>
+                <a href="#reports" class="nav-item flex items-center py-4 px-6 lg:px-6 text-gray-300 hover:bg-gray-700">
+                    <i class="fas fa-chart-line fa-fw text-2xl lg:text-base"></i>
+                    <span class="hidden lg:inline ml-4 font-medium">Reports</span>
+                </a>
+                <a href="#settings" class="nav-item flex items-center py-4 px-6 lg:px-6 text-gray-300 hover:bg-gray-700">
+                    <i class="fas fa-cog fa-fw text-2xl lg:text-base"></i>
+                    <span class="hidden lg:inline ml-4 font-medium">Settings</span>
+                </a>
+            </nav>
+            <div class="p-6 border-t border-gray-700">
+                <div class="text-xs text-center lg:text-left text-gray-400">
+                    <p>User ID:</p>
+                    <p id="user-id-display" class="font-mono text-xs break-all"></p>
+                </div>
+            </div>
         </div>
 
-        <div class="tab-content">
-            <!-- Employees Tab -->
-            <div class="tab-pane active" id="employees">
-                <div class="search-bar">
-                    <input type="text" id="searchEmployee" placeholder="Search employees...">
-                    <button id="searchBtn">Search</button>
+        <!-- Main content -->
+        <main class="flex-1 flex flex-col pl-20 lg:pl-64">
+            <!-- Header -->
+            <header class="bg-white shadow-md h-20 flex items-center justify-between px-6 z-20">
+                <h1 id="page-title" class="text-2xl font-bold text-gray-800">Dashboard</h1>
+                <div class="flex items-center">
+                   <div id="shop-name-header" class="text-lg font-semibold text-indigo-600">
+                        <!-- Shop name loads here -->
+                   </div>
                 </div>
-                
-                <ul class="employee-list" id="employeeList">
-                    <li class="employee-item">No employees found. Add your first employee using the "Add Employee" tab.</li>
-                </ul>
-            </div>
+            </header>
 
-            <!-- Add Employee Tab -->
-            <div class="tab-pane" id="addEmployee">
-                <h2>Add New Employee</h2>
-                <form id="employeeForm">
-                    <div class="form-row">
-                        <div class="form-col">
-                            <div class="form-group">
-                                <label for="empName">Full Name</label>
-                                <input type="text" id="empName" required>
-                            </div>
-                            <div class="form-group">
-                                <label for="empFatherName">Father's Name</label>
-                                <input type="text" id="empFatherName" required>
-                            </div>
-                            <div class="form-group">
-                                <label for="empCnic">CNIC</label>
-                                <input type="text" id="empCnic" placeholder="XXXXX-XXXXXXX-X" required>
-                            </div>
-                            <div class="form-group">
-                                <label for="empDob">Date of Birth</label>
-                                <input type="date" id="empDob" required>
-                            </div>
-                            <div class="form-group">
-                                <label for="empPhone">Phone Number</label>
-                                <input type="tel" id="empPhone" required>
-                            </div>
+            <!-- Page Content -->
+            <div class="flex-1 p-6 overflow-y-auto">
+                <div id="dashboard" class="page">
+                    <!-- Dashboard Content -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                        <div class="bg-white p-6 rounded-lg shadow">
+                            <h3 class="text-gray-500 text-sm font-medium">Total Products</h3>
+                            <p id="total-products" class="text-3xl font-bold text-gray-800">0</p>
                         </div>
-                        <div class="form-col">
-                            <div class="form-group">
-                                <label for="empEmail">Email</label>
-                                <input type="email" id="empEmail">
-                            </div>
-                            <div class="form-group">
-                                <label for="empAddress">Address</label>
-                                <input type="text" id="empAddress" required>
-                            </div>
-                            <div class="form-group">
-                                <label for="empMailingAddress">Mailing Address</label>
-                                <input type="text" id="empMailingAddress">
-                            </div>
-                            <div class="form-group">
-                                <label for="empJoiningDate">Joining Date</label>
-                                <input type="date" id="empJoiningDate" required>
-                            </div>
-                            <div class="form-group">
-                                <label for="empDesignation">Designation</label>
-                                <input type="text" id="empDesignation" required>
-                            </div>
+                        <div class="bg-white p-6 rounded-lg shadow">
+                            <h3 class="text-gray-500 text-sm font-medium">Low Stock Items</h3>
+                            <p id="low-stock-items" class="text-3xl font-bold text-red-500">0</p>
+                        </div>
+                        <div class="bg-white p-6 rounded-lg shadow">
+                            <h3 class="text-gray-500 text-sm font-medium">Today's Sales</h3>
+                            <p id="todays-sales-amount" class="text-3xl font-bold text-green-600">Rs 0.00</p>
+                        </div>
+                         <div class="bg-white p-6 rounded-lg shadow">
+                            <h3 class="text-gray-500 text-sm font-medium">Today's Profit</h3>
+                            <p id="todays-profit" class="text-3xl font-bold text-blue-600">Rs 0.00</p>
                         </div>
                     </div>
                     
-                    <div class="form-row">
-                        <div class="form-col">
-                            <div class="form-group">
-                                <label for="empSalary">Basic Salary</label>
-                                <input type="number" id="empSalary" required>
-                            </div>
-                            <div class="form-group">
-                                <label for="empExperience">Previous Experience (Years)</label>
-                                <input type="number" id="empExperience">
-                            </div>
-                        </div>
-                        <div class="form-col">
-                            <div class="form-group">
-                                <label for="empQualifications">Qualifications</label>
-                                <input type="text" id="empQualifications">
-                            </div>
-                            <div class="form-group">
-                                <label>Profile Picture</label>
-                                <div class="file-upload" id="profileUpload">
-                                    <div class="file-upload-icon">📷</div>
-                                    <p>Click to upload profile picture</p>
-                                    <input type="file" id="empProfilePic" accept="image/*">
+                    <div class="mt-8 bg-white p-6 rounded-lg shadow">
+                        <h2 class="text-xl font-bold text-gray-700 mb-4">Quick Product Search</h2>
+                        <input type="text" id="dashboard-search" placeholder="Search for products by name or SKU..." class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
+                        <div id="dashboard-search-results" class="mt-4"></div>
+                    </div>
+
+                </div>
+
+                <div id="billing" class="page hidden">
+                     <!-- Billing Content -->
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                        <div class="lg:col-span-2">
+                            <div class="bg-white p-6 rounded-lg shadow">
+                                <h2 class="text-xl font-bold text-gray-700 mb-4">Create New Bill</h2>
+                                <div class="flex gap-4 mb-4">
+                                    <input type="text" id="billing-search" placeholder="Search products to add to bill" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500">
+                                </div>
+                                <div id="billing-search-results" class="bg-gray-50 rounded-lg max-h-48 overflow-y-auto"></div>
+                                
+                                <div class="mt-6">
+                                    <h3 class="font-semibold text-lg text-gray-800">Current Bill Items</h3>
+                                    <div class="mt-2 flow-root">
+                                        <div class="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
+                                            <div class="inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8">
+                                                <table class="min-w-full divide-y divide-gray-300">
+                                                    <thead>
+                                                        <tr>
+                                                            <th scope="col" class="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-0">Product</th>
+                                                            <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Price</th>
+                                                            <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Quantity</th>
+                                                            <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Total</th>
+                                                            <th scope="col" class="relative py-3.5 pl-3 pr-4 sm:pr-0">
+                                                                <span class="sr-only">Remove</span>
+                                                            </th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody id="bill-items-table" class="divide-y divide-gray-200">
+                                                        <!-- Bill items will be injected here -->
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <p id="bill-empty-message" class="text-center text-gray-500 py-4">No items added to the bill.</p>
                                 </div>
                             </div>
                         </div>
+
+                        <div class="lg:col-span-1">
+                            <div class="bg-white p-6 rounded-lg shadow sticky top-6">
+                                <h3 class="text-xl font-bold text-gray-700 mb-4">Bill Summary</h3>
+                                <div class="space-y-3">
+                                    <div class="flex justify-between font-medium">
+                                        <span>Subtotal</span>
+                                        <span id="bill-subtotal">Rs 0.00</span>
+                                    </div>
+                                    <div class="flex justify-between items-center font-medium">
+                                        <span>Discount (%)</span>
+                                        <input type="number" id="bill-discount" value="0" min="0" max="100" class="w-20 text-right p-1 border rounded-md">
+                                    </div>
+                                    <div class="flex justify-between text-xl font-bold text-gray-800 border-t pt-3">
+                                        <span>TOTAL</span>
+                                        <span id="bill-total">Rs 0.00</span>
+                                    </div>
+                                </div>
+                                <div class="mt-6">
+                                    <input type="text" id="customer-name" placeholder="Customer Name (Optional)" class="w-full p-2 border rounded-md mb-2">
+                                    <input type="text" id="customer-contact" placeholder="Customer Contact (Optional)" class="w-full p-2 border rounded-md">
+                                </div>
+                                <button id="generate-bill-btn" class="mt-6 w-full bg-indigo-600 text-white font-bold py-3 rounded-lg hover:bg-indigo-700 transition duration-300 disabled:bg-gray-400">
+                                    Generate Bill & Print
+                                </button>
+                            </div>
+                        </div>
                     </div>
-                    
-                    <div class="form-actions">
-                        <button type="reset" class="btn btn-cancel">Reset</button>
-                        <button type="submit" class="btn">Add Employee</button>
+                </div>
+
+                <div id="stocks" class="page hidden">
+                    <!-- Stocks Content -->
+                    <div class="bg-white p-6 rounded-lg shadow">
+                         <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
+                            <h2 class="text-xl font-bold text-gray-700 mb-4 md:mb-0">Product Inventory</h2>
+                            <button id="add-product-btn" class="bg-indigo-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-indigo-700 transition duration-300">
+                                <i class="fas fa-plus mr-2"></i>Add New Product
+                            </button>
+                        </div>
+                        <input type="text" id="stock-search" placeholder="Search inventory..." class="w-full p-3 mb-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500">
+                        <div class="overflow-x-auto">
+                            <table class="min-w-full divide-y divide-gray-200">
+                                <thead class="bg-gray-50">
+                                    <tr>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Product Name</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">SKU</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Stock</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Buy Price</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Sell Price</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Profit</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="products-table" class="bg-white divide-y divide-gray-200">
+                                    <!-- Product rows will be injected here -->
+                                </tbody>
+                            </table>
+                             <p id="products-empty-message" class="text-center text-gray-500 py-8">No products found. Click 'Add New Product' to get started.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="reports" class="page hidden">
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                        <!-- Sales Report Section -->
+                        <div class="lg:col-span-2 bg-white p-6 rounded-lg shadow">
+                            <h2 class="text-xl font-bold text-gray-700 mb-4">Sales & Profit Report</h2>
+                            <div class="flex flex-wrap gap-4 items-center mb-4">
+                                <select id="report-period" class="p-2 border rounded-md">
+                                    <option value="daily">Daily</option>
+                                    <option value="weekly">Weekly</option>
+                                    <option value="monthly" selected>Monthly</option>
+                                    <option value="custom">Custom</option>
+                                </select>
+                                <div id="custom-date-range" class="flex gap-2 hidden">
+                                    <input type="date" id="start-date" class="p-2 border rounded-md">
+                                    <input type="date" id="end-date" class="p-2 border rounded-md">
+                                </div>
+                                <button id="export-sales-csv" class="bg-green-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-green-700"><i class="fas fa-file-csv mr-2"></i>Export Sales</button>
+                            </div>
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                                <div class="bg-gray-100 p-4 rounded-lg">
+                                    <h4 class="text-sm text-gray-600">Total Revenue</h4>
+                                    <p id="report-total-revenue" class="text-2xl font-bold text-gray-800">Rs 0.00</p>
+                                </div>
+                                <div class="bg-gray-100 p-4 rounded-lg">
+                                    <h4 class="text-sm text-gray-600">Total Profit</h4>
+                                    <p id="report-total-profit" class="text-2xl font-bold text-green-600">Rs 0.00</p>
+                                </div>
+                                <div class="bg-gray-100 p-4 rounded-lg">
+                                    <h4 class="text-sm text-gray-600">Net Profit (After Expenses)</h4>
+                                    <p id="report-net-profit" class="text-2xl font-bold text-blue-600">Rs 0.00</p>
+                                </div>
+                            </div>
+                            <div class="overflow-x-auto">
+                                <table class="min-w-full divide-y divide-gray-200">
+                                    <thead class="bg-gray-50">
+                                        <tr>
+                                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Date</th>
+                                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Total Amount</th>
+                                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Profit</th>
+                                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Items</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="sales-report-table" class="bg-white divide-y divide-gray-200">
+                                        <!-- Sales data here -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- Expenses Section -->
+                        <div class="lg:col-span-1 bg-white p-6 rounded-lg shadow">
+                            <h2 class="text-xl font-bold text-gray-700 mb-4">Track Expenses</h2>
+                            <form id="expense-form" class="space-y-4">
+                                <input type="text" id="expense-description" placeholder="Expense Description" class="w-full p-2 border rounded-md" required>
+                                <input type="number" id="expense-amount" placeholder="Amount" class="w-full p-2 border rounded-md" required>
+                                <input type="date" id="expense-date" class="w-full p-2 border rounded-md" required>
+                                <button type="submit" class="w-full bg-orange-500 text-white font-bold py-2 rounded-lg hover:bg-orange-600">Add Expense</button>
+                            </form>
+                            <hr class="my-6">
+                            <h3 class="font-semibold text-gray-700 mb-2">Recent Expenses</h3>
+                             <div class="overflow-x-auto max-h-60">
+                                <table class="min-w-full divide-y divide-gray-200">
+                                    <thead class="bg-gray-50 sticky top-0">
+                                        <tr>
+                                            <th class="px-2 py-2 text-left text-xs font-medium text-gray-500 uppercase">Description</th>
+                                            <th class="px-2 py-2 text-left text-xs font-medium text-gray-500 uppercase">Amount</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="expenses-table" class="bg-white divide-y divide-gray-200">
+                                        <!-- Expenses data here -->
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div class="mt-4 flex justify-between font-bold text-lg">
+                                <span>Total Expenses (Period)</span>
+                                <span id="report-total-expenses">Rs 0.00</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+                <div id="settings" class="page hidden">
+                    <!-- Settings Content -->
+                    <div class="max-w-2xl mx-auto bg-white p-8 rounded-lg shadow">
+                        <h2 class="text-2xl font-bold text-gray-800 mb-6">System Settings</h2>
+                        <form id="settings-form">
+                            <div class="mb-6">
+                                <label for="shop-name" class="block text-sm font-medium text-gray-700 mb-2">Shop Name</label>
+                                <input type="text" id="shop-name" name="shopName" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500" placeholder="Enter your shop's name">
+                            </div>
+                             <div class="mb-6">
+                                <label for="shop-address" class="block text-sm font-medium text-gray-700 mb-2">Shop Address</label>
+                                <input type="text" id="shop-address" name="shopAddress" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500" placeholder="e.g., 123 Main St, City">
+                            </div>
+                             <div class="mb-6">
+                                <label for="shop-contact" class="block text-sm font-medium text-gray-700 mb-2">Shop Contact Info</label>
+                                <input type="text" id="shop-contact" name="shopContact" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500" placeholder="e.g., +1 234 567 890">
+                            </div>
+                            <button type="submit" class="w-full bg-indigo-600 text-white font-bold py-3 rounded-lg hover:bg-indigo-700 transition duration-300">Save Settings</button>
+                        </form>
+
+                        <div class="mt-8 border-t pt-6">
+                            <h3 class="text-xl font-bold text-gray-800 mb-4">Data Management</h3>
+                             <div class="flex flex-wrap gap-4">
+                                <button id="import-products-btn" class="bg-blue-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-blue-700"><i class="fas fa-upload mr-2"></i>Import Products (CSV)</button>
+                                <input type="file" id="import-products-file" class="hidden" accept=".csv">
+                                <button id="export-products-btn" class="bg-green-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-green-700"><i class="fas fa-download mr-2"></i>Export Products (CSV)</button>
+                             </div>
+                        </div>
+
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Footer -->
+            <footer class="bg-gray-800 text-white text-center p-4">
+                Developed by Afrasiab Asghar. Visit <a href="http://www.nextgensites.org" target="_blank" class="underline hover:text-indigo-400">www.nextgensites.org</a> or Contact +923060406003
+            </footer>
+        </main>
+    </div>
+
+    <!-- Modals -->
+    <!-- Add/Edit Product Modal -->
+    <div id="product-modal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-40 hidden">
+        <div class="relative top-20 mx-auto p-5 border w-full max-w-2xl shadow-lg rounded-md bg-white">
+            <div class="flex justify-between items-center pb-3 border-b">
+                <h3 id="product-modal-title" class="text-2xl font-bold text-gray-900">Add New Product</h3>
+                <button id="close-product-modal" class="text-gray-400 hover:text-gray-600">
+                    <i class="fas fa-times fa-2x"></i>
+                </button>
+            </div>
+            <div class="mt-5">
+                <form id="product-form">
+                    <input type="hidden" id="product-id">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="md:col-span-2">
+                             <label for="product-name" class="block text-sm font-medium text-gray-700">Product Name</label>
+                             <input type="text" id="product-name" class="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500" required>
+                        </div>
+                        <div>
+                             <label for="product-sku" class="block text-sm font-medium text-gray-700">SKU (Stock Keeping Unit)</label>
+                             <input type="text" id="product-sku" class="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500" required>
+                        </div>
+                        <div>
+                            <label for="product-stock" class="block text-sm font-medium text-gray-700">Current Stock</label>
+                            <input type="number" id="product-stock" min="0" class="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500" required>
+                        </div>
+                         <div>
+                            <label for="product-buy-price" class="block text-sm font-medium text-gray-700">Buy Price (Rs)</label>
+                            <input type="number" id="product-buy-price" min="0" step="0.01" class="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500" required>
+                        </div>
+                        <div>
+                            <label for="product-sell-price" class="block text-sm font-medium text-gray-700">Sell Price (Rs)</label>
+                            <input type="number" id="product-sell-price" min="0" step="0.01" class="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500" required>
+                        </div>
+                         <div class="md:col-span-2">
+                            <label for="low-stock-warning" class="block text-sm font-medium text-gray-700">Low Stock Warning Level</label>
+                            <input type="number" id="low-stock-warning" min="0" class="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500" placeholder="e.g., 10" required>
+                        </div>
+                         <div class="md:col-span-2">
+                            <label for="product-description" class="block text-sm font-medium text-gray-700">Product Description</label>
+                            <textarea id="product-description" rows="3" class="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"></textarea>
+                        </div>
+                    </div>
+                    <div class="mt-6 flex justify-end gap-4">
+                        <button type="button" id="cancel-product-form" class="bg-gray-200 text-gray-800 font-bold py-2 px-6 rounded-lg hover:bg-gray-300">Cancel</button>
+                        <button type="submit" class="bg-indigo-600 text-white font-bold py-2 px-6 rounded-lg hover:bg-indigo-700">Save Product</button>
                     </div>
                 </form>
             </div>
+        </div>
+    </div>
 
-            <!-- Reports Tab -->
-            <div class="tab-pane" id="reports">
-                <h2>Reports</h2>
-                <div class="info-grid">
-                    <div class="info-item">
-                        <div class="info-label">Total Employees</div>
-                        <div class="info-value" id="totalEmployees">0</div>
-                    </div>
-                    <div class="info-item">
-                        <div class="info-label">Active Employees</div>
-                        <div class="info-value" id="activeEmployees">0</div>
-                    </div>
-                    <div class="info-item">
-                        <div class="info-label">Inactive Employees</div>
-                        <div class="info-value" id="inactiveEmployees">0</div>
-                    </div>
-                    <div class="info-item">
-                        <div class="info-label">Monthly Salary Expense</div>
-                        <div class="info-value" id="monthlyExpense">Rs. 0</div>
-                    </div>
+    <!-- Bill Modal -->
+    <div id="bill-modal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-40 hidden">
+        <div class="relative top-5 mx-auto p-5 border w-full max-w-3xl shadow-lg rounded-md bg-white">
+            <div id="bill-content" class="p-8">
+                 <!-- Bill content will be generated here -->
+            </div>
+            <div id="bill-controls" class="mt-4 px-8 pb-4 flex justify-end gap-4">
+                 <button id="close-bill-modal" class="bg-gray-200 text-gray-800 font-bold py-2 px-6 rounded-lg hover:bg-gray-300">Close</button>
+                 <button id="print-bill-btn" class="bg-indigo-600 text-white font-bold py-2 px-6 rounded-lg hover:bg-indigo-700"><i class="fas fa-print mr-2"></i>Print Bill</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Custom Alert Modal -->
+    <div id="alert-modal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50 hidden">
+        <div class="relative top-1/4 mx-auto p-5 border w-full max-w-md shadow-lg rounded-md bg-white">
+            <div class="mt-3 text-center">
+                <div id="alert-icon" class="mx-auto flex items-center justify-center h-12 w-12 rounded-full">
+                    <!-- Icon here -->
                 </div>
-                
-                <div class="profile-section">
-                    <h3>Recent Activity</h3>
-                    <div id="recentActivity">
-                        <p>No recent activity</p>
-                    </div>
+                <h3 id="alert-title" class="text-lg leading-6 font-medium text-gray-900 mt-2"></h3>
+                <div class="mt-2 px-7 py-3">
+                    <p id="alert-message" class="text-sm text-gray-500"></p>
+                </div>
+                <div class="items-center px-4 py-3">
+                    <button id="alert-ok-btn" class="px-4 py-2 bg-indigo-500 text-white text-base font-medium rounded-md w-full shadow-sm hover:bg-indigo-600 focus:outline-none focus:ring-2 focus:ring-indigo-300">
+                        OK
+                    </button>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Employee Profile Modal -->
-    <div class="modal" id="employeeModal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2 class="modal-title">Employee Profile</h2>
-                <button class="close-modal">&times;</button>
-            </div>
-            
-            <div class="profile-header">
-                <div class="profile-avatar" id="modalProfilePic">
-                    <div class="empty-avatar">👤</div>
-                    <img src="" alt="Profile Picture" id="modalProfileImg" style="display: none;">
-                </div>
-                <div class="profile-info">
-                    <h2 id="modalEmpName"></h2>
-                    <p id="modalEmpDesignation"></p>
-                    <p>Employee ID: <span id="modalEmpId"></span></p>
-                    <span class="profile-status" id="modalEmpStatus"></span>
-                </div>
-            </div>
-            
-            <div class="nav-tabs">
-                <button class="active" data-tab="profile">Profile</button>
-                <button data-tab="salary">Salary</button>
-                <button data-tab="leave">Leave</button>
-                <button data-tab="documents">Documents</button>
-                <button data-tab="actions" style="margin-left: auto;">Actions</button>
-            </div>
-            
-            <div class="tab-content">
-                <!-- Profile Tab -->
-                <div class="tab-pane active" id="profile">
-                    <div class="profile-section">
-                        <h3>Personal Information</h3>
-                        <div class="info-grid">
-                            <div class="info-item">
-                                <div class="info-label">Father's Name</div>
-                                <div class="info-value" id="modalEmpFatherName"></div>
-                            </div>
-                            <div class="info-item">
-                                <div class="info-label">CNIC</div>
-                                <div class="info-value" id="modalEmpCnic"></div>
-                            </div>
-                            <div class="info-item">
-                                <div class="info-label">Date of Birth</div>
-                                <div class="info-value" id="modalEmpDob"></div>
-                            </div>
-                            <div class="info-item">
-                                <div class="info-label">Phone</div>
-                                <div class="info-value" id="modalEmpPhone"></div>
-                            </div>
-                            <div class="info-item">
-                                <div class="info-label">Email</div>
-                                <div class="info-value" id="modalEmpEmail"></div>
-                            </div>
-                            <div class="info-item">
-                                <div class="info-label">Address</div>
-                                <div class="info-value" id="modalEmpAddress"></div>
-                            </div>
-                            <div class="info-item">
-                                <div class="info-label">Mailing Address</div>
-                                <div class="info-value" id="modalEmpMailingAddress"></div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="profile-section">
-                        <h3>Employment Details</h3>
-                        <div class="info-grid">
-                            <div class="info-item">
-                                <div class="info-label">Joining Date</div>
-                                <div class="info-value" id="modalEmpJoiningDate"></div>
-                            </div>
-                            <div class="info-item">
-                                <div class="info-label">Time with Company</div>
-                                <div class="info-value" id="modalEmpTenure"></div>
-                            </div>
-                            <div class="info-item">
-                                <div class="info-label">Basic Salary</div>
-                                <div class="info-value" id="modalEmpSalary"></div>
-                            </div>
-                            <div class="info-item">
-                                <div class="info-label">Previous Experience</div>
-                                <div class="info-value" id="modalEmpExperience"></div>
-                            </div>
-                            <div class="info-item">
-                                <div class="info-label">Qualifications</div>
-                                <div class="info-value" id="modalEmpQualifications"></div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Salary Tab -->
-                <div class="tab-pane" id="salary">
-                    <div class="profile-section">
-                        <h3>Salary History</h3>
-                        <table class="salary-table">
-                            <thead>
-                                <tr>
-                                    <th>Month</th>
-                                    <th>Basic Salary</th>
-                                    <th>Allowances</th>
-                                    <th>Deductions</th>
-                                    <th>Net Salary</th>
-                                    <th>Payment Date</th>
-                                    <th>Status</th>
-                                </tr>
-                            </thead>
-                            <tbody id="salaryHistory">
-                                <tr><td colspan="7" style="text-align: center;">No salary records found</td></tr>
-                            </tbody>
-                        </table>
-                    </div>
-                    
-                    <div class="profile-section">
-                        <h3>Add Salary Record</h3>
-                        <form id="salaryForm">
-                            <div class="form-row">
-                                <div class="form-col">
-                                    <div class="form-group">
-                                        <label for="salaryMonth">Month</label>
-                                        <input type="month" id="salaryMonth" required>
-                                    </div>
-                                    <div class="form-group">
-                                        <label for="basicSalary">Basic Salary</label>
-                                        <input type="number" id="basicSalary" required>
-                                    </div>
-                                </div>
-                                <div class="form-col">
-                                    <div class="form-group">
-                                        <label for="allowances">Allowances</label>
-                                        <input type="number" id="allowances" value="0">
-                                    </div>
-                                    <div class="form-group">
-                                        <label for="deductions">Deductions</label>
-                                        <input type="number" id="deductions" value="0">
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="form-actions">
-                                <button type="submit" class="btn">Add Salary</button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-                
-                <!-- Leave Tab -->
-                <div class="tab-pane" id="leave">
-                    <div class="profile-section">
-                        <h3>Leave History</h3>
-                        <table class="leave-table">
-                            <thead>
-                                <tr>
-                                    <th>Start Date</th>
-                                    <th>End Date</th>
-                                    <th>Days</th>
-                                    <th>Type</th>
-                                    <th>Reason</th>
-                                    <th>Status</th>
-                                </tr>
-                            </thead>
-                            <tbody id="leaveHistory">
-                                <tr><td colspan="6" style="text-align: center;">No leave records found</td></tr>
-                            </tbody>
-                        </table>
-                    </div>
-                    
-                    <div class="profile-section">
-                        <h3>Add Leave Record</h3>
-                        <form id="leaveForm">
-                            <div class="form-row">
-                                <div class="form-col">
-                                    <div class="form-group">
-                                        <label for="leaveStart">Start Date</label>
-                                        <input type="date" id="leaveStart" required>
-                                    </div>
-                                    <div class="form-group">
-                                        <label for="leaveEnd">End Date</label>
-                                        <input type="date" id="leaveEnd" required>
-                                    </div>
-                                </div>
-                                <div class="form-col">
-                                    <div class="form-group">
-                                        <label for="leaveType">Leave Type</label>
-                                        <select id="leaveType" required>
-                                            <option value="Casual">Casual</option>
-                                            <option value="Sick">Sick</option>
-                                            <option value="Annual">Annual</option>
-                                            <option value="Other">Other</option>
-                                        </select>
-                                    </div>
-                                    <div class="form-group">
-                                        <label for="leaveReason">Reason</label>
-                                        <input type="text" id="leaveReason">
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="form-actions">
-                                <button type="submit" class="btn">Add Leave</button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-                
-                <!-- Documents Tab -->
-                <div class="tab-pane" id="documents">
-                    <div class="profile-section">
-                        <h3>Employee Documents</h3>
-                        <div class="document-list" id="documentList">
-                            <p>No documents found</p>
-                        </div>
-                    </div>
-                    
-                    <div class="profile-section">
-                        <h3>Upload Document</h3>
-                        <form id="documentForm">
-                            <div class="form-row">
-                                <div class="form-col">
-                                    <div class="form-group">
-                                        <label for="docType">Document Type</label>
-                                        <select id="docType" required>
-                                            <option value="CNIC">CNIC</option>
-                                            <option value="Degree">Degree</option>
-                                            <option value="Experience Certificate">Experience Certificate</option>
-                                            <option value="Contract">Contract</option>
-                                            <option value="Other">Other</option>
-                                        </select>
-                                    </div>
-                                </div>
-                                <div class="form-col">
-                                    <div class="form-group">
-                                        <label for="docDescription">Description</label>
-                                        <input type="text" id="docDescription">
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <div class="file-upload" id="docUpload">
-                                <div class="file-upload-icon">📄</div>
-                                <p>Click to upload document</p>
-                                <input type="file" id="documentFile" required>
-                            </div>
-                            
-                            <div class="form-actions">
-                                <button type="submit" class="btn">Upload Document</button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-                
-                <!-- Actions Tab -->
-                <div class="tab-pane" id="actions">
-                    <div class="profile-section">
-                        <h3>Employee Actions</h3>
-                        
-                        <div class="alert" id="actionAlert" style="display: none;"></div>
-                        
-                        <div class="form-row">
-                            <div class="form-col">
-                                <div class="form-group">
-                                    <label for="actionType">Action Type</label>
-                                    <select id="actionType" required>
-                                        <option value="">Select action</option>
-                                        <option value="Promotion">Promotion</option>
-                                        <option value="Salary Increment">Salary Increment</option>
-                                        <option value="Warning">Warning</option>
-                                        <option value="Termination">Termination</option>
-                                        <option value="Resignation">Resignation</option>
-                                    </select>
-                                </div>
-                                <div class="form-group">
-                                    <label for="actionDate">Date</label>
-                                    <input type="date" id="actionDate" required>
-                                </div>
-                            </div>
-                            <div class="form-col">
-                                <div class="form-group">
-                                    <label for="actionDetails">Details</label>
-                                    <textarea id="actionDetails" rows="3" required></textarea>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div class="form-actions">
-                            <button type="button" class="btn" id="saveActionBtn">Save Action</button>
-                            <button type="button" class="btn btn-danger" id="terminateBtn">Terminate Employee</button>
-                        </div>
-                    </div>
-                    
-                    <div class="profile-section">
-                        <h3>Action History</h3>
-                        <div id="actionHistory">
-                            <p>No actions recorded</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
 
-    <script>
-        // Empty employees array - you can add your own employees
-        let employees = [];
-
-        // DOM elements
-        const loginScreen = document.getElementById('loginScreen');
-        const dashboard = document.getElementById('dashboard');
-        const loginBtn = document.getElementById('loginBtn');
-        const logoutBtn = document.getElementById('logoutBtn');
-        const usernameInput = document.getElementById('username');
-        const passwordInput = document.getElementById('password');
-        const employeeList = document.getElementById('employeeList');
-        const searchEmployee = document.getElementById('searchEmployee');
-        const searchBtn = document.getElementById('searchBtn');
-        const employeeForm = document.getElementById('employeeForm');
-        const employeeModal = document.getElementById('employeeModal');
-        const closeModal = document.querySelector('.close-modal');
-        const profileUpload = document.getElementById('profileUpload');
-        const empProfilePic = document.getElementById('empProfilePic');
-        const documentFile = document.getElementById('documentFile');
-        const docUpload = document.getElementById('docUpload');
+    <script type="module">
+        // Firebase Imports
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged, setPersistence, browserLocalPersistence } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, getDoc, setDoc, updateDoc, deleteDoc, addDoc, collection, onSnapshot, query, where, getDocs, writeBatch, serverTimestamp, Timestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
         
-        // Login functionality
-        loginBtn.addEventListener('click', function() {
-            const username = usernameInput.value;
-            const password = passwordInput.value;
+        // --- CONFIGURATION ---
+        const firebaseConfig = {
+            apiKey: "AIzaSyByhc0hUr4lZKPlXBM8fHmKtvC55Bbw41w",
+            authDomain: "mycommissionapp.firebaseapp.com",
+            databaseURL: "https://mycommissionapp-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "mycommissionapp",
+            storageBucket: "mycommissionapp.firebasestorage.app",
+            messagingSenderId: "151893676114",
+            appId: "1:151893676114:web:98df620215962d521b0f8b",
+            measurementId: "G-62T33XNW7L"
+        };
+        const appId = 'nextgen-inventory-app';
+
+        // --- FIREBASE INITIALIZATION ---
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        const auth = getAuth(app);
+        
+        // --- GLOBAL STATE ---
+        let userId = null;
+        let settingsUnsubscribe = () => {};
+        let productsUnsubscribe = () => {};
+        let salesUnsubscribe = () => {};
+        let expensesUnsubscribe = () => {};
+        
+        let allProducts = [];
+        let allSales = [];
+        let allExpenses = [];
+        let shopSettings = {};
+        
+        let currentBill = {
+            items: [], // { productId, name, sellPrice, quantity, buyPrice }
+            discount: 0
+        };
+
+        // --- DOM ELEMENTS ---
+        const pages = document.querySelectorAll('.page');
+        const navLinks = document.querySelectorAll('.nav-item');
+        const pageTitle = document.getElementById('page-title');
+        const loadingOverlay = document.getElementById('loading-overlay');
+        
+        // --- CUSTOM ALERT FUNCTION ---
+        const showAlert = (title, message, type = 'info') => {
+            const alertModal = document.getElementById('alert-modal');
+            document.getElementById('alert-title').textContent = title;
+            document.getElementById('alert-message').textContent = message;
             
-            if (username === 'Darson' && password === 'AFRASIAB') {
-                loginScreen.style.display = 'none';
-                dashboard.style.display = 'block';
-                loadEmployees();
-                updateReports();
+            const iconContainer = document.getElementById('alert-icon');
+            if (type === 'success') {
+                iconContainer.className = 'mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-green-100';
+                iconContainer.innerHTML = `<i class="fas fa-check text-green-600 fa-lg"></i>`;
+            } else if (type === 'error') {
+                iconContainer.className = 'mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-red-100';
+                iconContainer.innerHTML = `<i class="fas fa-times text-red-600 fa-lg"></i>`;
             } else {
-                alert('Invalid username or password');
+                 iconContainer.className = 'mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-blue-100';
+                 iconContainer.innerHTML = `<i class="fas fa-info text-blue-600 fa-lg"></i>`;
+            }
+
+            alertModal.classList.remove('hidden');
+            document.getElementById('alert-ok-btn').onclick = () => alertModal.classList.add('hidden');
+        };
+
+        // --- AUTHENTICATION ---
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                console.log("User is signed in with UID:", user.uid);
+                userId = user.uid;
+                document.getElementById('user-id-display').textContent = userId;
+                await setupListeners();
+                // Check for settings, if not present, force settings page
+                const settingsRef = doc(db, `artifacts/${appId}/users/${userId}/settings/shop`);
+                const settingsSnap = await getDoc(settingsRef);
+                if (!settingsSnap.exists() || !settingsSnap.data().shopName) {
+                    navigateTo('settings');
+                    showAlert('Welcome!', 'Please set up your shop name and details to begin.', 'info');
+                } else {
+                    navigateTo(window.location.hash.substring(1) || 'dashboard');
+                }
+                loadingOverlay.classList.add('hidden');
             }
         });
-        
-        // Logout functionality
-        logoutBtn.addEventListener('click', function() {
-            dashboard.style.display = 'none';
-            loginScreen.style.display = 'flex';
-            usernameInput.value = '';
-            passwordInput.value = '';
-        });
-        
-        // Tab switching
-        document.querySelectorAll('.nav-tabs button').forEach(button => {
-            button.addEventListener('click', function() {
-                if (!this.dataset.tab) return;
-                
-                // Remove active class from all buttons and panes
-                this.parentElement.querySelectorAll('button').forEach(btn => {
-                    btn.classList.remove('active');
+
+        const initializeAuth = async () => {
+             try {
+                await setPersistence(auth, browserLocalPersistence);
+                // We will now use anonymous sign-in by default
+                await signInAnonymously(auth);
+            } catch (error) {
+                console.error("Authentication Error:", error);
+                showAlert('Authentication Failed', `Could not sign in. Error: ${error.message}`, 'error');
+                loadingOverlay.innerHTML = `<div class="text-center"><p class="text-lg font-medium text-red-700">Fatal Authentication Error</p><p class="text-sm text-gray-600 mt-2">${error.message}</p></div>`;
+            }
+        };
+
+        // --- DATA LISTENERS ---
+        async function setupListeners() {
+            if (!userId) return;
+
+            // Detach existing listeners
+            settingsUnsubscribe();
+            productsUnsubscribe();
+            salesUnsubscribe();
+            expensesUnsubscribe();
+            
+            // Settings Listener
+            const settingsRef = doc(db, `artifacts/${appId}/users/${userId}/settings/shop`);
+            settingsUnsubscribe = onSnapshot(settingsRef, (doc) => {
+                if (doc.exists()) {
+                    shopSettings = doc.data();
+                    updateUISettings();
+                }
+            }, (error) => console.error("Error listening to settings:", error));
+
+            // Products Listener
+            const productsRef = collection(db, `artifacts/${appId}/users/${userId}/products`);
+            productsUnsubscribe = onSnapshot(query(productsRef), (snapshot) => {
+                allProducts = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                renderProductsTable();
+                updateDashboardCards();
+            }, (error) => console.error("Error listening to products:", error));
+
+            // Sales Listener
+            const salesRef = collection(db, `artifacts/${appId}/users/${userId}/sales`);
+            salesUnsubscribe = onSnapshot(query(salesRef), (snapshot) => {
+                allSales = snapshot.docs.map(doc => {
+                    const data = doc.data();
+                    // Ensure date is a Date object
+                    const date = data.date && data.date.toDate ? data.date.toDate() : new Date();
+                    return { id: doc.id, ...data, date: date };
                 });
-                
-                this.parentElement.parentElement.querySelectorAll('.tab-pane').forEach(pane => {
-                    pane.classList.remove('active');
+                updateDashboardCards();
+                updateReports();
+            }, (error) => console.error("Error listening to sales:", error));
+
+            // Expenses Listener
+            const expensesRef = collection(db, `artifacts/${appId}/users/${userId}/expenses`);
+            expensesUnsubscribe = onSnapshot(query(expensesRef), (snapshot) => {
+                allExpenses = snapshot.docs.map(doc => {
+                    const data = doc.data();
+                     // Ensure date is a Date object
+                    const date = data.date && data.date.toDate ? data.date.toDate() : new Date();
+                    return { id: doc.id, ...data, date: date };
                 });
-                
-                // Add active class to clicked button and corresponding pane
-                this.classList.add('active');
-                document.getElementById(this.dataset.tab).classList.add('active');
+                updateReports();
+            }, (error) => console.error("Error listening to expenses:", error));
+        }
+
+        // --- UI RENDERING ---
+        function updateUISettings() {
+            if (shopSettings.shopName) {
+                document.getElementById('shop-name-header').textContent = shopSettings.shopName;
+                document.getElementById('shop-name').value = shopSettings.shopName;
+            }
+            if(shopSettings.shopAddress) document.getElementById('shop-address').value = shopSettings.shopAddress;
+            if(shopSettings.shopContact) document.getElementById('shop-contact').value = shopSettings.shopContact;
+        }
+        
+        // Navigation
+        function navigateTo(pageId) {
+            pages.forEach(page => page.classList.add('hidden'));
+            navLinks.forEach(link => link.classList.remove('active'));
+
+            const targetPage = document.getElementById(pageId || 'dashboard');
+            const targetLink = document.querySelector(`.nav-item[href="#${pageId || 'dashboard'}"]`);
+
+            if (targetPage) {
+                targetPage.classList.remove('hidden');
+                const title = pageId || 'dashboard';
+                pageTitle.textContent = title.charAt(0).toUpperCase() + title.slice(1);
+            }
+            if (targetLink) {
+                targetLink.classList.add('active');
+            }
+        }
+
+        window.addEventListener('hashchange', () => navigateTo(window.location.hash.substring(1)));
+        navLinks.forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                const pageId = e.currentTarget.getAttribute('href').substring(1);
+                window.location.hash = pageId;
             });
         });
         
-        // Load employees into the list
-        function loadEmployees(searchTerm = '') {
-            employeeList.innerHTML = '';
+        // --- DASHBOARD ---
+        function updateDashboardCards() {
+            document.getElementById('total-products').textContent = allProducts.length;
+
+            const lowStockCount = allProducts.filter(p => p.stock <= p.lowStockWarning).length;
+            document.getElementById('low-stock-items').textContent = lowStockCount;
             
-            const filteredEmployees = employees.filter(emp => 
-                emp.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
-                emp.designation.toLowerCase().includes(searchTerm.toLowerCase())
+            const todayStart = new Date();
+            todayStart.setHours(0, 0, 0, 0);
+            
+            const todaysSales = allSales.filter(s => s.date >= todayStart);
+            const totalSalesAmount = todaysSales.reduce((sum, s) => sum + s.totalAmount, 0);
+            const totalProfit = todaysSales.reduce((sum, s) => sum + s.totalProfit, 0);
+
+            document.getElementById('todays-sales-amount').textContent = `Rs ${totalSalesAmount.toFixed(2)}`;
+            document.getElementById('todays-profit').textContent = `Rs ${totalProfit.toFixed(2)}`;
+        }
+        
+        document.getElementById('dashboard-search').addEventListener('input', (e) => {
+            const query = e.target.value.toLowerCase();
+            const resultsContainer = document.getElementById('dashboard-search-results');
+            if (!query) {
+                resultsContainer.innerHTML = '';
+                return;
+            }
+            const results = allProducts.filter(p => p.name.toLowerCase().includes(query) || p.sku.toLowerCase().includes(query));
+            if (results.length > 0) {
+                resultsContainer.innerHTML = `
+                    <ul class="divide-y divide-gray-200 border rounded-md p-2">
+                        ${results.map(p => `
+                            <li class="p-3">
+                                <div class="flex justify-between items-center">
+                                    <div>
+                                        <p class="font-semibold text-gray-800">${p.name}</p>
+                                        <p class="text-sm text-gray-500">SKU: ${p.sku}</p>
+                                    </div>
+                                    <div class="text-right">
+                                        <p class="font-bold text-lg ${p.stock <= p.lowStockWarning ? 'text-red-500' : 'text-green-600'}">${p.stock}</p>
+                                        <p class="text-sm text-gray-500">in stock</p>
+                                    </div>
+                                </div>
+                            </li>
+                        `).join('')}
+                    </ul>`;
+            } else {
+                resultsContainer.innerHTML = `<p class="text-center text-gray-500 p-4">No products found.</p>`;
+            }
+        });
+
+
+        // --- STOCKS/INVENTORY ---
+        const productModal = document.getElementById('product-modal');
+        const productForm = document.getElementById('product-form');
+
+        const openProductModal = (product = null) => {
+            productForm.reset();
+            document.getElementById('product-id').value = '';
+            if (product) {
+                document.getElementById('product-modal-title').textContent = 'Edit Product';
+                document.getElementById('product-id').value = product.id;
+                document.getElementById('product-name').value = product.name;
+                document.getElementById('product-sku').value = product.sku;
+                document.getElementById('product-stock').value = product.stock;
+                document.getElementById('product-buy-price').value = product.buyPrice;
+                document.getElementById('product-sell-price').value = product.sellPrice;
+                document.getElementById('low-stock-warning').value = product.lowStockWarning;
+                document.getElementById('product-description').value = product.description || '';
+            } else {
+                document.getElementById('product-modal-title').textContent = 'Add New Product';
+            }
+            productModal.classList.remove('hidden');
+        };
+
+        const closeProductModal = () => productModal.classList.add('hidden');
+
+        document.getElementById('add-product-btn').addEventListener('click', () => openProductModal());
+        document.getElementById('close-product-modal').addEventListener('click', closeProductModal);
+        document.getElementById('cancel-product-form').addEventListener('click', closeProductModal);
+
+        productForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const productId = document.getElementById('product-id').value;
+            const productData = {
+                name: document.getElementById('product-name').value,
+                sku: document.getElementById('product-sku').value,
+                stock: parseInt(document.getElementById('product-stock').value),
+                buyPrice: parseFloat(document.getElementById('product-buy-price').value),
+                sellPrice: parseFloat(document.getElementById('product-sell-price').value),
+                lowStockWarning: parseInt(document.getElementById('low-stock-warning').value),
+                description: document.getElementById('product-description').value,
+                lastUpdated: serverTimestamp()
+            };
+
+            try {
+                if (productId) {
+                    // Update existing product
+                    const productRef = doc(db, `artifacts/${appId}/users/${userId}/products`, productId);
+                    await updateDoc(productRef, productData);
+                    showAlert('Success', 'Product updated successfully.', 'success');
+                } else {
+                    // Add new product
+                    const productsRef = collection(db, `artifacts/${appId}/users/${userId}/products`);
+                    await addDoc(productsRef, productData);
+                    showAlert('Success', 'Product added successfully.', 'success');
+                }
+                closeProductModal();
+            } catch (error) {
+                console.error("Error saving product: ", error);
+                showAlert('Error', `Failed to save product. ${error.message}`, 'error');
+            }
+        });
+        
+        const deleteProduct = async (productId) => {
+             if (confirm('Are you sure you want to delete this product? This action cannot be undone.')) {
+                try {
+                    const productRef = doc(db, `artifacts/${appId}/users/${userId}/products`, productId);
+                    await deleteDoc(productRef);
+                    showAlert('Success', 'Product deleted successfully.', 'success');
+                } catch (error) {
+                    console.error("Error deleting product: ", error);
+                    showAlert('Error', `Failed to delete product. ${error.message}`, 'error');
+                }
+            }
+        };
+
+        function renderProductsTable(filterQuery = '') {
+            const tableBody = document.getElementById('products-table');
+            const emptyMessage = document.getElementById('products-empty-message');
+            const filteredProducts = allProducts.filter(p => 
+                p.name.toLowerCase().includes(filterQuery) || 
+                p.sku.toLowerCase().includes(filterQuery)
             );
             
-            if (filteredEmployees.length === 0) {
-                employeeList.innerHTML = '<li class="employee-item">No employees found</li>';
+            if (filteredProducts.length === 0) {
+                tableBody.innerHTML = '';
+                emptyMessage.classList.remove('hidden');
                 return;
             }
             
-            filteredEmployees.forEach(emp => {
-                const li = document.createElement('li');
-                li.className = 'employee-item';
-                li.dataset.id = emp.id;
-                
-                li.innerHTML = `
-                    <div class="employee-avatar">
-                        ${emp.profilePic ? `<img src="${emp.profilePic}" alt="${emp.name}">` : '<div class="empty-avatar">👤</div>'}
-                    </div>
-                    <div class="employee-info">
-                        <div class="employee-name">${emp.name}</div>
-                        <div class="employee-designation">${emp.designation}</div>
-                    </div>
-                    <div class="employee-status ${emp.status === 'Active' ? 'status-active' : 'status-inactive'}">
-                        ${emp.status}
-                    </div>
+            emptyMessage.classList.add('hidden');
+            tableBody.innerHTML = filteredProducts.map(p => {
+                const profit = p.sellPrice - p.buyPrice;
+                const profitMargin = p.sellPrice > 0 ? (profit / p.sellPrice) * 100 : 0;
+                const isLowStock = p.stock <= p.lowStockWarning;
+
+                return `
+                    <tr class="${isLowStock ? 'bg-red-50' : ''}">
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="font-medium text-gray-900">${p.name}</div>
+                            ${isLowStock ? `<div class="text-xs text-red-600 font-bold low-stock-pulse">LOW STOCK</div>` : ''}
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${p.sku}</td>
+                        <td class="px-6 py-4 whitespace-nowrap font-bold text-lg ${isLowStock ? 'text-red-500' : 'text-gray-900'}">${p.stock}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Rs ${p.buyPrice.toFixed(2)}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Rs ${p.sellPrice.toFixed(2)}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm ${profit >= 0 ? 'text-green-600' : 'text-red-600'}">
+                            Rs ${profit.toFixed(2)} (${profitMargin.toFixed(1)}%)
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                            <button class="edit-btn text-indigo-600 hover:text-indigo-900 mr-4" data-id="${p.id}"><i class="fas fa-edit"></i></button>
+                            <button class="delete-btn text-red-600 hover:text-red-900" data-id="${p.id}"><i class="fas fa-trash"></i></button>
+                        </td>
+                    </tr>
                 `;
-                
-                li.addEventListener('click', function() {
-                    openEmployeeModal(emp.id);
-                });
-                
-                employeeList.appendChild(li);
-            });
+            }).join('');
         }
-        
-        // Search functionality
-        searchBtn.addEventListener('click', function() {
-            loadEmployees(searchEmployee.value);
-        });
-        
-        searchEmployee.addEventListener('keyup', function(e) {
-            if (e.key === 'Enter') {
-                loadEmployees(searchEmployee.value);
+
+        document.getElementById('stock-search').addEventListener('input', (e) => renderProductsTable(e.target.value.toLowerCase()));
+
+        document.getElementById('products-table').addEventListener('click', (e) => {
+            const editBtn = e.target.closest('.edit-btn');
+            if(editBtn) {
+                const product = allProducts.find(p => p.id === editBtn.dataset.id);
+                if (product) openProductModal(product);
+            }
+            
+            const deleteBtn = e.target.closest('.delete-btn');
+            if (deleteBtn) {
+                deleteProduct(deleteBtn.dataset.id);
             }
         });
         
-        // Add new employee
-        employeeForm.addEventListener('submit', function(e) {
-            e.preventDefault();
+        // --- BILLING ---
+        const billingSearchInput = document.getElementById('billing-search');
+        const billingSearchResultsContainer = document.getElementById('billing-search-results');
+        
+        billingSearchInput.addEventListener('input', (e) => {
+            const query = e.target.value.toLowerCase();
+            if (!query) {
+                billingSearchResultsContainer.innerHTML = '';
+                billingSearchResultsContainer.classList.add('hidden');
+                return;
+            }
             
-            const newEmployee = {
-                id: employees.length > 0 ? Math.max(...employees.map(emp => emp.id)) + 1 : 1,
-                name: document.getElementById('empName').value,
-                fatherName: document.getElementById('empFatherName').value,
-                cnic: document.getElementById('empCnic').value,
-                dob: document.getElementById('empDob').value,
-                phone: document.getElementById('empPhone').value,
-                email: document.getElementById('empEmail').value,
-                address: document.getElementById('empAddress').value,
-                mailingAddress: document.getElementById('empMailingAddress').value,
-                joiningDate: document.getElementById('empJoiningDate').value,
-                designation: document.getElementById('empDesignation').value,
-                salary: parseFloat(document.getElementById('empSalary').value),
-                experience: parseInt(document.getElementById('empExperience').value) || 0,
-                qualifications: document.getElementById('empQualifications').value,
-                profilePic: '',
-                status: "Active",
-                documents: [],
-                salaryHistory: [],
-                leaveHistory: [],
-                actions: [{
-                    type: "Hiring",
-                    date: document.getElementById('empJoiningDate').value,
-                    details: `Hired as ${document.getElementById('empDesignation').value} with salary Rs. ${document.getElementById('empSalary').value}`
-                }]
-            };
+            const results = allProducts.filter(p => (p.name.toLowerCase().includes(query) || p.sku.toLowerCase().includes(query)) && p.stock > 0);
             
-            // Handle profile picture upload
-            if (empProfilePic.files.length > 0) {
-                const file = empProfilePic.files[0];
-                const reader = new FileReader();
-                
-                reader.onload = function(e) {
-                    newEmployee.profilePic = e.target.result;
-                    employees.push(newEmployee);
-                    employeeForm.reset();
-                    profileUpload.querySelector('p').textContent = 'Click to upload profile picture';
-                    loadEmployees();
-                    updateReports();
-                    showAlert('Employee added successfully!', 'success');
-                    
-                    // Switch to employees tab
-                    document.querySelector('[data-tab="employees"]').click();
-                };
-                
-                reader.readAsDataURL(file);
+            if(results.length > 0) {
+                billingSearchResultsContainer.innerHTML = `
+                    <ul class="divide-y divide-gray-100">
+                        ${results.map(p => `
+                            <li class="p-3 hover:bg-indigo-100 cursor-pointer flex justify-between items-center add-to-bill-item" data-id="${p.id}">
+                                <div>
+                                    <p class="font-semibold text-gray-800">${p.name}</p>
+                                    <p class="text-sm text-gray-500">SKU: ${p.sku}</p>
+                                </div>
+                                <div>
+                                    <span class="font-medium text-gray-700">Rs ${p.sellPrice.toFixed(2)}</span>
+                                    <span class="ml-4 text-sm text-gray-500">(Stock: ${p.stock})</span>
+                                </div>
+                            </li>
+                        `).join('')}
+                    </ul>
+                `;
+                billingSearchResultsContainer.classList.remove('hidden');
             } else {
-                employees.push(newEmployee);
-                employeeForm.reset();
-                loadEmployees();
-                updateReports();
-                showAlert('Employee added successfully!', 'success');
-                
-                // Switch to employees tab
-                document.querySelector('[data-tab="employees"]').click();
+                 billingSearchResultsContainer.innerHTML = `<p class="p-3 text-center text-gray-500">No products found or out of stock.</p>`;
+                 billingSearchResultsContainer.classList.remove('hidden');
             }
         });
         
-        // Profile picture upload
-        profileUpload.addEventListener('click', function() {
-            empProfilePic.click();
-        });
-        
-        empProfilePic.addEventListener('change', function() {
-            if (this.files.length > 0) {
-                profileUpload.querySelector('p').textContent = this.files[0].name;
+        billingSearchResultsContainer.addEventListener('click', (e) => {
+            const item = e.target.closest('.add-to-bill-item');
+            if (item) {
+                const productId = item.dataset.id;
+                addProductToBill(productId);
+                billingSearchInput.value = '';
+                billingSearchResultsContainer.innerHTML = '';
+                billingSearchResultsContainer.classList.add('hidden');
             }
         });
         
-        // Document upload
-        docUpload.addEventListener('click', function() {
-            documentFile.click();
-        });
-        
-        documentFile.addEventListener('change', function() {
-            if (this.files.length > 0) {
-                docUpload.querySelector('p').textContent = this.files[0].name;
-            }
-        });
-        
-        // Open employee modal
-        function openEmployeeModal(employeeId) {
-            const emp = employees.find(e => e.id === employeeId);
-            if (!emp) return;
+        function addProductToBill(productId) {
+            const product = allProducts.find(p => p.id === productId);
+            if (!product) return;
             
-            // Calculate tenure
-            const joiningDate = new Date(emp.joiningDate);
-            const today = new Date();
-            const diffTime = Math.abs(today - joiningDate);
-            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-            const years = Math.floor(diffDays / 365);
-            const months = Math.floor((diffDays % 365) / 30);
-            const days = diffDays % 30;
-            const tenure = `${years} years, ${months} months, ${days} days`;
-            
-            // Set profile info
-            document.getElementById('modalEmpName').textContent = emp.name;
-            document.getElementById('modalEmpDesignation').textContent = emp.designation;
-            document.getElementById('modalEmpId').textContent = emp.id;
-            document.getElementById('modalEmpStatus').textContent = emp.status;
-            document.getElementById('modalEmpStatus').className = `profile-status ${emp.status === 'Active' ? 'status-active' : 'status-inactive'}`;
-            
-            // Set profile picture
-            const profileImg = document.getElementById('modalProfileImg');
-            const emptyAvatar = document.querySelector('#modalProfilePic .empty-avatar');
-            if (emp.profilePic) {
-                profileImg.src = emp.profilePic;
-                profileImg.style.display = 'block';
-                if (emptyAvatar) emptyAvatar.style.display = 'none';
+            const existingItem = currentBill.items.find(i => i.productId === productId);
+            if (existingItem) {
+                 if (existingItem.quantity < product.stock) {
+                    existingItem.quantity++;
+                 } else {
+                    showAlert('Stock Limit', `Cannot add more of ${product.name}. Only ${product.stock} available.`, 'info');
+                 }
             } else {
-                profileImg.style.display = 'none';
-                if (emptyAvatar) emptyAvatar.style.display = 'flex';
+                currentBill.items.push({
+                    productId: product.id,
+                    name: product.name,
+                    sellPrice: product.sellPrice,
+                    buyPrice: product.buyPrice,
+                    quantity: 1,
+                    maxStock: product.stock
+                });
             }
+            renderBillItems();
+        }
+
+        function renderBillItems() {
+            const tableBody = document.getElementById('bill-items-table');
+            const emptyMsg = document.getElementById('bill-empty-message');
             
-            // Set personal info
-            document.getElementById('modalEmpFatherName').textContent = emp.fatherName;
-            document.getElementById('modalEmpCnic').textContent = emp.cnic;
-            document.getElementById('modalEmpDob').textContent = formatDate(emp.dob);
-            document.getElementById('modalEmpPhone').textContent = emp.phone;
-            document.getElementById('modalEmpEmail').textContent = emp.email || 'N/A';
-            document.getElementById('modalEmpAddress').textContent = emp.address;
-            document.getElementById('modalEmpMailingAddress').textContent = emp.mailingAddress || 'Same as address';
-            
-            // Set employment info
-            document.getElementById('modalEmpJoiningDate').textContent = formatDate(emp.joiningDate);
-            document.getElementById('modalEmpTenure').textContent = tenure;
-            document.getElementById('modalEmpSalary').textContent = `Rs. ${emp.salary.toLocaleString()}`;
-            document.getElementById('modalEmpExperience').textContent = `${emp.experience} years`;
-            document.getElementById('modalEmpQualifications').textContent = emp.qualifications || 'N/A';
-            
-            // Load salary history
-            loadSalaryHistory(emp.id);
-            
-            // Load leave history
-            loadLeaveHistory(emp.id);
-            
-            // Load documents
-            loadDocuments(emp.id);
-            
-            // Load action history
-            loadActionHistory(emp.id);
-            
-            // Set up salary form
-            document.getElementById('salaryForm').dataset.employeeId = emp.id;
-            document.getElementById('basicSalary').value = emp.salary;
-            
-            // Set up leave form
-            document.getElementById('leaveForm').dataset.employeeId = emp.id;
-            
-            // Set up document form
-            document.getElementById('documentForm').dataset.employeeId = emp.id;
-            
-            // Set up action buttons
-            document.getElementById('saveActionBtn').dataset.employeeId = emp.id;
-            document.getElementById('terminateBtn').dataset.employeeId = emp.id;
-            
-            // Show modal
-            employeeModal.style.display = 'flex';
+            if (currentBill.items.length === 0) {
+                tableBody.innerHTML = '';
+                emptyMsg.classList.remove('hidden');
+                tableBody.parentElement.parentElement.parentElement.classList.add('hidden');
+            } else {
+                emptyMsg.classList.add('hidden');
+                tableBody.parentElement.parentElement.parentElement.classList.remove('hidden');
+                tableBody.innerHTML = currentBill.items.map((item, index) => `
+                    <tr>
+                        <td class="py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-0">${item.name}</td>
+                        <td class="px-3 py-4 text-sm text-gray-500">Rs ${item.sellPrice.toFixed(2)}</td>
+                        <td class="px-3 py-4 text-sm text-gray-500">
+                            <input type="number" value="${item.quantity}" min="1" max="${item.maxStock}" data-index="${index}" class="bill-item-qty w-16 p-1 border rounded-md text-center">
+                        </td>
+                        <td class="px-3 py-4 text-sm text-gray-700 font-semibold">Rs ${(item.sellPrice * item.quantity).toFixed(2)}</td>
+                        <td class="relative py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-0">
+                            <button class="remove-bill-item-btn text-red-500 hover:text-red-700" data-index="${index}"><i class="fas fa-trash"></i></button>
+                        </td>
+                    </tr>
+                `).join('');
+            }
+            updateBillSummary();
         }
         
-        // Close modal
-        closeModal.addEventListener('click', function() {
-            employeeModal.style.display = 'none';
-        });
-        
-        // Close modal when clicking outside
-        window.addEventListener('click', function(e) {
-            if (e.target === employeeModal) {
-                employeeModal.style.display = 'none';
+        document.getElementById('bill-items-table').addEventListener('change', (e) => {
+            if (e.target.classList.contains('bill-item-qty')) {
+                const index = e.target.dataset.index;
+                const newQty = parseInt(e.target.value);
+                const item = currentBill.items[index];
+                if (newQty > item.maxStock) {
+                    e.target.value = item.maxStock;
+                     showAlert('Stock Limit', `Only ${item.maxStock} units of ${item.name} are available.`, 'info');
+                }
+                currentBill.items[index].quantity = parseInt(e.target.value);
+                renderBillItems();
             }
         });
         
-        // Tab switching in modal
-        employeeModal.querySelectorAll('.nav-tabs button').forEach(button => {
-            button.addEventListener('click', function() {
-                if (!this.dataset.tab) return;
-                
-                // Remove active class from all buttons and panes
-                this.parentElement.querySelectorAll('button').forEach(btn => {
-                    btn.classList.remove('active');
-                });
-                
-                employeeModal.querySelectorAll('.tab-content .tab-pane').forEach(pane => {
-                    pane.classList.remove('active');
-                });
-                
-                // Add active class to clicked button and corresponding pane
-                this.classList.add('active');
-                employeeModal.querySelector(`#${this.dataset.tab}`).classList.add('active');
-            });
-        });
-        
-        // Load salary history
-        function loadSalaryHistory(employeeId) {
-            const emp = employees.find(e => e.id === employeeId);
-            if (!emp) return;
-            
-            const tbody = document.getElementById('salaryHistory');
-            tbody.innerHTML = '';
-            
-            if (emp.salaryHistory.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="7" style="text-align: center;">No salary records found</td></tr>';
-                return;
+        document.getElementById('bill-items-table').addEventListener('click', (e) => {
+            const btn = e.target.closest('.remove-bill-item-btn');
+            if (btn) {
+                currentBill.items.splice(btn.dataset.index, 1);
+                renderBillItems();
             }
+        });
+
+        function updateBillSummary() {
+            const subtotal = currentBill.items.reduce((sum, item) => sum + (item.sellPrice * item.quantity), 0);
+            const discountPercent = parseFloat(document.getElementById('bill-discount').value) || 0;
+            const discountAmount = subtotal * (discountPercent / 100);
+            const total = subtotal - discountAmount;
             
-            emp.salaryHistory.forEach(salary => {
-                const tr = document.createElement('tr');
-                tr.innerHTML = `
-                    <td>${salary.month}</td>
-                    <td>Rs. ${salary.basicSalary.toLocaleString()}</td>
-                    <td>Rs. ${salary.allowances.toLocaleString()}</td>
-                    <td>Rs. ${salary.deductions.toLocaleString()}</td>
-                    <td>Rs. ${(salary.basicSalary + salary.allowances - salary.deductions).toLocaleString()}</td>
-                    <td>${formatDate(salary.paymentDate)}</td>
-                    <td>${salary.status}</td>
-                `;
-                tbody.appendChild(tr);
-            });
+            document.getElementById('bill-subtotal').textContent = `Rs ${subtotal.toFixed(2)}`;
+            document.getElementById('bill-total').textContent = `Rs ${total.toFixed(2)}`;
+            
+            document.getElementById('generate-bill-btn').disabled = currentBill.items.length === 0;
         }
+
+        document.getElementById('bill-discount').addEventListener('input', updateBillSummary);
         
-        // Add salary record
-        document.getElementById('salaryForm').addEventListener('submit', function(e) {
-            e.preventDefault();
+        function resetBill() {
+            currentBill = { items: [], discount: 0 };
+            document.getElementById('customer-name').value = '';
+            document.getElementById('customer-contact').value = '';
+            document.getElementById('bill-discount').value = 0;
+            renderBillItems();
+        }
+
+        document.getElementById('generate-bill-btn').addEventListener('click', async () => {
+            if (currentBill.items.length === 0) return;
             
-            const employeeId = parseInt(this.dataset.employeeId);
-            const emp = employees.find(e => e.id === employeeId);
-            if (!emp) return;
-            
-            const salaryRecord = {
-                month: document.getElementById('salaryMonth').value,
-                basicSalary: parseFloat(document.getElementById('basicSalary').value),
-                allowances: parseFloat(document.getElementById('allowances').value) || 0,
-                deductions: parseFloat(document.getElementById('deductions').value) || 0,
-                paymentDate: new Date().toISOString().split('T')[0],
-                status: "Paid"
+            const subtotal = currentBill.items.reduce((sum, item) => sum + (item.sellPrice * item.quantity), 0);
+            const discountPercent = parseFloat(document.getElementById('bill-discount').value) || 0;
+            const discountAmount = subtotal * (discountPercent / 100);
+            const totalAmount = subtotal - discountAmount;
+            const totalProfit = currentBill.items.reduce((sum, item) => sum + ((item.sellPrice - item.buyPrice) * item.quantity), 0);
+
+            const saleData = {
+                date: serverTimestamp(),
+                customerName: document.getElementById('customer-name').value || 'N/A',
+                customerContact: document.getElementById('customer-contact').value || 'N/A',
+                items: currentBill.items,
+                subtotal: subtotal,
+                discountPercent: discountPercent,
+                discountAmount: discountAmount,
+                totalAmount: totalAmount,
+                totalProfit: totalProfit
             };
-            
-            emp.salaryHistory.push(salaryRecord);
-            loadSalaryHistory(employeeId);
-            this.reset();
-            document.getElementById('basicSalary').value = emp.salary;
-            
-            showAlert('Salary record added successfully!', 'success');
-            updateReports();
-        });
-        
-        // Load leave history
-        function loadLeaveHistory(employeeId) {
-            const emp = employees.find(e => e.id === employeeId);
-            if (!emp) return;
-            
-            const tbody = document.getElementById('leaveHistory');
-            tbody.innerHTML = '';
-            
-            if (emp.leaveHistory.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="6" style="text-align: center;">No leave records found</td></tr>';
-                return;
-            }
-            
-            emp.leaveHistory.forEach(leave => {
-                const startDate = new Date(leave.startDate);
-                const endDate = new Date(leave.endDate);
-                const diffTime = Math.abs(endDate - startDate);
-                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1;
+
+            try {
+                // Use a batch write to ensure atomicity
+                const batch = writeBatch(db);
                 
-                const tr = document.createElement('tr');
-                tr.innerHTML = `
-                    <td>${formatDate(leave.startDate)}</td>
-                    <td>${formatDate(leave.endDate)}</td>
-                    <td>${diffDays}</td>
-                    <td>${leave.type}</td>
-                    <td>${leave.reason || 'N/A'}</td>
-                    <td class="status-${leave.status.toLowerCase()}">${leave.status}</td>
-                `;
-                tbody.appendChild(tr);
-            });
-        }
-        
-        // Add leave record
-        document.getElementById('leaveForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-            
-            const employeeId = parseInt(this.dataset.employeeId);
-            const emp = employees.find(e => e.id === employeeId);
-            if (!emp) return;
-            
-            const leaveRecord = {
-                startDate: document.getElementById('leaveStart').value,
-                endDate: document.getElementById('leaveEnd').value,
-                type: document.getElementById('leaveType').value,
-                reason: document.getElementById('leaveReason').value,
-                status: "Approved"
-            };
-            
-            emp.leaveHistory.push(leaveRecord);
-            loadLeaveHistory(employeeId);
-            this.reset();
-            
-            showAlert('Leave record added successfully!', 'success');
-            updateReports();
-        });
-        
-        // Load documents
-        function loadDocuments(employeeId) {
-            const emp = employees.find(e => e.id === employeeId);
-            if (!emp) return;
-            
-            const documentList = document.getElementById('documentList');
-            documentList.innerHTML = '';
-            
-            if (emp.documents.length === 0) {
-                documentList.innerHTML = '<p>No documents found</p>';
-                return;
-            }
-            
-            emp.documents.forEach(doc => {
-                const docItem = document.createElement('div');
-                docItem.className = 'document-item';
-                docItem.innerHTML = `
-                    <div class="document-icon">📄</div>
-                    <div class="document-name">${doc.type}</div>
-                    <div class="document-date">${formatDate(doc.uploadDate)}</div>
-                    <div class="document-actions">
-                        <button class="view-doc" data-url="${doc.url}">View</button>
-                        <button class="delete-doc" data-id="${doc.id}">Delete</button>
-                    </div>
-                `;
+                // 1. Add the sale document
+                const salesRef = collection(db, `artifacts/${appId}/users/${userId}/sales`);
+                const saleDocRef = doc(salesRef); // Automatically generate ID
+                batch.set(saleDocRef, saleData);
                 
-                documentList.appendChild(docItem);
-            });
-            
-            // Add event listeners for document actions
-            document.querySelectorAll('.view-doc').forEach(btn => {
-                btn.addEventListener('click', function() {
-                    window.open(this.dataset.url, '_blank');
-                });
-            });
-            
-            document.querySelectorAll('.delete-doc').forEach(btn => {
-                btn.addEventListener('click', function() {
-                    if (confirm('Are you sure you want to delete this document?')) {
-                        const docId = this.dataset.id;
-                        emp.documents = emp.documents.filter(d => d.id !== docId);
-                        loadDocuments(employeeId);
-                        showAlert('Document deleted successfully!', 'success');
+                // 2. Update stock for each product
+                for (const item of currentBill.items) {
+                    const productRef = doc(db, `artifacts/${appId}/users/${userId}/products`, item.productId);
+                    const product = allProducts.find(p => p.id === item.productId);
+                    if (product) {
+                        const newStock = product.stock - item.quantity;
+                        batch.update(productRef, { stock: newStock });
                     }
-                });
-            });
-        }
-        
-        // Add document
-        document.getElementById('documentForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-            
-            const employeeId = parseInt(this.dataset.employeeId);
-            const emp = employees.find(e => e.id === employeeId);
-            if (!emp) return;
-            
-            if (documentFile.files.length === 0) {
-                showAlert('Please select a document to upload', 'error');
-                return;
+                }
+                
+                await batch.commit();
+
+                // Generate and show bill modal
+                generateBillHTML(saleData, saleDocRef.id);
+                document.getElementById('bill-modal').classList.remove('hidden');
+
+                showAlert('Success', 'Sale recorded and stock updated.', 'success');
+                resetBill();
+            } catch (error) {
+                 console.error("Error processing sale: ", error);
+                 showAlert('Error', `Failed to process sale. ${error.message}`, 'error');
             }
-            
-            const file = documentFile.files[0];
-            const reader = new FileReader();
-            
-            reader.onload = function(e) {
-                const newDoc = {
-                    id: Date.now(),
-                    type: document.getElementById('docType').value,
-                    description: document.getElementById('docDescription').value,
-                    uploadDate: new Date().toISOString().split('T')[0],
-                    url: e.target.result
-                };
-                
-                emp.documents.push(newDoc);
-                loadDocuments(employeeId);
-                document.getElementById('documentForm').reset();
-                docUpload.querySelector('p').textContent = 'Click to upload document';
-                
-                showAlert('Document uploaded successfully!', 'success');
-            };
-            
-            reader.readAsDataURL(file);
         });
-        
-        // Load action history
-        function loadActionHistory(employeeId) {
-            const emp = employees.find(e => e.id === employeeId);
-            if (!emp) return;
-            
-            const actionHistory = document.getElementById('actionHistory');
-            actionHistory.innerHTML = '';
-            
-            if (emp.actions.length === 0) {
-                actionHistory.innerHTML = '<p>No actions recorded</p>';
-                return;
-            }
-            
-            emp.actions.forEach(action => {
-                const actionItem = document.createElement('div');
-                actionItem.className = 'info-item';
-                actionItem.innerHTML = `
-                    <div class="info-label">${action.type} - ${formatDate(action.date)}</div>
-                    <div class="info-value">${action.details}</div>
-                `;
-                actionHistory.appendChild(actionItem);
-            });
+
+        function generateBillHTML(sale, saleId) {
+             const billContent = document.getElementById('bill-content');
+             const now = new Date();
+             
+             billContent.innerHTML = `
+                <div class="border-b-2 border-dashed pb-4 mb-4">
+                    <h2 class="text-3xl font-bold text-center">${shopSettings.shopName || 'Your Shop'}</h2>
+                    <p class="text-center text-sm text-gray-600">${shopSettings.shopAddress || ''}</p>
+                    <p class="text-center text-sm text-gray-600">${shopSettings.shopContact || ''}</p>
+                </div>
+                <div class="flex justify-between text-sm mb-4">
+                    <div>
+                        <p><strong>Bill ID:</strong> ${saleId}</p>
+                        <p><strong>Date:</strong> ${now.toLocaleDateString()} ${now.toLocaleTimeString()}</p>
+                    </div>
+                     <div>
+                        <p><strong>Customer:</strong> ${sale.customerName}</p>
+                        <p><strong>Contact:</strong> ${sale.customerContact}</p>
+                    </div>
+                </div>
+                <table class="w-full text-sm">
+                    <thead>
+                        <tr class="border-b">
+                            <th class="text-left py-2">Item</th>
+                            <th class="text-center py-2">Qty</th>
+                            <th class="text-right py-2">Price</th>
+                            <th class="text-right py-2">Total</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${sale.items.map(item => `
+                        <tr>
+                            <td class="py-1">${item.name}</td>
+                            <td class="text-center py-1">${item.quantity}</td>
+                            <td class="text-right py-1">${item.sellPrice.toFixed(2)}</td>
+                            <td class="text-right py-1">${(item.quantity * item.sellPrice).toFixed(2)}</td>
+                        </tr>
+                        `).join('')}
+                    </tbody>
+                    <tfoot class="border-t-2 border-dashed">
+                        <tr>
+                            <td colspan="3" class="text-right py-1 pt-4">Subtotal:</td>
+                            <td class="text-right py-1 pt-4">${sale.subtotal.toFixed(2)}</td>
+                        </tr>
+                         <tr>
+                            <td colspan="3" class="text-right py-1">Discount (${sale.discountPercent}%):</td>
+                            <td class="text-right py-1">-${sale.discountAmount.toFixed(2)}</td>
+                        </tr>
+                        <tr>
+                            <td colspan="3" class="text-right font-bold text-lg py-2">Total:</td>
+                            <td class="text-right font-bold text-lg py-2">Rs ${sale.totalAmount.toFixed(2)}</td>
+                        </tr>
+                    </tfoot>
+                </table>
+                <div class="text-center text-xs text-gray-500 mt-8">
+                    Thank you for your purchase!
+                </div>
+             `;
         }
-        
-        // Save employee action
-        document.getElementById('saveActionBtn').addEventListener('click', function() {
-            const employeeId = parseInt(this.dataset.employeeId);
-            const emp = employees.find(e => e.id === employeeId);
-            if (!emp) return;
-            
-            const actionType = document.getElementById('actionType').value;
-            const actionDate = document.getElementById('actionDate').value;
-            const actionDetails = document.getElementById('actionDetails').value;
-            
-            if (!actionType || !actionDate || !actionDetails) {
-                showAlert('Please fill all action fields', 'error');
-                return;
+
+        document.getElementById('close-bill-modal').addEventListener('click', () => {
+             document.getElementById('bill-modal').classList.add('hidden');
+        });
+
+        document.getElementById('print-bill-btn').addEventListener('click', () => {
+            window.print();
+        });
+
+        // --- REPORTS ---
+        const reportPeriodSelect = document.getElementById('report-period');
+        const customDateRange = document.getElementById('custom-date-range');
+        const startDateInput = document.getElementById('start-date');
+        const endDateInput = document.getElementById('end-date');
+
+        reportPeriodSelect.addEventListener('change', () => {
+            if (reportPeriodSelect.value === 'custom') {
+                customDateRange.classList.remove('hidden');
+            } else {
+                customDateRange.classList.add('hidden');
             }
-            
-            const newAction = {
-                type: actionType,
-                date: actionDate,
-                details: actionDetails
-            };
-            
-            emp.actions.push(newAction);
-            loadActionHistory(employeeId);
-            
-            // Handle specific actions
-            if (actionType === 'Salary Increment') {
-                const incrementMatch = actionDetails.match(/(\d+)/);
-                if (incrementMatch) {
-                    const incrementAmount = parseFloat(incrementMatch[0]);
-                    emp.salary += incrementAmount;
-                    document.getElementById('modalEmpSalary').textContent = `Rs. ${emp.salary.toLocaleString()}`;
-                    document.getElementById('basicSalary').value = emp.salary;
-                }
-            } else if (actionType === 'Promotion') {
-                const promotionMatch = actionDetails.match(/to (.+)/i);
-                if (promotionMatch) {
-                    emp.designation = promotionMatch[1];
-                    document.getElementById('modalEmpDesignation').textContent = emp.designation;
-                }
-            }
-            
-            // Reset form
-            document.getElementById('actionType').value = '';
-            document.getElementById('actionDate').value = '';
-            document.getElementById('actionDetails').value = '';
-            
-            showAlert('Action saved successfully!', 'success');
             updateReports();
         });
-        
-        // Terminate employee
-        document.getElementById('terminateBtn').addEventListener('click', function() {
-            const employeeId = parseInt(this.dataset.employeeId);
-            const emp = employees.find(e => e.id === employeeId);
-            if (!emp) return;
+        startDateInput.addEventListener('change', updateReports);
+        endDateInput.addEventListener('change', updateReports);
+
+        function updateReports() {
+            let { start, end } = getDateRange();
+
+            const filteredSales = allSales.filter(s => s.date >= start && s.date <= end);
+            const filteredExpenses = allExpenses.filter(e => e.date >= start && e.date <= end);
             
-            if (confirm('Are you sure you want to terminate this employee?')) {
-                emp.status = 'Terminated';
-                
-                const terminationDate = new Date().toISOString().split('T')[0];
-                const terminationDetails = `Employee terminated on ${formatDate(terminationDate)}`;
-                
-                emp.actions.push({
-                    type: 'Termination',
-                    date: terminationDate,
-                    details: terminationDetails
-                });
-                
-                // Update UI
-                document.getElementById('modalEmpStatus').textContent = 'Terminated';
-                document.getElementById('modalEmpStatus').className = 'profile-status status-inactive';
-                loadActionHistory(employeeId);
-                
-                showAlert('Employee terminated successfully!', 'success');
-                updateReports();
-                
-                // Close modal after 2 seconds
-                setTimeout(() => {
-                    employeeModal.style.display = 'none';
-                    loadEmployees();
-                }, 2000);
+            const totalRevenue = filteredSales.reduce((sum, s) => sum + s.totalAmount, 0);
+            const totalProfit = filteredSales.reduce((sum, s) => sum + s.totalProfit, 0);
+            const totalExpenses = filteredExpenses.reduce((sum, e) => sum + e.amount, 0);
+            const netProfit = totalProfit - totalExpenses;
+
+            document.getElementById('report-total-revenue').textContent = `Rs ${totalRevenue.toFixed(2)}`;
+            document.getElementById('report-total-profit').textContent = `Rs ${totalProfit.toFixed(2)}`;
+            document.getElementById('report-total-expenses').textContent = `Rs ${totalExpenses.toFixed(2)}`;
+            document.getElementById('report-net-profit').textContent = `Rs ${netProfit.toFixed(2)}`;
+            
+            renderSalesReportTable(filteredSales);
+            renderExpensesTable(filteredExpenses);
+        }
+
+        function getDateRange() {
+            const period = reportPeriodSelect.value;
+            const now = new Date();
+            let start = new Date(now);
+            let end = new Date(now);
+
+            if (period === 'daily') {
+                start.setHours(0, 0, 0, 0);
+                end.setHours(23, 59, 59, 999);
+            } else if (period === 'weekly') {
+                const day = start.getDay();
+                start.setDate(start.getDate() - day + (day === 0 ? -6 : 1)); // Adjust to Monday
+                start.setHours(0, 0, 0, 0);
+                end = new Date(start);
+                end.setDate(end.getDate() + 6);
+                end.setHours(23, 59, 59, 999);
+            } else if (period === 'monthly') {
+                start = new Date(now.getFullYear(), now.getMonth(), 1);
+                end = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+                end.setHours(23, 59, 59, 999);
+            } else if (period === 'custom') {
+                start = startDateInput.value ? new Date(startDateInput.value) : new Date(0);
+                start.setHours(0,0,0,0);
+                end = endDateInput.value ? new Date(endDateInput.value) : new Date();
+                end.setHours(23,59,59,999);
+            }
+            return { start, end };
+        }
+
+        function renderSalesReportTable(sales) {
+            const tableBody = document.getElementById('sales-report-table');
+            if (sales.length === 0) {
+                tableBody.innerHTML = `<tr><td colspan="4" class="text-center py-4 text-gray-500">No sales data for this period.</td></tr>`;
+                return;
+            }
+            tableBody.innerHTML = sales.sort((a,b) => b.date - a.date).map(s => `
+                <tr>
+                    <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-600">${s.date.toLocaleDateString()}</td>
+                    <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-800 font-medium">Rs ${s.totalAmount.toFixed(2)}</td>
+                    <td class="px-4 py-3 whitespace-nowrap text-sm text-green-600 font-medium">Rs ${s.totalProfit.toFixed(2)}</td>
+                    <td class="px-4 py-3 text-sm text-gray-500">${s.items.map(i => `${i.name} (x${i.quantity})`).join(', ')}</td>
+                </tr>
+            `).join('');
+        }
+        
+        function renderExpensesTable(expenses) {
+            const tableBody = document.getElementById('expenses-table');
+             if (expenses.length === 0) {
+                tableBody.innerHTML = `<tr><td colspan="2" class="text-center py-4 text-gray-500">No expenses logged.</td></tr>`;
+                return;
+            }
+            tableBody.innerHTML = expenses.sort((a,b) => b.date - a.date).map(e => `
+                <tr>
+                    <td class="px-2 py-2 text-sm text-gray-600">${e.description} on ${e.date.toLocaleDateString()}</td>
+                    <td class="px-2 py-2 text-sm text-gray-800 font-medium">Rs ${e.amount.toFixed(2)}</td>
+                </tr>
+            `).join('');
+        }
+
+        document.getElementById('expense-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const expenseData = {
+                description: document.getElementById('expense-description').value,
+                amount: parseFloat(document.getElementById('expense-amount').value),
+                date: Timestamp.fromDate(new Date(document.getElementById('expense-date').value))
+            };
+
+            if (!expenseData.description || !expenseData.amount || !document.getElementById('expense-date').value) {
+                showAlert('Invalid Input', 'Please fill all expense fields.', 'error');
+                return;
+            }
+
+            try {
+                const expensesRef = collection(db, `artifacts/${appId}/users/${userId}/expenses`);
+                await addDoc(expensesRef, expenseData);
+                showAlert('Success', 'Expense added successfully.', 'success');
+                e.target.reset();
+                document.getElementById('expense-date').valueAsDate = new Date();
+            } catch (error) {
+                console.error("Error adding expense: ", error);
+                showAlert('Error', `Failed to add expense. ${error.message}`, 'error');
             }
         });
-        
-        // Update reports
-        function updateReports() {
-            const totalEmployees = employees.length;
-            const activeEmployees = employees.filter(emp => emp.status === 'Active').length;
-            const inactiveEmployees = totalEmployees - activeEmployees;
-            const monthlyExpense = employees.reduce((sum, emp) => sum + (emp.status === 'Active' ? emp.salary : 0), 0);
-            
-            document.getElementById('totalEmployees').textContent = totalEmployees;
-            document.getElementById('activeEmployees').textContent = activeEmployees;
-            document.getElementById('inactiveEmployees').textContent = inactiveEmployees;
-            document.getElementById('monthlyExpense').textContent = `Rs. ${monthlyExpense.toLocaleString()}`;
-            
-            // Update recent activity
-            const recentActivity = document.getElementById('recentActivity');
-            recentActivity.innerHTML = '';
-            
-            if (employees.length === 0) {
-                recentActivity.innerHTML = '<p>No recent activity</p>';
+        document.getElementById('expense-date').valueAsDate = new Date(); // set default date for expense form
+
+
+        // --- SETTINGS ---
+        document.getElementById('settings-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const settingsData = {
+                shopName: document.getElementById('shop-name').value,
+                shopAddress: document.getElementById('shop-address').value,
+                shopContact: document.getElementById('shop-contact').value
+            };
+            try {
+                const settingsRef = doc(db, `artifacts/${appId}/users/${userId}/settings/shop`);
+                await setDoc(settingsRef, settingsData, { merge: true });
+                showAlert('Success', 'Settings saved successfully!', 'success');
+            } catch(error) {
+                console.error("Error saving settings: ", error);
+                showAlert('Error', 'Could not save settings.', 'error');
+            }
+        });
+
+        // --- DATA EXPORT/IMPORT ---
+        function exportToCSV(data, filename) {
+            if (data.length === 0) {
+                showAlert('No Data', 'There is no data to export.', 'info');
                 return;
             }
-            
-            // Get all actions from all employees
-            const allActions = [];
-            employees.forEach(emp => {
-                emp.actions.forEach(action => {
-                    allActions.push({
-                        employeeId: emp.id,
-                        employeeName: emp.name,
-                        ...action
-                    });
+            const headers = Object.keys(data[0]);
+            const csvRows = [
+                headers.join(','),
+                ...data.map(row => 
+                    headers.map(header => {
+                        const value = String(row[header]).includes(',') ? `"${row[header]}"` : row[header];
+                        return value;
+                    }).join(',')
+                )
+            ];
+            const csvString = csvRows.join('\n');
+            const blob = new Blob([csvString], { type: 'text/csv' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.setAttribute('href', url);
+            a.setAttribute('download', filename);
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        document.getElementById('export-products-btn').addEventListener('click', () => {
+             if (allProducts.length === 0) { showAlert('No Data', 'There are no products to export.', 'info'); return; }
+             const dataToExport = allProducts.map(({ id, lastUpdated, ...rest }) => rest);
+             exportToCSV(dataToExport, 'products-export.csv');
+        });
+
+        document.getElementById('export-sales-csv').addEventListener('click', () => {
+             let { start, end } = getDateRange();
+             const filteredSales = allSales
+                .filter(s => s.date >= start && s.date <= end)
+                .map(s => ({
+                    date: s.date.toISOString().split('T')[0],
+                    customerName: s.customerName,
+                    totalAmount: s.totalAmount,
+                    totalProfit: s.totalProfit,
+                    discountPercent: s.discountPercent,
+                    items: s.items.map(i => `${i.name}(${i.quantity})`).join(' | ')
+                }));
+            if (filteredSales.length === 0) { showAlert('No Data', 'No sales data for this period to export.', 'info'); return; }
+            exportToCSV(filteredSales, 'sales-report.csv');
+        });
+
+        document.getElementById('import-products-btn').addEventListener('click', () => {
+            document.getElementById('import-products-file').click();
+        });
+
+        document.getElementById('import-products-file').addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = async (event) => {
+                const csv = event.target.result;
+                const lines = csv.split('\n').filter(line => line);
+                if (lines.length <= 1) {
+                    showAlert('Error', 'CSV file is empty or has only headers.', 'error');
+                    return;
+                }
+                const headers = lines[0].split(',').map(h => h.trim());
+                const requiredHeaders = ['name', 'sku', 'stock', 'buyPrice', 'sellPrice', 'lowStockWarning'];
+                if(!requiredHeaders.every(h => headers.includes(h))) {
+                    showAlert('Import Error', `CSV must contain these headers: ${requiredHeaders.join(', ')}`, 'error');
+                    return;
+                }
+
+                const productsToImport = lines.slice(1).map(line => {
+                    const values = line.split(',');
+                    const product = headers.reduce((obj, header, index) => {
+                        let value = values[index] ? values[index].trim() : '';
+                        if (['stock', 'lowStockWarning'].includes(header)) {
+                            value = parseInt(value, 10);
+                        } else if (['buyPrice', 'sellPrice'].includes(header)) {
+                             value = parseFloat(value);
+                        }
+                        obj[header] = value;
+                        return obj;
+                    }, {});
+                    return product;
                 });
-            });
-            
-            // Sort by date (newest first)
-            allActions.sort((a, b) => new Date(b.date) - new Date(a.date));
-            
-            // Show last 5 activities
-            const recentActions = allActions.slice(0, 5);
-            
-            if (recentActions.length === 0) {
-                recentActivity.innerHTML = '<p>No recent activity</p>';
-                return;
-            }
-            
-            recentActions.forEach(action => {
-                const activityItem = document.createElement('div');
-                activityItem.className = 'info-item';
-                activityItem.innerHTML = `
-                    <div class="info-label">${action.employeeName} - ${formatDate(action.date)}</div>
-                    <div class="info-value">${action.type}: ${action.details}</div>
-                `;
-                recentActivity.appendChild(activityItem);
-            });
-        }
-        
-        // Helper function to format date
-        function formatDate(dateString) {
-            if (!dateString) return 'N/A';
-            
-            const date = new Date(dateString);
-            if (isNaN(date.getTime())) return dateString;
-            
-            return date.toLocaleDateString('en-US', {
-                year: 'numeric',
-                month: 'short',
-                day: 'numeric'
-            });
-        }
-        
-        // Helper function to show alerts
-        function showAlert(message, type) {
-            const alertDiv = document.getElementById('actionAlert');
-            alertDiv.textContent = message;
-            alertDiv.className = `alert alert-${type}`;
-            alertDiv.style.display = 'block';
-            
-            setTimeout(() => {
-                alertDiv.style.display = 'none';
-            }, 3000);
-        }
+
+                if (confirm(`You are about to import ${productsToImport.length} products. This may overwrite existing products with the same SKU. Continue?`)) {
+                    try {
+                        const batch = writeBatch(db);
+                        for (const product of productsToImport) {
+                            const productsRef = collection(db, `artifacts/${appId}/users/${userId}/products`);
+                            const q = query(productsRef, where("sku", "==", product.sku));
+                            const querySnapshot = await getDocs(q);
+
+                            if (!querySnapshot.empty) {
+                                // Update existing product
+                                const docRef = querySnapshot.docs[0].ref;
+                                batch.update(docRef, {...product, lastUpdated: serverTimestamp()});
+                            } else {
+                                // Add new product
+                                const newDocRef = doc(productsRef);
+                                batch.set(newDocRef, {...product, lastUpdated: serverTimestamp()});
+                            }
+                        }
+                        await batch.commit();
+                        showAlert('Success', `${productsToImport.length} products imported successfully.`, 'success');
+                    } catch (error) {
+                        console.error('Error importing products:', error);
+                        showAlert('Import Failed', `An error occurred during import: ${error.message}`, 'error');
+                    }
+                }
+            };
+            reader.readAsText(file);
+            e.target.value = ''; // Reset file input
+        });
+
+
+        // --- INITIALIZATION ---
+        document.addEventListener('DOMContentLoaded', () => {
+            initializeAuth();
+        });
     </script>
 </body>
 </html>
