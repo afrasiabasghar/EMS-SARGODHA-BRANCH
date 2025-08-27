@@ -3,1520 +3,1878 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Next Gen Sites - Inventory Management</title>
+    <title>Darson Sargodha Brokerage</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/browser-image-compression@2.0.2/dist/browser-image-compression.js"></script>
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
         body {
             font-family: 'Inter', sans-serif;
+            background-color: #f4f7f9;
         }
-        .sidebar-icon {
-            transition: all 0.3s ease;
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
         }
-        .sidebar-icon:hover {
-            transform: scale(1.1);
+        .section-container {
+            display: none;
+            animation: fadeIn 0.5s ease-in-out;
         }
-        .nav-item.active {
-            background-color: #4f46e5;
-            color: white;
+        .section-container.active {
+            display: block;
         }
-        .nav-item.active i {
-            color: white;
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
         }
-        .low-stock-pulse {
-            animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        .animated-btn {
+            transition: all 0.2s ease-in-out;
         }
-        @keyframes pulse {
-            0%, 100% {
-                opacity: 1;
+        .animated-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .card {
+            background-color: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+        }
+        .card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+        }
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            overflow-y: auto;
+            padding: 20px 0;
+        }
+        .modal-content {
+            background-color: white;
+            padding: 24px;
+            border-radius: 12px;
+            max-width: 500px;
+            width: 90%;
+            text-align: center;
+            animation: slideIn 0.3s ease-in-out;
+        }
+        @keyframes slideIn {
+            from { transform: translateY(-50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        
+        /* --- NEW STYLES FOR PROFILE POPUP WINDOW --- */
+        .popup-window-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: none;
+            z-index: 1000;
+            opacity: 0;
+            transition: opacity 0.3s ease-in-out;
+        }
+        .popup-window-overlay.active {
+            display: block;
+            opacity: 1;
+        }
+        .popup-window-content {
+            position: fixed;
+            top: 0;
+            right: -100%; /* Start off-screen */
+            width: 100%;
+            height: 100%;
+            background-color: #f4f7f9;
+            box-shadow: -4px 0 12px rgba(0,0,0,0.1);
+            transition: right 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            display: flex;
+            flex-direction: column;
+        }
+        @media (min-width: 768px) { /* md breakpoint */
+            .popup-window-content {
+                width: 80%;
+                max-width: 800px;
             }
-            50% {
-                opacity: .5;
-            }
         }
-        @media print {
-            body * {
-                visibility: hidden;
-            }
-            #bill-modal, #bill-modal * {
-                visibility: visible;
-            }
-            #bill-modal {
-                position: absolute;
-                left: 0;
-                top: 0;
-                width: 100%;
-            }
-            #bill-controls {
-                display: none;
-            }
+        .popup-window-content.active {
+            right: 0; /* Slide in */
         }
+        .popup-window-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 1.5rem;
+            background-color: white;
+            border-bottom: 1px solid #e5e7eb;
+            flex-shrink: 0; /* Prevent header from shrinking */
+        }
+        .popup-window-body {
+            padding: 1.5rem;
+            flex-grow: 1;
+            overflow-y: auto; /* Allow body to scroll */
+        }
+
     </style>
 </head>
-<body class="bg-gray-100">
+<body class="bg-gray-100 min-h-screen flex flex-col">
 
-    <!-- OVERLAYS -->
-    <div id="loading-overlay" class="fixed inset-0 bg-white bg-opacity-75 z-50 flex items-center justify-center">
-        <div class="flex items-center space-x-2">
-            <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600"></div>
-            <span class="text-lg font-medium text-gray-700">System ko initialize kiya ja raha hai...</span>
+    <div id="loading" class="fixed inset-0 bg-gray-200 bg-opacity-75 flex items-center justify-center z-50 hidden">
+        <div class="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-blue-500"></div>
+    </div>
+
+    <div id="messageModal" class="modal-overlay">
+        <div class="modal-content card">
+            <h3 id="modalTitle" class="text-xl font-bold mb-2"></h3>
+            <p id="modalMessage" class="text-gray-600 mb-4"></p>
+            <button id="modalCloseBtn" class="bg-blue-500 text-white px-6 py-2 rounded-full font-semibold hover:bg-blue-600 focus:outline-none">OK</button>
         </div>
     </div>
 
-    <!-- AUTHENTICATION CONTAINER -->
-    <div id="auth-container" class="fixed inset-0 bg-gray-200 z-50 flex items-center justify-center hidden">
-        <div class="w-full max-w-md bg-white rounded-lg shadow-md p-8">
-            <div class="text-center mb-6">
-                 <h1 class="text-3xl font-bold text-indigo-600">Next Gen Inventory</h1>
-                 <p class="text-gray-500">Apne account mein login karein ya naya banayein</p>
-            </div>
-
-            <!-- TABS -->
-            <div class="mb-4 border-b border-gray-200">
-                <ul class="flex flex-wrap -mb-px">
-                    <li class="mr-2">
-                        <a href="#" id="login-tab" class="inline-block py-4 px-4 text-sm font-medium text-center text-indigo-600 border-b-2 border-indigo-600 rounded-t-lg active" aria-current="page">Login</a>
-                    </li>
-                    <li class="mr-2">
-                        <a href="#" id="signup-tab" class="inline-block py-4 px-4 text-sm font-medium text-center text-gray-500 border-b-2 border-transparent rounded-t-lg hover:text-gray-600 hover:border-gray-300">Sign Up</a>
-                    </li>
-                </ul>
-            </div>
-
-            <!-- LOGIN FORM -->
-            <form id="login-form">
-                <div class="mb-4">
-                    <label for="login-email" class="block mb-2 text-sm font-medium text-gray-700">Email</label>
-                    <input type="email" id="login-email" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500" required>
-                </div>
-                <div class="mb-6">
-                    <label for="login-password" class="block mb-2 text-sm font-medium text-gray-700">Password</label>
-                    <input type="password" id="login-password" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500" required>
-                </div>
-                <button type="submit" class="w-full bg-indigo-600 text-white font-bold py-3 rounded-lg hover:bg-indigo-700 transition duration-300">Login Karein</button>
-            </form>
-
-            <!-- SIGNUP FORM -->
-            <form id="signup-form" class="hidden">
-                <div class="mb-4">
-                    <label for="signup-email" class="block mb-2 text-sm font-medium text-gray-700">Email</label>
-                    <input type="email" id="signup-email" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500" required>
-                </div>
-                <div class="mb-6">
-                    <label for="signup-password" class="block mb-2 text-sm font-medium text-gray-700">Password (kam se kam 6 characters)</label>
-                    <input type="password" id="signup-password" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500" required>
-                </div>
-                <button type="submit" class="w-full bg-green-600 text-white font-bold py-3 rounded-lg hover:bg-green-700 transition duration-300">Naya Account Banayein</button>
-            </form>
-        </div>
-    </div>
-
-
-    <!-- MAIN APPLICATION CONTAINER -->
-    <div id="app-container" class="hidden">
-        <div class="flex h-screen bg-gray-200">
-            <!-- Sidebar -->
-            <div class="fixed top-0 left-0 h-full w-20 lg:w-64 bg-gray-800 text-white flex flex-col z-30">
-                <div class="flex items-center justify-center lg:justify-start lg:pl-6 h-20 border-b border-gray-700">
-                     <div class="bg-indigo-600 p-2 rounded-lg">
-                        <i class="fa-solid fa-boxes-stacked fa-2x"></i>
+    <main id="auth-section" class="flex-grow flex items-center justify-center p-6">
+        <div class="bg-white p-8 rounded-2xl shadow-xl w-full max-w-md">
+            <h2 class="text-2xl font-bold text-center text-gray-800 mb-6">Darson Sargodha</h2>
+            <div id="auth-forms">
+                <form id="login-form" class="space-y-4">
+                    <h3 class="text-xl font-semibold mb-4 text-center">Login to your account</h3>
+                    <div>
+                        <input type="email" id="login-email" placeholder="Email Address" required
+                               class="w-full px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500">
                     </div>
-                    <span class="hidden lg:inline ml-4 text-xl font-bold">Next Gen Sites</span>
-                </div>
-                <nav class="flex-grow mt-4">
-                    <a href="#dashboard" class="nav-item flex items-center py-4 px-6 lg:px-6 text-gray-300 hover:bg-gray-700 active">
-                        <i class="fas fa-tachometer-alt fa-fw text-2xl lg:text-base"></i>
-                        <span class="hidden lg:inline ml-4 font-medium">Dashboard</span>
-                    </a>
-                    <a href="#billing" class="nav-item flex items-center py-4 px-6 lg:px-6 text-gray-300 hover:bg-gray-700">
-                        <i class="fas fa-file-invoice-dollar fa-fw text-2xl lg:text-base"></i>
-                        <span class="hidden lg:inline ml-4 font-medium">Billing</span>
-                    </a>
-                    <a href="#stocks" class="nav-item flex items-center py-4 px-6 lg:px-6 text-gray-300 hover:bg-gray-700">
-                        <i class="fas fa-warehouse fa-fw text-2xl lg:text-base"></i>
-                        <span class="hidden lg:inline ml-4 font-medium">Stocks</span>
-                    </a>
-                    <a href="#reports" class="nav-item flex items-center py-4 px-6 lg:px-6 text-gray-300 hover:bg-gray-700">
-                        <i class="fas fa-chart-line fa-fw text-2xl lg:text-base"></i>
-                        <span class="hidden lg:inline ml-4 font-medium">Reports</span>
-                    </a>
-                    <a href="#settings" class="nav-item flex items-center py-4 px-6 lg:px-6 text-gray-300 hover:bg-gray-700">
-                        <i class="fas fa-cog fa-fw text-2xl lg:text-base"></i>
-                        <span class="hidden lg:inline ml-4 font-medium">Settings</span>
-                    </a>
-                </nav>
-                 <div class="p-4 border-t border-gray-700">
-                    <div class="text-xs text-center lg:text-left text-gray-400 mb-2">
-                        <p>Logged in as:</p>
-                        <p id="user-email-display" class="font-mono text-xs break-all"></p>
+                    <div>
+                        <input type="password" id="login-password" placeholder="Password" required
+                               class="w-full px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500">
                     </div>
-                    <button id="logout-btn" class="w-full bg-red-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-red-700 transition duration-300">
-                        <i class="fas fa-sign-out-alt mr-2"></i>
-                        <span class="hidden lg:inline">Logout</span>
+                    <button type="submit"
+                            class="w-full bg-blue-500 text-white py-2 rounded-full font-semibold hover:bg-blue-600 transition duration-200">
+                        Login
                     </button>
-                </div>
-            </div>
+                    <p class="text-center text-sm text-gray-600 mt-4">
+                        Don't have an account? <a href="#" id="show-signup" class="text-blue-500 font-medium hover:underline">Sign up</a>
+                    </p>
+                </form>
 
-            <!-- Main content -->
-            <main class="flex-1 flex flex-col pl-20 lg:pl-64">
-                <!-- Header -->
-                <header class="bg-white shadow-md h-20 flex items-center justify-between px-6 z-20">
-                    <h1 id="page-title" class="text-2xl font-bold text-gray-800">Dashboard</h1>
-                    <div class="flex items-center">
-                       <div id="shop-name-header" class="text-lg font-semibold text-indigo-600">
-                            <!-- Shop name loads here -->
-                       </div>
+                <form id="signup-form" class="space-y-4 hidden">
+                    <h3 class="text-xl font-semibold mb-4 text-center">Create a new account</h3>
+                    <div>
+                        <input type="email" id="signup-email" placeholder="Email Address" required
+                               class="w-full px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500">
                     </div>
-                </header>
-
-                <!-- Page Content -->
-                <div class="flex-1 p-6 overflow-y-auto">
-                    <div id="dashboard" class="page">
-                        <!-- Dashboard Content -->
-                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                            <div class="bg-white p-6 rounded-lg shadow">
-                                <h3 class="text-gray-500 text-sm font-medium">Total Products</h3>
-                                <p id="total-products" class="text-3xl font-bold text-gray-800">0</p>
-                            </div>
-                            <div class="bg-white p-6 rounded-lg shadow">
-                                <h3 class="text-gray-500 text-sm font-medium">Low Stock Items</h3>
-                                <p id="low-stock-items" class="text-3xl font-bold text-red-500">0</p>
-                            </div>
-                            <div class="bg-white p-6 rounded-lg shadow">
-                                <h3 class="text-gray-500 text-sm font-medium">Today's Sales</h3>
-                                <p id="todays-sales-amount" class="text-3xl font-bold text-green-600">Rs 0.00</p>
-                            </div>
-                             <div class="bg-white p-6 rounded-lg shadow">
-                                <h3 class="text-gray-500 text-sm font-medium">Today's Profit</h3>
-                                <p id="todays-profit" class="text-3xl font-bold text-blue-600">Rs 0.00</p>
-                            </div>
-                        </div>
-                        
-                        <div class="mt-8 bg-white p-6 rounded-lg shadow">
-                            <h2 class="text-xl font-bold text-gray-700 mb-4">Quick Product Search</h2>
-                            <input type="text" id="dashboard-search" placeholder="Search for products by name or SKU..." class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
-                            <div id="dashboard-search-results" class="mt-4"></div>
-                        </div>
-
+                    <div>
+                        <input type="password" id="signup-password" placeholder="Password" required
+                               class="w-full px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500">
                     </div>
-
-                    <div id="billing" class="page hidden">
-                         <!-- Billing Content -->
-                        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                            <div class="lg:col-span-2">
-                                <div class="bg-white p-6 rounded-lg shadow">
-                                    <h2 class="text-xl font-bold text-gray-700 mb-4">Create New Bill</h2>
-                                    <div class="flex gap-4 mb-4">
-                                        <input type="text" id="billing-search" placeholder="Search products to add to bill" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500">
-                                    </div>
-                                    <div id="billing-search-results" class="bg-gray-50 rounded-lg max-h-48 overflow-y-auto"></div>
-                                    
-                                    <div class="mt-6">
-                                        <h3 class="font-semibold text-lg text-gray-800">Current Bill Items</h3>
-                                        <div class="mt-2 flow-root">
-                                            <div class="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
-                                                <div class="inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8">
-                                                    <table class="min-w-full divide-y divide-gray-300">
-                                                        <thead>
-                                                            <tr>
-                                                                <th scope="col" class="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-0">Product</th>
-                                                                <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Price</th>
-                                                                <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Quantity</th>
-                                                                <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Total</th>
-                                                                <th scope="col" class="relative py-3.5 pl-3 pr-4 sm:pr-0">
-                                                                    <span class="sr-only">Remove</span>
-                                                                </th>
-                                                            </tr>
-                                                        </thead>
-                                                        <tbody id="bill-items-table" class="divide-y divide-gray-200">
-                                                            <!-- Bill items will be injected here -->
-                                                        </tbody>
-                                                    </table>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <p id="bill-empty-message" class="text-center text-gray-500 py-4">No items added to the bill.</p>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="lg:col-span-1">
-                                <div class="bg-white p-6 rounded-lg shadow sticky top-6">
-                                    <h3 class="text-xl font-bold text-gray-700 mb-4">Bill Summary</h3>
-                                    <div class="space-y-3">
-                                        <div class="flex justify-between font-medium">
-                                            <span>Subtotal</span>
-                                            <span id="bill-subtotal">Rs 0.00</span>
-                                        </div>
-                                        <div class="flex justify-between items-center font-medium">
-                                            <span>Discount (%)</span>
-                                            <input type="number" id="bill-discount" value="0" min="0" max="100" class="w-20 text-right p-1 border rounded-md">
-                                        </div>
-                                        <div class="flex justify-between text-xl font-bold text-gray-800 border-t pt-3">
-                                            <span>TOTAL</span>
-                                            <span id="bill-total">Rs 0.00</span>
-                                        </div>
-                                    </div>
-                                    <div class="mt-6">
-                                        <input type="text" id="customer-name" placeholder="Customer Name (Optional)" class="w-full p-2 border rounded-md mb-2">
-                                        <input type="text" id="customer-contact" placeholder="Customer Contact (Optional)" class="w-full p-2 border rounded-md">
-                                    </div>
-                                    <button id="generate-bill-btn" class="mt-6 w-full bg-indigo-600 text-white font-bold py-3 rounded-lg hover:bg-indigo-700 transition duration-300 disabled:bg-gray-400">
-                                        Generate Bill & Print
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div id="stocks" class="page hidden">
-                        <!-- Stocks Content -->
-                        <div class="bg-white p-6 rounded-lg shadow">
-                             <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
-                                <h2 class="text-xl font-bold text-gray-700 mb-4 md:mb-0">Product Inventory</h2>
-                                <button id="add-product-btn" class="bg-indigo-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-indigo-700 transition duration-300">
-                                    <i class="fas fa-plus mr-2"></i>Add New Product
-                                </button>
-                            </div>
-                            <input type="text" id="stock-search" placeholder="Search inventory..." class="w-full p-3 mb-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500">
-                            <div class="overflow-x-auto">
-                                <table class="min-w-full divide-y divide-gray-200">
-                                    <thead class="bg-gray-50">
-                                        <tr>
-                                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Product Name</th>
-                                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">SKU</th>
-                                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Stock</th>
-                                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Buy Price</th>
-                                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Sell Price</th>
-                                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Profit</th>
-                                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody id="products-table" class="bg-white divide-y divide-gray-200">
-                                        <!-- Product rows will be injected here -->
-                                    </tbody>
-                                </table>
-                                 <p id="products-empty-message" class="text-center text-gray-500 py-8">No products found. Click 'Add New Product' to get started.</p>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div id="reports" class="page hidden">
-                        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                            <!-- Sales Report Section -->
-                            <div class="lg:col-span-2 bg-white p-6 rounded-lg shadow">
-                                <h2 class="text-xl font-bold text-gray-700 mb-4">Sales & Profit Report</h2>
-                                <div class="flex flex-wrap gap-4 items-center mb-4">
-                                    <select id="report-period" class="p-2 border rounded-md">
-                                        <option value="daily">Daily</option>
-                                        <option value="weekly">Weekly</option>
-                                        <option value="monthly" selected>Monthly</option>
-                                        <option value="custom">Custom</option>
-                                    </select>
-                                    <div id="custom-date-range" class="flex gap-2 hidden">
-                                        <input type="date" id="start-date" class="p-2 border rounded-md">
-                                        <input type="date" id="end-date" class="p-2 border rounded-md">
-                                    </div>
-                                    <button id="export-sales-csv" class="bg-green-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-green-700"><i class="fas fa-file-csv mr-2"></i>Export Sales</button>
-                                </div>
-                                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-                                    <div class="bg-gray-100 p-4 rounded-lg">
-                                        <h4 class="text-sm text-gray-600">Total Revenue</h4>
-                                        <p id="report-total-revenue" class="text-2xl font-bold text-gray-800">Rs 0.00</p>
-                                    </div>
-                                    <div class="bg-gray-100 p-4 rounded-lg">
-                                        <h4 class="text-sm text-gray-600">Total Profit</h4>
-                                        <p id="report-total-profit" class="text-2xl font-bold text-green-600">Rs 0.00</p>
-                                    </div>
-                                    <div class="bg-gray-100 p-4 rounded-lg">
-                                        <h4 class="text-sm text-gray-600">Net Profit (After Expenses)</h4>
-                                        <p id="report-net-profit" class="text-2xl font-bold text-blue-600">Rs 0.00</p>
-                                    </div>
-                                </div>
-                                <div class="overflow-x-auto">
-                                    <table class="min-w-full divide-y divide-gray-200">
-                                        <thead class="bg-gray-50">
-                                            <tr>
-                                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Date</th>
-                                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Total Amount</th>
-                                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Profit</th>
-                                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Items</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody id="sales-report-table" class="bg-white divide-y divide-gray-200">
-                                            <!-- Sales data here -->
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
-
-                            <!-- Expenses Section -->
-                            <div class="lg:col-span-1 bg-white p-6 rounded-lg shadow">
-                                <h2 class="text-xl font-bold text-gray-700 mb-4">Track Expenses</h2>
-                                <form id="expense-form" class="space-y-4">
-                                    <input type="text" id="expense-description" placeholder="Expense Description" class="w-full p-2 border rounded-md" required>
-                                    <input type="number" id="expense-amount" placeholder="Amount" class="w-full p-2 border rounded-md" required>
-                                    <input type="date" id="expense-date" class="w-full p-2 border rounded-md" required>
-                                    <button type="submit" class="w-full bg-orange-500 text-white font-bold py-2 rounded-lg hover:bg-orange-600">Add Expense</button>
-                                </form>
-                                <hr class="my-6">
-                                <h3 class="font-semibold text-gray-700 mb-2">Recent Expenses</h3>
-                                 <div class="overflow-x-auto max-h-60">
-                                    <table class="min-w-full divide-y divide-gray-200">
-                                        <thead class="bg-gray-50 sticky top-0">
-                                            <tr>
-                                                <th class="px-2 py-2 text-left text-xs font-medium text-gray-500 uppercase">Description</th>
-                                                <th class="px-2 py-2 text-left text-xs font-medium text-gray-500 uppercase">Amount</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody id="expenses-table" class="bg-white divide-y divide-gray-200">
-                                            <!-- Expenses data here -->
-                                        </tbody>
-                                    </table>
-                                </div>
-                                <div class="mt-4 flex justify-between font-bold text-lg">
-                                    <span>Total Expenses (Period)</span>
-                                    <span id="report-total-expenses">Rs 0.00</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-
-                    <div id="settings" class="page hidden">
-                        <!-- Settings Content -->
-                        <div class="max-w-2xl mx-auto bg-white p-8 rounded-lg shadow">
-                            <h2 class="text-2xl font-bold text-gray-800 mb-6">System Settings</h2>
-                            <form id="settings-form">
-                                <div class="mb-6">
-                                    <label for="shop-name" class="block text-sm font-medium text-gray-700 mb-2">Shop Name</label>
-                                    <input type="text" id="shop-name" name="shopName" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500" placeholder="Enter your shop's name">
-                                </div>
-                                 <div class="mb-6">
-                                    <label for="shop-address" class="block text-sm font-medium text-gray-700 mb-2">Shop Address</label>
-                                    <input type="text" id="shop-address" name="shopAddress" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500" placeholder="e.g., 123 Main St, City">
-                                </div>
-                                 <div class="mb-6">
-                                    <label for="shop-contact" class="block text-sm font-medium text-gray-700 mb-2">Shop Contact Info</label>
-                                    <input type="text" id="shop-contact" name="shopContact" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500" placeholder="e.g., +1 234 567 890">
-                                </div>
-                                <button type="submit" class="w-full bg-indigo-600 text-white font-bold py-3 rounded-lg hover:bg-indigo-700 transition duration-300">Save Settings</button>
-                            </form>
-
-                            <div class="mt-8 border-t pt-6">
-                                <h3 class="text-xl font-bold text-gray-800 mb-4">Data Management</h3>
-                                 <div class="flex flex-wrap gap-4">
-                                    <button id="import-products-btn" class="bg-blue-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-blue-700"><i class="fas fa-upload mr-2"></i>Import Products (CSV)</button>
-                                    <input type="file" id="import-products-file" class="hidden" accept=".csv">
-                                    <button id="export-products-btn" class="bg-green-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-green-700"><i class="fas fa-download mr-2"></i>Export Products (CSV)</button>
-                                 </div>
-                            </div>
-
-                        </div>
-                    </div>
-
-                </div>
-
-                <!-- Footer -->
-                <footer class="bg-gray-800 text-white text-center p-4">
-                    Developed by Afrasiab Asghar. Visit <a href="http://www.nextgensites.org" target="_blank" class="underline hover:text-indigo-400">www.nextgensites.org</a> or Contact +923060406003
-                </footer>
-            </main>
-        </div>
-    </div>
-
-
-    <!-- Modals -->
-    <!-- Add/Edit Product Modal -->
-    <div id="product-modal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-40 hidden">
-        <div class="relative top-20 mx-auto p-5 border w-full max-w-2xl shadow-lg rounded-md bg-white">
-            <div class="flex justify-between items-center pb-3 border-b">
-                <h3 id="product-modal-title" class="text-2xl font-bold text-gray-900">Add New Product</h3>
-                <button id="close-product-modal" class="text-gray-400 hover:text-gray-600">
-                    <i class="fas fa-times fa-2x"></i>
-                </button>
-            </div>
-            <div class="mt-5">
-                <form id="product-form">
-                    <input type="hidden" id="product-id">
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div class="md:col-span-2">
-                             <label for="product-name" class="block text-sm font-medium text-gray-700">Product Name</label>
-                             <input type="text" id="product-name" class="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500" required>
-                        </div>
-                        <div>
-                             <label for="product-sku" class="block text-sm font-medium text-gray-700">SKU (Stock Keeping Unit)</label>
-                             <input type="text" id="product-sku" class="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500" required>
-                        </div>
-                        <div>
-                            <label for="product-stock" class="block text-sm font-medium text-gray-700">Current Stock</label>
-                            <input type="number" id="product-stock" min="0" class="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500" required>
-                        </div>
-                         <div>
-                            <label for="product-buy-price" class="block text-sm font-medium text-gray-700">Buy Price (Rs)</label>
-                            <input type="number" id="product-buy-price" min="0" step="0.01" class="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500" required>
-                        </div>
-                        <div>
-                            <label for="product-sell-price" class="block text-sm font-medium text-gray-700">Sell Price (Rs)</label>
-                            <input type="number" id="product-sell-price" min="0" step="0.01" class="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500" required>
-                        </div>
-                         <div class="md:col-span-2">
-                            <label for="low-stock-warning" class="block text-sm font-medium text-gray-700">Low Stock Warning Level</label>
-                            <input type="number" id="low-stock-warning" min="0" class="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500" placeholder="e.g., 10" required>
-                        </div>
-                         <div class="md:col-span-2">
-                            <label for="product-description" class="block text-sm font-medium text-gray-700">Product Description</label>
-                            <textarea id="product-description" rows="3" class="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"></textarea>
-                        </div>
-                    </div>
-                    <div class="mt-6 flex justify-end gap-4">
-                        <button type="button" id="cancel-product-form" class="bg-gray-200 text-gray-800 font-bold py-2 px-6 rounded-lg hover:bg-gray-300">Cancel</button>
-                        <button type="submit" class="bg-indigo-600 text-white font-bold py-2 px-6 rounded-lg hover:bg-indigo-700">Save Product</button>
-                    </div>
+                    <button type="submit"
+                            class="w-full bg-blue-500 text-white py-2 rounded-full font-semibold hover:bg-blue-600 transition duration-200">
+                        Sign Up
+                    </button>
+                    <p class="text-center text-sm text-gray-600 mt-4">
+                        Already have an account? <a href="#" id="show-login" class="text-blue-500 font-medium hover:underline">Log in</a>
+                    </p>
                 </form>
             </div>
         </div>
-    </div>
+    </main>
 
-    <!-- Bill Modal -->
-    <div id="bill-modal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-40 hidden">
-        <div class="relative top-5 mx-auto p-5 border w-full max-w-3xl shadow-lg rounded-md bg-white">
-            <div id="bill-content" class="p-8">
-                 <!-- Bill content will be generated here -->
+    <div id="main-app" class="hidden flex-grow flex flex-col">
+        <header class="bg-white shadow-sm p-4 sticky top-0 z-40">
+            <div class="container flex flex-col md:flex-row items-center justify-between">
+                <h1 class="text-2xl font-bold text-gray-800">Darson Sargodha</h1>
+                <nav class="mt-4 md:mt-0">
+                    <ul id="main-nav" class="flex flex-wrap justify-center md:justify-end gap-2 md:gap-4">
+                        <li><button data-section="dashboard" class="nav-btn px-4 py-2 rounded-full text-sm font-medium bg-blue-500 text-white animated-btn">Dashboard</button></li>
+                        <li><button data-section="complaints" class="nav-btn px-4 py-2 rounded-full text-sm font-medium bg-gray-200 text-gray-700 hover:bg-gray-300 animated-btn">Complaints</button></li>
+                        <li><button data-section="deposits" class="nav-btn px-4 py-2 rounded-full text-sm font-medium bg-gray-200 text-gray-700 hover:bg-gray-300 animated-btn">Deposits</button></li>
+                        <li><button data-section="withdrawals" class="nav-btn px-4 py-2 rounded-full text-sm font-medium bg-gray-200 text-gray-700 hover:bg-gray-300 animated-btn">Withdrawals</button></li>
+                        <li><button data-section="commission" class="nav-btn px-4 py-2 rounded-full text-sm font-medium bg-gray-200 text-gray-700 hover:bg-gray-300 animated-btn">Commission</button></li>
+                        <li><button data-section="expenses" class="nav-btn px-4 py-2 rounded-full text-sm font-medium bg-gray-200 text-gray-700 hover:bg-gray-300 animated-btn">Expenses</button></li>
+                        <li><button data-section="profiles" class="nav-btn px-4 py-2 rounded-full text-sm font-medium bg-gray-200 text-gray-700 hover:bg-gray-300 animated-btn">Profiles</button></li>
+                        <li><button data-section="employees" class="nav-btn px-4 py-2 rounded-full text-sm font-medium bg-gray-200 text-gray-700 hover:bg-gray-300 animated-btn">Employees</button></li>
+                        <li><button id="sign-out-btn" class="nav-btn px-4 py-2 rounded-full text-sm font-medium bg-red-500 text-white hover:bg-red-600 animated-btn">Sign Out</button></li>
+                    </ul>
+                </nav>
             </div>
-            <div id="bill-controls" class="mt-4 px-8 pb-4 flex justify-end gap-4">
-                 <button id="close-bill-modal" class="bg-gray-200 text-gray-800 font-bold py-2 px-6 rounded-lg hover:bg-gray-300">Close</button>
-                 <button id="print-bill-btn" class="bg-indigo-600 text-white font-bold py-2 px-6 rounded-lg hover:bg-indigo-700"><i class="fas fa-print mr-2"></i>Print Bill</button>
+        </header>
+
+        <main class="flex-grow p-6">
+            <div class="container">
+
+                <section id="dashboard" class="section-container active">
+                    <h2 class="text-3xl font-bold text-gray-800 mb-6">Dashboard</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                        <div class="card p-6 text-center">
+                            <h3 class="text-gray-500 text-sm">Total Complaints</h3>
+                            <p id="total-complaints" class="text-3xl font-bold text-gray-800 mt-2">0</p>
+                        </div>
+                        <div class="card p-6 text-center">
+                            <h3 class="text-gray-500 text-sm">Active Clients</h3>
+                            <p id="total-clients" class="text-3xl font-bold text-gray-800 mt-2">0</p>
+                        </div>
+                        <div class="card p-6 text-center">
+                            <h3 class="text-gray-500 text-sm">This Month's Revenue</h3>
+                            <p id="monthly-revenue" class="text-3xl font-bold text-green-600 mt-2">PKR 0</p>
+                        </div>
+                        <div class="card p-6 text-center">
+                            <h3 class="text-gray-500 text-sm">Total Employees</h3>
+                            <p id="total-employees" class="text-3xl font-bold text-gray-800 mt-2">0</p>
+                        </div>
+                    </div>
+                    
+                    <!-- Graphs Section -->
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        <div class="card p-6">
+                            <h3 class="text-xl font-semibold mb-4">Complaints Status</h3>
+                            <div class="relative max-h-80 mx-auto">
+                                 <canvas id="complaintStatusChart"></canvas>
+                            </div>
+                        </div>
+                        <!-- NEW: Monthly Commission Chart -->
+                        <div class="card p-6">
+                            <h3 class="text-xl font-semibold mb-4">Monthly Commission Received</h3>
+                            <div class="relative max-h-80 mx-auto">
+                                <canvas id="monthlyCommissionChart"></canvas>
+                            </div>
+                        </div>
+                        <!-- NEW: New Clients Chart -->
+                        <div class="card p-6">
+                            <h3 class="text-xl font-semibold mb-4">Monthly New Clients</h3>
+                            <div class="relative max-h-80 mx-auto">
+                                <canvas id="newClientsChart"></canvas>
+                            </div>
+                        </div>
+                        <!-- NEW: Monthly Expenses Chart -->
+                        <div class="card p-6">
+                            <h3 class="text-xl font-semibold mb-4">Monthly Expenses</h3>
+                            <div class="relative max-h-80 mx-auto">
+                                <canvas id="monthlyExpensesChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <section id="complaints" class="section-container">
+                    <h2 class="text-3xl font-bold text-gray-800 mb-6">Complaints</h2>
+                    <div class="card p-6 mb-6">
+                        <h3 class="text-xl font-semibold mb-4">Add New Complaint</h3>
+                        <form id="add-complaint-form" class="space-y-4">
+                            <input type="text" id="complaint-trading-account" placeholder="Trading Account Number" required list="client-trading-accounts"
+                                   class="w-full px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <input type="text" id="complaint-client-name" placeholder="Client Name (auto-filled)" readonly
+                                   class="w-full px-4 py-2 border rounded-full bg-gray-100">
+                            <textarea id="complaint-details" rows="4" placeholder="Complaint Details" required
+                                      class="w-full px-4 py-2 border rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"></textarea>
+                            <select id="complaint-status" class="w-full px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                <option value="Pending">Pending</option>
+                                <option value="Done">Done</option>
+                                <option value="Closed">Closed</option>
+                            </select>
+                            <button type="submit" class="w-full bg-blue-500 text-white py-2 rounded-full font-semibold hover:bg-blue-600 animated-btn">
+                                Save Complaint
+                            </button>
+                        </form>
+                    </div>
+                    <div class="card p-6">
+                        <h3 class="text-xl font-semibold mb-4">View Complaints</h3>
+                        <input type="text" id="complaint-search" placeholder="Search by Client Name or Account Number..."
+                               class="w-full px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500 mb-4">
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left table-auto">
+                                <thead class="border-b-2">
+                                    <tr class="text-gray-600 uppercase text-sm">
+                                        <th class="p-2">Client Name</th>
+                                        <th class="p-2">Account No.</th>
+                                        <th class="p-2">Details</th>
+                                        <th class="p-2">Status</th>
+                                        <th class="p-2">Date</th>
+                                        <th class="p-2">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="complaints-list">
+                                    </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+
+                <section id="deposits" class="section-container">
+                    <h2 class="text-3xl font-bold text-gray-800 mb-6">Deposit Cheques</h2>
+                    <div class="card p-6 mb-6">
+                        <h3 class="text-xl font-semibold mb-4">Add New Cheque Deposit</h3>
+                        <form id="add-deposit-form" class="space-y-4">
+                            <input type="text" id="deposit-trading-account" placeholder="Trading Account Number" required list="client-trading-accounts"
+                                   class="w-full px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <input type="text" id="deposit-client-name" placeholder="Client Name (auto-filled)" readonly
+                                   class="w-full px-4 py-2 border rounded-full bg-gray-100">
+                            <div class="flex items-center space-x-4">
+                                <input type="number" id="deposit-amount" placeholder="Amount (PKR)" required
+                                       class="w-full px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                <input type="date" id="deposit-date" required
+                                       class="w-full px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            </div>
+                            <input type="text" id="deposit-cheque-number" placeholder="Cheque Number" required
+                                   class="w-full px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <div>
+                                <label for="deposit-image" class="block text-gray-700 font-medium mb-2">Upload Cheque Image (Max 3MB, PNG/JPG)</label>
+                                <input type="file" id="deposit-image" multiple accept="image/png, image/jpeg"
+                                       class="w-full px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                <div id="image-previews" class="flex flex-wrap gap-2 mt-2"></div>
+                            </div>
+                            <select id="deposit-status" class="w-full px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                <option value="Pending">Pending</option>
+                                <option value="Deposited">Deposited</option>
+                                <option value="Returned">Returned</option>
+                            </select>
+                            <input type="text" id="deposit-returned-reason" placeholder="Reason for return (if applicable)"
+                                   class="w-full px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500 hidden">
+                            <button type="submit" class="w-full bg-blue-500 text-white py-2 rounded-full font-semibold hover:bg-blue-600 animated-btn">
+                                Save Deposit
+                            </button>
+                        </form>
+                    </div>
+                    <div class="card p-6">
+                        <h3 class="text-xl font-semibold mb-4">View Deposits</h3>
+                        <input type="text" id="deposit-search" placeholder="Search by Client Name or Account Number..."
+                               class="w-full px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500 mb-4">
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left table-auto">
+                                <thead class="border-b-2">
+                                    <tr class="text-gray-600 uppercase text-sm">
+                                        <th class="p-2">Client Name</th>
+                                        <th class="p-2">Account No.</th>
+                                        <th class="p-2">Amount</th>
+                                        <th class="p-2">Cheque No.</th>
+                                        <th class="p-2">Status</th>
+                                        <th class="p-2">Date</th>
+                                        <th class="p-2">Images</th>
+                                        <th class="p-2">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="deposits-list">
+                                    </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+
+                <section id="withdrawals" class="section-container">
+                    <h2 class="text-3xl font-bold text-gray-800 mb-6">Withdrawals</h2>
+                    <div class="card p-6 mb-6">
+                        <h3 class="text-xl font-semibold mb-4">Add New Withdrawal Request</h3>
+                        <form id="add-withdrawal-form" class="space-y-4">
+                            <input type="text" id="withdrawal-trading-account" placeholder="Trading Account Number" required list="client-trading-accounts"
+                                   class="w-full px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <input type="text" id="withdrawal-client-name" placeholder="Client Name (auto-filled)" readonly
+                                   class="w-full px-4 py-2 border rounded-full bg-gray-100">
+                            <input type="number" id="withdrawal-amount" placeholder="Requested Amount (PKR)" required
+                                   class="w-full px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <select id="withdrawal-status" class="w-full px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                <option value="Accepted">Accepted</option>
+                                <option value="Returned">Returned</option>
+                            </select>
+                            <textarea id="withdrawal-returned-reason" rows="3" placeholder="Reason for return (if applicable)"
+                                      class="w-full px-4 py-2 border rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 hidden"></textarea>
+                            <button type="submit" class="w-full bg-blue-500 text-white py-2 rounded-full font-semibold hover:bg-blue-600 animated-btn">
+                                Save Withdrawal
+                            </button>
+                        </form>
+                    </div>
+                    <div class="card p-6">
+                        <h3 class="text-xl font-semibold mb-4">View Withdrawals</h3>
+                        <input type="text" id="withdrawal-search" placeholder="Search by Client Name or Account Number..."
+                               class="w-full px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500 mb-4">
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left table-auto">
+                                <thead class="border-b-2">
+                                    <tr class="text-gray-600 uppercase text-sm">
+                                        <th class="p-2">Client Name</th>
+                                        <th class="p-2">Account No.</th>
+                                        <th class="p-2">Amount</th>
+                                        <th class="p-2">Status</th>
+                                        <th class="p-2">Date</th>
+                                        <th class="p-2">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="withdrawals-list">
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+
+                <section id="commission" class="section-container">
+                    <h2 class="text-3xl font-bold text-gray-800 mb-6">House Commission</h2>
+                    <div class="card p-6 mb-6">
+                        <h3 class="text-xl font-semibold mb-4">Add Monthly Commission</h3>
+                        <form id="add-commission-form" class="space-y-4">
+                            <div class="flex items-center space-x-4">
+                                <select id="commission-month" required class="w-1/2 px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                    </select>
+                                <input type="number" id="commission-year" placeholder="Year" required
+                                       class="w-1/2 px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            </div>
+                            <input type="number" id="commission-total" placeholder="Total Commission (PKR)" required
+                                   class="w-full px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <input type="number" id="commission-requested" placeholder="Requested Payment (PKR)" required
+                                   class="w-full px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <input type="number" id="commission-received" placeholder="Received Amount (PKR)" required
+                                   class="w-full px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <button type="submit" class="w-full bg-blue-500 text-white py-2 rounded-full font-semibold hover:bg-blue-600 animated-btn">
+                                Save Commission
+                            </button>
+                        </form>
+                    </div>
+                    <div class="card p-6">
+                        <h3 class="text-xl font-semibold mb-4">Monthly Trend</h3>
+                        <canvas id="commissionChart"></canvas>
+                        <div class="overflow-x-auto mt-6">
+                            <table class="w-full text-left table-auto">
+                                <thead class="border-b-2">
+                                    <tr class="text-gray-600 uppercase text-sm">
+                                        <th class="p-2">Month/Year</th>
+                                        <th class="p-2">Total Commission</th>
+                                        <th class="p-2">Requested Payment</th>
+                                        <th class="p-2">Received Amount</th>
+                                        <th class="p-2">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="commission-list">
+                                    </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+
+                <section id="expenses" class="section-container">
+                    <h2 class="text-3xl font-bold text-gray-800 mb-6">House Expenses</h2>
+                    <div class="card p-6 mb-6">
+                        <h3 class="text-xl font-semibold mb-4">Add New Expense</h3>
+                        <form id="add-expense-form" class="space-y-4">
+                            <div class="flex items-center space-x-4">
+                               <select id="expense-month" required class="w-1/2 px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                    </select>
+                                <input type="number" id="expense-year" placeholder="Year" required
+                                       class="w-1/2 px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            </div>
+                            <input type="text" id="expense-name" placeholder="Expense Name (e.g., Electricity Bill)" required
+                                   class="w-full px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <input type="number" id="expense-amount" placeholder="Amount (PKR)" required
+                                   class="w-full px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <button type="submit" class="w-full bg-blue-500 text-white py-2 rounded-full font-semibold hover:bg-blue-600 animated-btn">
+                                Save Expense
+                            </button>
+                        </form>
+                    </div>
+                    <div class="card p-6">
+                        <h3 class="text-xl font-semibold mb-4">Monthly Expenses Report</h3>
+                        <div class="flex items-center space-x-4 mb-4">
+                            <select id="expense-report-month" class="px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                </select>
+                            <input type="number" id="expense-report-year" placeholder="Year"
+                                   class="px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <button id="print-expenses-btn" class="bg-gray-700 text-white px-6 py-2 rounded-full font-semibold hover:bg-gray-800 animated-btn">
+                                Print Report
+                            </button>
+                        </div>
+                        <div id="expenses-report-container" class="space-y-4">
+                            <p id="total-expenses-display" class="text-xl font-bold text-gray-800 mt-4">Grand Total: PKR 0</p>
+                            <table class="w-full text-left table-auto">
+                                <thead class="border-b-2">
+                                    <tr class="text-gray-600 uppercase text-sm">
+                                        <th class="p-2">Expense Name</th>
+                                        <th class="p-2">Amount</th>
+                                        <th class="p-2">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="expenses-list">
+                                    </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+
+                <section id="profiles" class="section-container">
+                    <h2 class="text-3xl font-bold text-gray-800 mb-6">Client Profiles</h2>
+                    <div class="card p-6 mb-6">
+                        <h3 class="text-xl font-semibold mb-4">Add New Client</h3>
+                        <form id="add-client-form" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <input type="text" id="profile-client-name" placeholder="Client Name" required
+                                   class="w-full px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <input type="text" id="profile-trading-account" placeholder="Trading Account Number" required
+                                   class="w-full px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <input type="text" id="profile-cnic" placeholder="CNIC" required
+                                   class="w-full px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <input type="text" id="profile-cdc-account" placeholder="CDC Account Number"
+                                   class="w-full px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <input type="email" id="profile-email" placeholder="Email Address"
+                                   class="w-full px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <input type="text" id="profile-contact" placeholder="Contact Number"
+                                   class="w-full px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500">
+                             <input type="text" id="profile-address" placeholder="Address"
+                                   class="w-full px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500 md:col-span-2">
+                            <!-- MODIFIED: Wrapped date input in a div -->
+                            <div id="profile-account-date-wrapper">
+                                <input type="date" id="profile-account-date" required
+                                       class="w-full px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            </div>
+                            <div class="flex items-center space-x-2">
+                                <input type="checkbox" id="profile-is-old-client">
+                                <label for="profile-is-old-client" class="text-gray-700">Old Client (before software)</label>
+                            </div>
+                            <button type="submit" class="w-full bg-blue-500 text-white py-2 rounded-full font-semibold hover:bg-blue-600 animated-btn md:col-span-2">
+                                Save Client Profile
+                            </button>
+                        </form>
+                    </div>
+                    <div class="card p-6">
+                        <h3 class="text-xl font-semibold mb-4">View Client Profiles</h3>
+                        <div class="flex flex-wrap items-center gap-4 mb-4">
+                            <input type="text" id="profiles-search" placeholder="Search by Client Name or Account Number..."
+                                   class="flex-grow px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        </div>
+                        <div id="profiles-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        </div>
+                    </div>
+                </section>
+
+                <section id="employees" class="section-container">
+                    <h2 class="text-3xl font-bold text-gray-800 mb-6">Employees</h2>
+                    <div class="card p-6 mb-6">
+                        <h3 class="text-xl font-semibold mb-4">Add New Employee</h3>
+                        <form id="add-employee-form" class="space-y-4">
+                            <input type="text" id="employee-name" placeholder="Name" required
+                                   class="w-full px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <input type="text" id="employee-cnic" placeholder="CNIC" required
+                                   class="w-full px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <input type="text" id="employee-address" placeholder="Address" required
+                                   class="w-full px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <input type="date" id="employee-joining-date" required
+                                   class="w-full px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <input type="text" id="employee-designation" placeholder="Designation" required
+                                   class="w-full px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <input type="number" id="employee-salary" placeholder="Salary (PKR)" required
+                                   class="w-full px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <button type="submit" class="w-full bg-blue-500 text-white py-2 rounded-full font-semibold hover:bg-blue-600 animated-btn">
+                                Save Employee
+                            </button>
+                        </form>
+                    </div>
+                    <div class="card p-6">
+                        <h3 class="text-xl font-semibold mb-4">Employee List</h3>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left table-auto">
+                                <thead class="border-b-2">
+                                    <tr class="text-gray-600 uppercase text-sm">
+                                        <th class="p-2">Name</th>
+                                        <th class="p-2">CNIC</th>
+                                        <th class="p-2">Designation</th>
+                                        <th class="p-2">Joining Date</th>
+                                        <th class="p-2">Status</th>
+                                        <th class="p-2">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="employees-list">
+                                    </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
             </div>
-        </div>
-    </div>
-    
-    <!-- Custom Alert Modal -->
-    <div id="alert-modal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50 hidden">
-        <div class="relative top-1/4 mx-auto p-5 border w-full max-w-md shadow-lg rounded-md bg-white">
-            <div class="mt-3 text-center">
-                <div id="alert-icon" class="mx-auto flex items-center justify-center h-12 w-12 rounded-full">
-                    <!-- Icon here -->
-                </div>
-                <h3 id="alert-title" class="text-lg leading-6 font-medium text-gray-900 mt-2"></h3>
-                <div class="mt-2 px-7 py-3">
-                    <p id="alert-message" class="text-sm text-gray-500"></p>
-                </div>
-                <div class="items-center px-4 py-3">
-                    <button id="alert-ok-btn" class="px-4 py-2 bg-indigo-500 text-white text-base font-medium rounded-md w-full shadow-sm hover:bg-indigo-600 focus:outline-none focus:ring-2 focus:ring-indigo-300">
-                        OK
+        </main>
+        
+        <div id="profile-detail-modal" class="popup-window-overlay">
+            <div class="popup-window-content">
+                <div class="popup-window-header">
+                    <h3 id="profile-detail-name" class="text-2xl font-bold text-gray-800"></h3>
+                    <button id="close-profile-btn" class="text-gray-500 hover:text-gray-800">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                        </svg>
                     </button>
                 </div>
+                <div class="popup-window-body">
+                    <div id="profile-detail-info" class="text-gray-600 text-sm mb-4 bg-white p-4 rounded-lg shadow-sm grid grid-cols-1 md:grid-cols-2 gap-4"></div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="bg-white p-4 rounded-lg shadow-sm">
+                            <h4 class="font-semibold text-lg mb-2">Client Payment History</h4>
+                            <canvas id="clientCommissionChart"></canvas>
+                        </div>
+                        <div class="bg-white p-4 rounded-lg shadow-sm">
+                            <h4 class="font-semibold text-lg mb-2">Financial History</h4>
+                            <ul id="client-financial-history" class="space-y-2 text-gray-700 max-h-60 overflow-y-auto pr-2">
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-6 border-t pt-4 bg-white p-4 rounded-lg shadow-sm">
+                         <h4 class="font-semibold text-lg mb-2">Add Client Payment</h4>
+                         <form id="add-client-payment-form" class="space-y-3">
+                            <div class="flex items-center space-x-4">
+                                <select id="client-payment-month" required class="w-1/2 px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                    </select>
+                                <input type="number" id="client-payment-year" placeholder="Year" required
+                                       class="w-1/2 px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            </div>
+                            <input type="number" id="client-payment-amount" placeholder="Amount Paid (PKR)" required
+                                   class="w-full px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <button type="submit" class="w-full bg-green-500 text-white py-2 rounded-full font-semibold hover:bg-green-600 animated-btn">
+                                Save Payment
+                            </button>
+                         </form>
+                    </div>
+
+                    <div class="mt-6 text-center">
+                        <button id="close-account-btn" class="bg-red-500 text-white px-6 py-2 rounded-full font-semibold hover:bg-red-600 animated-btn">Close Account</button>
+                    </div>
+                    <div id="account-closure-form" class="mt-4 hidden bg-white p-4 rounded-lg shadow-sm">
+                        <label for="closure-date-input" class="block mb-2 font-medium">Select Closure Date:</label>
+                        <input type="date" id="closure-date-input" required
+                               class="w-full px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500 mb-2">
+                        <button id="confirm-closure-btn" class="w-full bg-red-600 text-white py-2 rounded-full font-semibold hover:bg-red-700">Confirm Account Closure</button>
+                    </div>
+                </div>
             </div>
         </div>
+
+        <div id="employee-detail-modal" class="popup-window-overlay">
+            <div class="popup-window-content">
+                 <div class="popup-window-header">
+                    <h3 id="employee-detail-name" class="text-2xl font-bold text-gray-800"></h3>
+                    <button id="close-employee-modal-btn" class="text-gray-500 hover:text-gray-800">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    </button>
+                </div>
+                <div class="popup-window-body">
+                    <form id="update-employee-form" class="space-y-4">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 p-4 bg-white rounded-lg shadow-sm">
+                            <div>
+                                <label class="font-semibold text-gray-500 text-sm">CNIC:</label>
+                                <p id="employee-detail-cnic" class="text-gray-800"></p>
+                            </div>
+                            <div>
+                                <label class="font-semibold text-gray-500 text-sm">Address:</label>
+                                <p id="employee-detail-address" class="text-gray-800"></p>
+                            </div>
+                            <div>
+                                <label class="font-semibold text-gray-500 text-sm">Joining Date:</label>
+                                <p id="employee-detail-joiningdate" class="text-gray-800"></p>
+                            </div>
+                             <div>
+                                <label class="font-semibold text-gray-500 text-sm">Designation:</label>
+                                <p id="employee-detail-designation" class="text-gray-800"></p>
+                            </div>
+                             <div>
+                                <label class="font-semibold text-gray-500 text-sm">Salary:</label>
+                                <p id="employee-detail-salary" class="text-gray-800"></p>
+                            </div>
+                        </div>
+                        <div class="border-t pt-4 mt-4 p-4 bg-white rounded-lg shadow-sm">
+                            <h4 class="font-semibold text-lg mb-2">Additional Information</h4>
+                            <div>
+                                <label for="employee-detail-performance" class="block font-medium">Performance:</label>
+                                <textarea id="employee-detail-performance" rows="3" class="w-full mt-1 px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"></textarea>
+                            </div>
+                             <div>
+                                <label for="employee-detail-leaves" class="block font-medium">Leaves:</label>
+                                <input type="text" id="employee-detail-leaves" class="w-full mt-1 px-3 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            </div>
+                             <div>
+                                <label for="employee-detail-incentives" class="block font-medium">Incentives (PKR):</label>
+                                <input type="number" id="employee-detail-incentives" class="w-full mt-1 px-3 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            </div>
+                             <div>
+                                <label for="employee-detail-allowance" class="block font-medium">Allowance (PKR):</label>
+                                <input type="number" id="employee-detail-allowance" class="w-full mt-1 px-3 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            </div>
+                        </div>
+                        <div class="mt-6 text-center">
+                            <button type="submit" class="bg-blue-500 text-white px-6 py-2 rounded-full font-semibold hover:bg-blue-600 animated-btn">Save Changes</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <footer class="bg-gray-800 text-gray-300 p-4 mt-8">
+            <div class="container text-center text-sm">
+                Developed by Next Gen Sites | Developer Afrasiab Asghar | Contact: +923060406003 | www.nextgensites.org
+            </div>
+        </footer>
     </div>
+    
+    <datalist id="client-trading-accounts"></datalist>
 
+    <script src="https://www.gstatic.com/firebasejs/11.6.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/11.6.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/11.6.1/firebase-storage-compat.js"></script>
 
-    <script type="module">
-        // Firebase Imports
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { 
-            getAuth, 
-            onAuthStateChanged, 
-            setPersistence, 
-            browserLocalPersistence,
-            createUserWithEmailAndPassword,
-            signInWithEmailAndPassword,
-            signOut
-        } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, doc, getDoc, setDoc, updateDoc, deleteDoc, addDoc, collection, onSnapshot, query, where, getDocs, writeBatch, serverTimestamp, Timestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
-        
-        // --- CONFIGURATION ---
-        const firebaseConfig = {
-            // Aapki Firebase config yahan paste karein
-             apiKey: "AIzaSyByhc0hUr4lZKPlXBM8fHmKtvC55Bbw41w",
-            authDomain: "mycommissionapp.firebaseapp.com",
-            databaseURL: "https://mycommissionapp-default-rtdb.asia-southeast1.firebasedatabase.app",
-            projectId: "mycommissionapp",
-            storageBucket: "mycommissionapp.firebasestorage.app",
-            messagingSenderId: "151893676114",
-            appId: "1:151893676114:web:98df620215962d521b0f8b",
-            measurementId: "G-62T33XNW7L"
+    <script>
+        // Check for global variables provided by the canvas environment.
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {
+            apiKey: "AIzaSyAWNOeEvj6OPNJ9c3WlLR16Gb6W1zukqO8",
+            authDomain: "darson-sargodha-clients.firebaseapp.com",
+            databaseURL: "https://darson-sargodha-clients-default-rtdb.firebaseio.com",
+            projectId: "darson-sargodha-clients",
+            storageBucket: "darson-sargodha-clients.appspot.com",
+            messagingSenderId: "999438441124",
+            appId: "1:999438441124:web:15e41fd26a2a8cb561e431",
+            measurementId: "G-2P2R1BBB1B"
         };
-        const appId = 'nextgen-inventory-app';
+        const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
+        
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+        const storage = firebase.storage();
+        
+        let currentUserId = null;
+        let unsubscribeListeners = [];
 
-        // --- FIREBASE INITIALIZATION ---
-        const app = initializeApp(firebaseConfig);
-        const db = getFirestore(app);
-        const auth = getAuth(app);
-        
-        // --- GLOBAL STATE ---
-        let userId = null;
-        let settingsUnsubscribe = () => {};
-        let productsUnsubscribe = () => {};
-        let salesUnsubscribe = () => {};
-        let expensesUnsubscribe = () => {};
-        
-        let allProducts = [];
-        let allSales = [];
+        // Global data caches
+        let allComplaints = [];
+        let allDeposits = [];
+        let allCommissions = [];
         let allExpenses = [];
-        let shopSettings = {};
-        
-        let currentBill = {
-            items: [], // { productId, name, sellPrice, quantity, buyPrice }
-            discount: 0
-        };
+        let allClients = [];
+        let allEmployees = [];
+        let allClientPayments = [];
+        let allWithdrawals = []; 
 
-        // --- DOM ELEMENTS ---
-        const pages = document.querySelectorAll('.page');
-        const navLinks = document.querySelectorAll('.nav-item');
-        const pageTitle = document.getElementById('page-title');
-        const loadingOverlay = document.getElementById('loading-overlay');
-        const authContainer = document.getElementById('auth-container');
-        const appContainer = document.getElementById('app-container');
-        
-        // --- CUSTOM ALERT FUNCTION ---
-        const showAlert = (title, message, type = 'info') => {
-            const alertModal = document.getElementById('alert-modal');
-            document.getElementById('alert-title').textContent = title;
-            document.getElementById('alert-message').textContent = message;
-            
-            const iconContainer = document.getElementById('alert-icon');
-            if (type === 'success') {
-                iconContainer.className = 'mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-green-100';
-                iconContainer.innerHTML = `<i class="fas fa-check text-green-600 fa-lg"></i>`;
-            } else if (type === 'error') {
-                iconContainer.className = 'mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-red-100';
-                iconContainer.innerHTML = `<i class="fas fa-times text-red-600 fa-lg"></i>`;
-            } else {
-                 iconContainer.className = 'mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-blue-100';
-                 iconContainer.innerHTML = `<i class="fas fa-info text-blue-600 fa-lg"></i>`;
-            }
-
-            alertModal.classList.remove('hidden');
-            document.getElementById('alert-ok-btn').onclick = () => alertModal.classList.add('hidden');
-        };
-
-        // --- AUTHENTICATION ---
-        onAuthStateChanged(auth, async (user) => {
-            loadingOverlay.classList.remove('hidden');
-            if (user && !user.isAnonymous) {
-                // User is logged in
-                console.log("User logged in:", user.uid);
-                userId = user.uid;
-                document.getElementById('user-email-display').textContent = user.email;
-                
-                authContainer.classList.add('hidden');
-                appContainer.classList.remove('hidden');
-
-                await setupListeners();
-                
-                const settingsRef = doc(db, `artifacts/${appId}/users/${userId}/settings/shop`);
-                const settingsSnap = await getDoc(settingsRef);
-                if (!settingsSnap.exists() || !settingsSnap.data().shopName) {
-                    navigateTo('settings');
-                    showAlert('Welcome!', 'Apne shop ka naam aur deegar details set karein.', 'info');
-                } else {
-                    navigateTo(window.location.hash.substring(1) || 'dashboard');
-                }
-                loadingOverlay.classList.add('hidden');
-            } else {
-                // User is not logged in
-                console.log("No user is logged in.");
-                userId = null;
-                // Stop listening to data
-                settingsUnsubscribe();
-                productsUnsubscribe();
-                salesUnsubscribe();
-                expensesUnsubscribe();
-                
-                // Show login/signup screen
-                appContainer.classList.add('hidden');
-                authContainer.classList.remove('hidden');
-                loadingOverlay.classList.add('hidden');
-            }
-        });
-
-        const initializeAuth = async () => {
-             try {
-                // This will keep the user logged in even after closing the browser tab
-                await setPersistence(auth, browserLocalPersistence);
-            } catch (error) {
-                console.error("Persistence Error:", error);
-                showAlert('Authentication Error', `Could not set auth persistence. Error: ${error.message}`, 'error');
-            }
-        };
-
-        // --- AUTH UI LOGIC ---
-        const loginTab = document.getElementById('login-tab');
-        const signupTab = document.getElementById('signup-tab');
+        // UI Elements
+        const loading = document.getElementById('loading');
+        const authSection = document.getElementById('auth-section');
+        const mainApp = document.getElementById('main-app');
         const loginForm = document.getElementById('login-form');
         const signupForm = document.getElementById('signup-form');
-
-        loginTab.addEventListener('click', (e) => {
-            e.preventDefault();
-            loginTab.classList.add('text-indigo-600', 'border-indigo-600');
-            loginTab.classList.remove('text-gray-500', 'border-transparent', 'hover:text-gray-600', 'hover:border-gray-300');
-            signupTab.classList.add('text-gray-500', 'border-transparent', 'hover:text-gray-600', 'hover:border-gray-300');
-            signupTab.classList.remove('text-indigo-600', 'border-indigo-600');
-            loginForm.classList.remove('hidden');
-            signupForm.classList.add('hidden');
-        });
-
-        signupTab.addEventListener('click', (e) => {
-            e.preventDefault();
-            signupTab.classList.add('text-indigo-600', 'border-indigo-600');
-            signupTab.classList.remove('text-gray-500', 'border-transparent', 'hover:text-gray-600', 'hover:border-gray-300');
-            loginTab.classList.add('text-gray-500', 'border-transparent', 'hover:text-gray-600', 'hover:border-gray-300');
-            loginTab.classList.remove('text-indigo-600', 'border-indigo-600');
-            signupForm.classList.remove('hidden');
-            loginForm.classList.add('hidden');
-        });
-
-        // Handle Signup
-        signupForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const email = document.getElementById('signup-email').value;
-            const password = document.getElementById('signup-password').value;
-            loadingOverlay.classList.remove('hidden');
-            try {
-                await createUserWithEmailAndPassword(auth, email, password);
-                // onAuthStateChanged will handle the rest
-                signupForm.reset();
-            } catch (error) {
-                console.error("Signup Error:", error);
-                showAlert('Signup Mein Masla', error.message, 'error');
-                loadingOverlay.classList.add('hidden');
-            }
-        });
-
-        // Handle Login
-        loginForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const email = document.getElementById('login-email').value;
-            const password = document.getElementById('login-password').value;
-            loadingOverlay.classList.remove('hidden');
-            try {
-                await signInWithEmailAndPassword(auth, email, password);
-                // onAuthStateChanged will handle the rest
-                loginForm.reset();
-            } catch (error) {
-                console.error("Login Error:", error);
-                showAlert('Login Mein Masla', error.message, 'error');
-                loadingOverlay.classList.add('hidden');
-            }
-        });
-
-        // Handle Logout
-        document.getElementById('logout-btn').addEventListener('click', async () => {
-            try {
-                await signOut(auth);
-                // onAuthStateChanged will handle UI switch
-            } catch (error) {
-                console.error("Logout Error:", error);
-                showAlert('Logout Mein Masla', error.message, 'error');
-            }
-        });
-
-        // --- DATA LISTENERS ---
-        async function setupListeners() {
-            if (!userId) return;
-
-            // Detach existing listeners
-            settingsUnsubscribe();
-            productsUnsubscribe();
-            salesUnsubscribe();
-            expensesUnsubscribe();
-            
-            // Settings Listener
-            const settingsRef = doc(db, `artifacts/${appId}/users/${userId}/settings/shop`);
-            settingsUnsubscribe = onSnapshot(settingsRef, (doc) => {
-                if (doc.exists()) {
-                    shopSettings = doc.data();
-                    updateUISettings();
-                }
-            }, (error) => console.error("Error listening to settings:", error));
-
-            // Products Listener
-            const productsRef = collection(db, `artifacts/${appId}/users/${userId}/products`);
-            productsUnsubscribe = onSnapshot(query(productsRef), (snapshot) => {
-                allProducts = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-                renderProductsTable();
-                updateDashboardCards();
-            }, (error) => console.error("Error listening to products:", error));
-
-            // Sales Listener
-            const salesRef = collection(db, `artifacts/${appId}/users/${userId}/sales`);
-            salesUnsubscribe = onSnapshot(query(salesRef), (snapshot) => {
-                allSales = snapshot.docs.map(doc => {
-                    const data = doc.data();
-                    // Ensure date is a Date object
-                    const date = data.date && data.date.toDate ? data.date.toDate() : new Date();
-                    return { id: doc.id, ...data, date: date };
-                });
-                updateDashboardCards();
-                updateReports();
-            }, (error) => console.error("Error listening to sales:", error));
-
-            // Expenses Listener
-            const expensesRef = collection(db, `artifacts/${appId}/users/${userId}/expenses`);
-            expensesUnsubscribe = onSnapshot(query(expensesRef), (snapshot) => {
-                allExpenses = snapshot.docs.map(doc => {
-                    const data = doc.data();
-                     // Ensure date is a Date object
-                    const date = data.date && data.date.toDate ? data.date.toDate() : new Date();
-                    return { id: doc.id, ...data, date: date };
-                });
-                updateReports();
-            }, (error) => console.error("Error listening to expenses:", error));
-        }
-
-        // --- UI RENDERING ---
-        function updateUISettings() {
-            if (shopSettings.shopName) {
-                document.getElementById('shop-name-header').textContent = shopSettings.shopName;
-                document.getElementById('shop-name').value = shopSettings.shopName;
-            }
-            if(shopSettings.shopAddress) document.getElementById('shop-address').value = shopSettings.shopAddress;
-            if(shopSettings.shopContact) document.getElementById('shop-contact').value = shopSettings.shopContact;
-        }
+        const showSignupBtn = document.getElementById('show-signup');
+        const showLoginBtn = document.getElementById('show-login');
+        const signOutBtn = document.getElementById('sign-out-btn');
+        const navButtons = document.querySelectorAll('.nav-btn');
+        const sections = document.querySelectorAll('.section-container');
+        const messageModal = document.getElementById('messageModal');
+        const modalTitle = document.getElementById('modalTitle');
+        const modalMessage = document.getElementById('modalMessage');
+        const modalCloseBtn = document.getElementById('modalCloseBtn');
         
-        // Navigation
-        function navigateTo(pageId) {
-            pages.forEach(page => page.classList.add('hidden'));
-            navLinks.forEach(link => link.classList.remove('active'));
+        // Chart instances
+        let complaintStatusChart, commissionChart, clientCommissionChart;
+        let monthlyCommissionChart, newClientsChart, monthlyExpensesChart;
+        
+        // Month array for dropdowns
+        const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 
-            const targetPage = document.getElementById(pageId || 'dashboard');
-            const targetLink = document.querySelector(`.nav-item[href="#${pageId || 'dashboard'}"]`);
+        // Utility functions
+        function showLoading() { loading.classList.remove('hidden'); }
+        function hideLoading() { loading.classList.add('hidden'); }
 
-            if (targetPage) {
-                targetPage.classList.remove('hidden');
-                const title = pageId || 'dashboard';
-                pageTitle.textContent = title.charAt(0).toUpperCase() + title.slice(1);
-            }
-            if (targetLink) {
-                targetLink.classList.add('active');
-            }
+        function showMessage(title, message) {
+            modalTitle.textContent = title;
+            modalMessage.textContent = message;
+            messageModal.style.display = 'flex';
         }
 
-        window.addEventListener('hashchange', () => navigateTo(window.location.hash.substring(1)));
-        navLinks.forEach(link => {
-            link.addEventListener('click', (e) => {
-                e.preventDefault();
-                const pageId = e.currentTarget.getAttribute('href').substring(1);
-                window.location.hash = pageId;
+        modalCloseBtn.addEventListener('click', () => {
+            messageModal.style.display = 'none';
+        });
+
+        // Navigation
+        function showSection(sectionId) {
+            sections.forEach(section => {
+                if (section.id === sectionId) {
+                    section.classList.add('active');
+                } else {
+                    section.classList.remove('active');
+                }
+            });
+            navButtons.forEach(btn => {
+                if(btn.id === 'sign-out-btn') return;
+                if (btn.dataset.section === sectionId) {
+                    btn.classList.remove('bg-gray-200', 'text-gray-700', 'hover:bg-gray-300');
+                    btn.classList.add('bg-blue-500', 'text-white');
+                } else {
+                    btn.classList.remove('bg-blue-500', 'text-white');
+                    btn.classList.add('bg-gray-200', 'text-gray-700', 'hover:bg-gray-300');
+                }
+            });
+        }
+
+        navButtons.forEach(btn => {
+            btn.addEventListener('click', () => {
+                const sectionId = btn.dataset.section;
+                if (sectionId) {
+                    showSection(sectionId);
+                }
             });
         });
-        
-        // --- DASHBOARD ---
-        function updateDashboardCards() {
-            document.getElementById('total-products').textContent = allProducts.length;
 
-            const lowStockCount = allProducts.filter(p => p.stock <= p.lowStockWarning).length;
-            document.getElementById('low-stock-items').textContent = lowStockCount;
-            
-            const todayStart = new Date();
-            todayStart.setHours(0, 0, 0, 0);
-            
-            const todaysSales = allSales.filter(s => s.date >= todayStart);
-            const totalSalesAmount = todaysSales.reduce((sum, s) => sum + s.totalAmount, 0);
-            const totalProfit = todaysSales.reduce((sum, s) => sum + s.totalProfit, 0);
-
-            document.getElementById('todays-sales-amount').textContent = `Rs ${totalSalesAmount.toFixed(2)}`;
-            document.getElementById('todays-profit').textContent = `Rs ${totalProfit.toFixed(2)}`;
-        }
-        
-        document.getElementById('dashboard-search').addEventListener('input', (e) => {
-            const query = e.target.value.toLowerCase();
-            const resultsContainer = document.getElementById('dashboard-search-results');
-            if (!query) {
-                resultsContainer.innerHTML = '';
-                return;
-            }
-            const results = allProducts.filter(p => p.name.toLowerCase().includes(query) || p.sku.toLowerCase().includes(query));
-            if (results.length > 0) {
-                resultsContainer.innerHTML = `
-                    <ul class="divide-y divide-gray-200 border rounded-md p-2">
-                        ${results.map(p => `
-                            <li class="p-3">
-                                <div class="flex justify-between items-center">
-                                    <div>
-                                        <p class="font-semibold text-gray-800">${p.name}</p>
-                                        <p class="text-sm text-gray-500">SKU: ${p.sku}</p>
-                                    </div>
-                                    <div class="text-right">
-                                        <p class="font-bold text-lg ${p.stock <= p.lowStockWarning ? 'text-red-500' : 'text-green-600'}">${p.stock}</p>
-                                        <p class="text-sm text-gray-500">in stock</p>
-                                    </div>
-                                </div>
-                            </li>
-                        `).join('')}
-                    </ul>`;
-            } else {
-                resultsContainer.innerHTML = `<p class="text-center text-gray-500 p-4">No products found.</p>`;
-            }
-        });
-
-
-        // --- STOCKS/INVENTORY ---
-        const productModal = document.getElementById('product-modal');
-        const productForm = document.getElementById('product-form');
-
-        const openProductModal = (product = null) => {
-            productForm.reset();
-            document.getElementById('product-id').value = '';
-            if (product) {
-                document.getElementById('product-modal-title').textContent = 'Edit Product';
-                document.getElementById('product-id').value = product.id;
-                document.getElementById('product-name').value = product.name;
-                document.getElementById('product-sku').value = product.sku;
-                document.getElementById('product-stock').value = product.stock;
-                document.getElementById('product-buy-price').value = product.buyPrice;
-                document.getElementById('product-sell-price').value = product.sellPrice;
-                document.getElementById('low-stock-warning').value = product.lowStockWarning;
-                document.getElementById('product-description').value = product.description || '';
-            } else {
-                document.getElementById('product-modal-title').textContent = 'Add New Product';
-            }
-            productModal.classList.remove('hidden');
-        };
-
-        const closeProductModal = () => productModal.classList.add('hidden');
-
-        document.getElementById('add-product-btn').addEventListener('click', () => openProductModal());
-        document.getElementById('close-product-modal').addEventListener('click', closeProductModal);
-        document.getElementById('cancel-product-form').addEventListener('click', closeProductModal);
-
-        productForm.addEventListener('submit', async (e) => {
+        // Authentication Handlers
+        loginForm.addEventListener('submit', async (e) => {
             e.preventDefault();
-            if (!userId) return;
-            const productId = document.getElementById('product-id').value;
-            const productData = {
-                name: document.getElementById('product-name').value,
-                sku: document.getElementById('product-sku').value,
-                stock: parseInt(document.getElementById('product-stock').value),
-                buyPrice: parseFloat(document.getElementById('product-buy-price').value),
-                sellPrice: parseFloat(document.getElementById('product-sell-price').value),
-                lowStockWarning: parseInt(document.getElementById('low-stock-warning').value),
-                description: document.getElementById('product-description').value,
-                lastUpdated: serverTimestamp()
-            };
-
+            showLoading();
+            const email = loginForm['login-email'].value;
+            const password = loginForm['login-password'].value;
             try {
-                if (productId) {
-                    // Update existing product
-                    const productRef = doc(db, `artifacts/${appId}/users/${userId}/products`, productId);
-                    await updateDoc(productRef, productData);
-                    showAlert('Success', 'Product updated successfully.', 'success');
-                } else {
-                    // Add new product
-                    const productsRef = collection(db, `artifacts/${appId}/users/${userId}/products`);
-                    await addDoc(productsRef, productData);
-                    showAlert('Success', 'Product added successfully.', 'success');
-                }
-                closeProductModal();
+                await auth.signInWithEmailAndPassword(email, password);
             } catch (error) {
-                console.error("Error saving product: ", error);
-                showAlert('Error', `Failed to save product. ${error.message}`, 'error');
-            }
-        });
-        
-        const deleteProduct = async (productId) => {
-             if (confirm('Kya aap waqai is product ko delete karna chahte hain? Yeh amal wapas nahi ho sakta.')) {
-                try {
-                    const productRef = doc(db, `artifacts/${appId}/users/${userId}/products`, productId);
-                    await deleteDoc(productRef);
-                    showAlert('Success', 'Product deleted successfully.', 'success');
-                } catch (error) {
-                    console.error("Error deleting product: ", error);
-                    showAlert('Error', `Failed to delete product. ${error.message}`, 'error');
-                }
-            }
-        };
-
-        function renderProductsTable(filterQuery = '') {
-            const tableBody = document.getElementById('products-table');
-            const emptyMessage = document.getElementById('products-empty-message');
-            const filteredProducts = allProducts.filter(p => 
-                p.name.toLowerCase().includes(filterQuery) || 
-                p.sku.toLowerCase().includes(filterQuery)
-            );
-            
-            if (filteredProducts.length === 0) {
-                tableBody.innerHTML = '';
-                emptyMessage.classList.remove('hidden');
-                return;
-            }
-            
-            emptyMessage.classList.add('hidden');
-            tableBody.innerHTML = filteredProducts.map(p => {
-                const profit = p.sellPrice - p.buyPrice;
-                const profitMargin = p.sellPrice > 0 ? (profit / p.sellPrice) * 100 : 0;
-                const isLowStock = p.stock <= p.lowStockWarning;
-
-                return `
-                    <tr class="${isLowStock ? 'bg-red-50' : ''}">
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            <div class="font-medium text-gray-900">${p.name}</div>
-                            ${isLowStock ? `<div class="text-xs text-red-600 font-bold low-stock-pulse">LOW STOCK</div>` : ''}
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${p.sku}</td>
-                        <td class="px-6 py-4 whitespace-nowrap font-bold text-lg ${isLowStock ? 'text-red-500' : 'text-gray-900'}">${p.stock}</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Rs ${p.buyPrice.toFixed(2)}</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Rs ${p.sellPrice.toFixed(2)}</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm ${profit >= 0 ? 'text-green-600' : 'text-red-600'}">
-                            Rs ${profit.toFixed(2)} (${profitMargin.toFixed(1)}%)
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                            <button class="edit-btn text-indigo-600 hover:text-indigo-900 mr-4" data-id="${p.id}"><i class="fas fa-edit"></i></button>
-                            <button class="delete-btn text-red-600 hover:text-red-900" data-id="${p.id}"><i class="fas fa-trash"></i></button>
-                        </td>
-                    </tr>
-                `;
-            }).join('');
-        }
-
-        document.getElementById('stock-search').addEventListener('input', (e) => renderProductsTable(e.target.value.toLowerCase()));
-
-        document.getElementById('products-table').addEventListener('click', (e) => {
-            const editBtn = e.target.closest('.edit-btn');
-            if(editBtn) {
-                const product = allProducts.find(p => p.id === editBtn.dataset.id);
-                if (product) openProductModal(product);
-            }
-            
-            const deleteBtn = e.target.closest('.delete-btn');
-            if (deleteBtn) {
-                deleteProduct(deleteBtn.dataset.id);
-            }
-        });
-        
-        // --- BILLING ---
-        const billingSearchInput = document.getElementById('billing-search');
-        const billingSearchResultsContainer = document.getElementById('billing-search-results');
-        
-        billingSearchInput.addEventListener('input', (e) => {
-            const query = e.target.value.toLowerCase();
-            if (!query) {
-                billingSearchResultsContainer.innerHTML = '';
-                billingSearchResultsContainer.classList.add('hidden');
-                return;
-            }
-            
-            const results = allProducts.filter(p => (p.name.toLowerCase().includes(query) || p.sku.toLowerCase().includes(query)) && p.stock > 0);
-            
-            if(results.length > 0) {
-                billingSearchResultsContainer.innerHTML = `
-                    <ul class="divide-y divide-gray-100">
-                        ${results.map(p => `
-                            <li class="p-3 hover:bg-indigo-100 cursor-pointer flex justify-between items-center add-to-bill-item" data-id="${p.id}">
-                                <div>
-                                    <p class="font-semibold text-gray-800">${p.name}</p>
-                                    <p class="text-sm text-gray-500">SKU: ${p.sku}</p>
-                                </div>
-                                <div>
-                                    <span class="font-medium text-gray-700">Rs ${p.sellPrice.toFixed(2)}</span>
-                                    <span class="ml-4 text-sm text-gray-500">(Stock: ${p.stock})</span>
-                                </div>
-                            </li>
-                        `).join('')}
-                    </ul>
-                `;
-                billingSearchResultsContainer.classList.remove('hidden');
-            } else {
-                 billingSearchResultsContainer.innerHTML = `<p class="p-3 text-center text-gray-500">No products found or out of stock.</p>`;
-                 billingSearchResultsContainer.classList.remove('hidden');
-            }
-        });
-        
-        billingSearchResultsContainer.addEventListener('click', (e) => {
-            const item = e.target.closest('.add-to-bill-item');
-            if (item) {
-                const productId = item.dataset.id;
-                addProductToBill(productId);
-                billingSearchInput.value = '';
-                billingSearchResultsContainer.innerHTML = '';
-                billingSearchResultsContainer.classList.add('hidden');
-            }
-        });
-        
-        function addProductToBill(productId) {
-            const product = allProducts.find(p => p.id === productId);
-            if (!product) return;
-            
-            const existingItem = currentBill.items.find(i => i.productId === productId);
-            if (existingItem) {
-                 if (existingItem.quantity < product.stock) {
-                    existingItem.quantity++;
-                 } else {
-                    showAlert('Stock Limit', `Cannot add more of ${product.name}. Only ${product.stock} available.`, 'info');
-                 }
-            } else {
-                currentBill.items.push({
-                    productId: product.id,
-                    name: product.name,
-                    sellPrice: product.sellPrice,
-                    buyPrice: product.buyPrice,
-                    quantity: 1,
-                    maxStock: product.stock
-                });
-            }
-            renderBillItems();
-        }
-
-        function renderBillItems() {
-            const tableBody = document.getElementById('bill-items-table');
-            const emptyMsg = document.getElementById('bill-empty-message');
-            
-            if (currentBill.items.length === 0) {
-                tableBody.innerHTML = '';
-                emptyMsg.classList.remove('hidden');
-                tableBody.parentElement.parentElement.parentElement.classList.add('hidden');
-            } else {
-                emptyMsg.classList.add('hidden');
-                tableBody.parentElement.parentElement.parentElement.classList.remove('hidden');
-                tableBody.innerHTML = currentBill.items.map((item, index) => `
-                    <tr>
-                        <td class="py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-0">${item.name}</td>
-                        <td class="px-3 py-4 text-sm text-gray-500">Rs ${item.sellPrice.toFixed(2)}</td>
-                        <td class="px-3 py-4 text-sm text-gray-500">
-                            <input type="number" value="${item.quantity}" min="1" max="${item.maxStock}" data-index="${index}" class="bill-item-qty w-16 p-1 border rounded-md text-center">
-                        </td>
-                        <td class="px-3 py-4 text-sm text-gray-700 font-semibold">Rs ${(item.sellPrice * item.quantity).toFixed(2)}</td>
-                        <td class="relative py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-0">
-                            <button class="remove-bill-item-btn text-red-500 hover:text-red-700" data-index="${index}"><i class="fas fa-trash"></i></button>
-                        </td>
-                    </tr>
-                `).join('');
-            }
-            updateBillSummary();
-        }
-        
-        document.getElementById('bill-items-table').addEventListener('change', (e) => {
-            if (e.target.classList.contains('bill-item-qty')) {
-                const index = e.target.dataset.index;
-                const newQty = parseInt(e.target.value);
-                const item = currentBill.items[index];
-                if (newQty > item.maxStock) {
-                    e.target.value = item.maxStock;
-                     showAlert('Stock Limit', `Only ${item.maxStock} units of ${item.name} are available.`, 'info');
-                }
-                currentBill.items[index].quantity = parseInt(e.target.value);
-                renderBillItems();
-            }
-        });
-        
-        document.getElementById('bill-items-table').addEventListener('click', (e) => {
-            const btn = e.target.closest('.remove-bill-item-btn');
-            if (btn) {
-                currentBill.items.splice(btn.dataset.index, 1);
-                renderBillItems();
+                showMessage('Login Failed', error.message);
+            } finally {
+                hideLoading();
             }
         });
 
-        function updateBillSummary() {
-            const subtotal = currentBill.items.reduce((sum, item) => sum + (item.sellPrice * item.quantity), 0);
-            const discountPercent = parseFloat(document.getElementById('bill-discount').value) || 0;
-            const discountAmount = subtotal * (discountPercent / 100);
-            const total = subtotal - discountAmount;
-            
-            document.getElementById('bill-subtotal').textContent = `Rs ${subtotal.toFixed(2)}`;
-            document.getElementById('bill-total').textContent = `Rs ${total.toFixed(2)}`;
-            
-            document.getElementById('generate-bill-btn').disabled = currentBill.items.length === 0;
-        }
-
-        document.getElementById('bill-discount').addEventListener('input', updateBillSummary);
-        
-        function resetBill() {
-            currentBill = { items: [], discount: 0 };
-            document.getElementById('customer-name').value = '';
-            document.getElementById('customer-contact').value = '';
-            document.getElementById('bill-discount').value = 0;
-            renderBillItems();
-        }
-
-        document.getElementById('generate-bill-btn').addEventListener('click', async () => {
-            if (currentBill.items.length === 0 || !userId) return;
-            
-            const subtotal = currentBill.items.reduce((sum, item) => sum + (item.sellPrice * item.quantity), 0);
-            const discountPercent = parseFloat(document.getElementById('bill-discount').value) || 0;
-            const discountAmount = subtotal * (discountPercent / 100);
-            const totalAmount = subtotal - discountAmount;
-            const totalProfit = currentBill.items.reduce((sum, item) => sum + ((item.sellPrice - item.buyPrice) * item.quantity), 0);
-
-            const saleData = {
-                date: serverTimestamp(),
-                customerName: document.getElementById('customer-name').value || 'N/A',
-                customerContact: document.getElementById('customer-contact').value || 'N/A',
-                items: currentBill.items,
-                subtotal: subtotal,
-                discountPercent: discountPercent,
-                discountAmount: discountAmount,
-                totalAmount: totalAmount,
-                totalProfit: totalProfit
-            };
-
+        signupForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            showLoading();
+            const email = signupForm['signup-email'].value;
+            const password = signupForm['signup-password'].value;
             try {
-                // Use a batch write to ensure atomicity
-                const batch = writeBatch(db);
-                
-                // 1. Add the sale document
-                const salesRef = collection(db, `artifacts/${appId}/users/${userId}/sales`);
-                const saleDocRef = doc(salesRef); // Automatically generate ID
-                batch.set(saleDocRef, saleData);
-                
-                // 2. Update stock for each product
-                for (const item of currentBill.items) {
-                    const productRef = doc(db, `artifacts/${appId}/users/${userId}/products`, item.productId);
-                    const product = allProducts.find(p => p.id === item.productId);
-                    if (product) {
-                        const newStock = product.stock - item.quantity;
-                        batch.update(productRef, { stock: newStock });
-                    }
-                }
-                
-                await batch.commit();
-
-                // Generate and show bill modal
-                generateBillHTML(saleData, saleDocRef.id);
-                document.getElementById('bill-modal').classList.remove('hidden');
-
-                showAlert('Success', 'Sale recorded and stock updated.', 'success');
-                resetBill();
+                await auth.createUserWithEmailAndPassword(email, password);
+                showMessage('Success', 'Account created successfully!');
             } catch (error) {
-                 console.error("Error processing sale: ", error);
-                 showAlert('Error', `Failed to process sale. ${error.message}`, 'error');
+                showMessage('Signup Failed', error.message);
+            } finally {
+                hideLoading();
             }
         });
-
-        function generateBillHTML(sale, saleId) {
-             const billContent = document.getElementById('bill-content');
-             const now = new Date();
-             
-             billContent.innerHTML = `
-                <div class="border-b-2 border-dashed pb-4 mb-4">
-                    <h2 class="text-3xl font-bold text-center">${shopSettings.shopName || 'Your Shop'}</h2>
-                    <p class="text-center text-sm text-gray-600">${shopSettings.shopAddress || ''}</p>
-                    <p class="text-center text-sm text-gray-600">${shopSettings.shopContact || ''}</p>
-                </div>
-                <div class="flex justify-between text-sm mb-4">
-                    <div>
-                        <p><strong>Bill ID:</strong> ${saleId}</p>
-                        <p><strong>Date:</strong> ${now.toLocaleDateString()} ${now.toLocaleTimeString()}</p>
-                    </div>
-                     <div>
-                        <p><strong>Customer:</strong> ${sale.customerName}</p>
-                        <p><strong>Contact:</strong> ${sale.customerContact}</p>
-                    </div>
-                </div>
-                <table class="w-full text-sm">
-                    <thead>
-                        <tr class="border-b">
-                            <th class="text-left py-2">Item</th>
-                            <th class="text-center py-2">Qty</th>
-                            <th class="text-right py-2">Price</th>
-                            <th class="text-right py-2">Total</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        ${sale.items.map(item => `
-                        <tr>
-                            <td class="py-1">${item.name}</td>
-                            <td class="text-center py-1">${item.quantity}</td>
-                            <td class="text-right py-1">${item.sellPrice.toFixed(2)}</td>
-                            <td class="text-right py-1">${(item.quantity * item.sellPrice).toFixed(2)}</td>
-                        </tr>
-                        `).join('')}
-                    </tbody>
-                    <tfoot class="border-t-2 border-dashed">
-                        <tr>
-                            <td colspan="3" class="text-right py-1 pt-4">Subtotal:</td>
-                            <td class="text-right py-1 pt-4">${sale.subtotal.toFixed(2)}</td>
-                        </tr>
-                         <tr>
-                            <td colspan="3" class="text-right py-1">Discount (${sale.discountPercent}%):</td>
-                            <td class="text-right py-1">-${sale.discountAmount.toFixed(2)}</td>
-                        </tr>
-                        <tr>
-                            <td colspan="3" class="text-right font-bold text-lg py-2">Total:</td>
-                            <td class="text-right font-bold text-lg py-2">Rs ${sale.totalAmount.toFixed(2)}</td>
-                        </tr>
-                    </tfoot>
-                </table>
-                <div class="text-center text-xs text-gray-500 mt-8">
-                    Thank you for your purchase!
-                </div>
-             `;
-        }
-
-        document.getElementById('close-bill-modal').addEventListener('click', () => {
-             document.getElementById('bill-modal').classList.add('hidden');
+        
+        signOutBtn.addEventListener('click', async () => {
+            try {
+                await auth.signOut();
+            } catch (error) {
+                showMessage('Sign Out Failed', error.message);
+            }
+        });
+        
+        showSignupBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            loginForm.classList.add('hidden');
+            signupForm.classList.remove('hidden');
+        });
+        
+        showLoginBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            signupForm.classList.add('hidden');
+            loginForm.classList.remove('hidden');
         });
 
-        document.getElementById('print-bill-btn').addEventListener('click', () => {
-            window.print();
-        });
-
-        // --- REPORTS ---
-        const reportPeriodSelect = document.getElementById('report-period');
-        const customDateRange = document.getElementById('custom-date-range');
-        const startDateInput = document.getElementById('start-date');
-        const endDateInput = document.getElementById('end-date');
-
-        reportPeriodSelect.addEventListener('change', () => {
-            if (reportPeriodSelect.value === 'custom') {
-                customDateRange.classList.remove('hidden');
+        // Auth state listener
+        auth.onAuthStateChanged(async (user) => {
+            if (user) {
+                currentUserId = user.uid;
+                authSection.classList.add('hidden');
+                mainApp.classList.remove('hidden');
+                showSection('dashboard');
+                startRealtimeListeners();
             } else {
-                customDateRange.classList.add('hidden');
+                currentUserId = null;
+                authSection.classList.remove('hidden');
+                mainApp.classList.add('hidden');
+                stopRealtimeListeners();
             }
-            updateReports();
         });
-        startDateInput.addEventListener('change', updateReports);
-        endDateInput.addEventListener('change', updateReports);
+        
+        // Start all Firestore real-time listeners
+        function startRealtimeListeners() {
+            if (unsubscribeListeners.length > 0) return; 
 
-        function updateReports() {
-            let { start, end } = getDateRange();
+            const commonErrorHandler = (error) => console.error("Firestore listener error:", error);
 
-            const filteredSales = allSales.filter(s => s.date >= start && s.date <= end);
-            const filteredExpenses = allExpenses.filter(e => e.date >= start && e.date <= end);
+            unsubscribeListeners.push(db.collection(`users/${currentUserId}/complaints`).onSnapshot(snapshot => {
+                allComplaints = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                renderComplaints();
+                updateDashboard();
+            }, commonErrorHandler));
+
+            unsubscribeListeners.push(db.collection(`users/${currentUserId}/deposits`).onSnapshot(snapshot => {
+                allDeposits = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                renderDeposits();
+            }, commonErrorHandler));
+
+            unsubscribeListeners.push(db.collection(`users/${currentUserId}/commissions`).onSnapshot(snapshot => {
+                allCommissions = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                renderCommissions();
+                updateDashboard();
+            }, commonErrorHandler));
+
+            unsubscribeListeners.push(db.collection(`users/${currentUserId}/expenses`).onSnapshot(snapshot => {
+                allExpenses = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                renderExpenses();
+                updateDashboard();
+            }, commonErrorHandler));
+
+            unsubscribeListeners.push(db.collection(`users/${currentUserId}/clients`).onSnapshot(snapshot => {
+                allClients = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                renderProfiles();
+                updateDashboard();
+                updateClientDatalist();
+            }, commonErrorHandler));
+
+            unsubscribeListeners.push(db.collection(`users/${currentUserId}/employees`).onSnapshot(snapshot => {
+                allEmployees = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                renderEmployees();
+                updateDashboard();
+            }, commonErrorHandler));
             
-            const totalRevenue = filteredSales.reduce((sum, s) => sum + s.totalAmount, 0);
-            const totalProfit = filteredSales.reduce((sum, s) => sum + s.totalProfit, 0);
-            const totalExpenses = filteredExpenses.reduce((sum, e) => sum + e.amount, 0);
-            const netProfit = totalProfit - totalExpenses;
-
-            document.getElementById('report-total-revenue').textContent = `Rs ${totalRevenue.toFixed(2)}`;
-            document.getElementById('report-total-profit').textContent = `Rs ${totalProfit.toFixed(2)}`;
-            document.getElementById('report-total-expenses').textContent = `Rs ${totalExpenses.toFixed(2)}`;
-            document.getElementById('report-net-profit').textContent = `Rs ${netProfit.toFixed(2)}`;
+            unsubscribeListeners.push(db.collection(`users/${currentUserId}/client_payments`).onSnapshot(snapshot => {
+                allClientPayments = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+            }, commonErrorHandler));
             
-            renderSalesReportTable(filteredSales);
-            renderExpensesTable(filteredExpenses);
+            unsubscribeListeners.push(db.collection(`users/${currentUserId}/withdrawals`).onSnapshot(snapshot => {
+                allWithdrawals = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                renderWithdrawals();
+            }, commonErrorHandler));
         }
 
-        function getDateRange() {
-            const period = reportPeriodSelect.value;
+        // Stop all Firestore real-time listeners
+        function stopRealtimeListeners() {
+            unsubscribeListeners.forEach(unsub => unsub());
+            unsubscribeListeners = [];
+        }
+
+        // --- DASHBOARD MODULE ---
+        function updateDashboard() {
+            // Update KPIs
+            const totalComplaints = allComplaints.length;
+            const activeClients = allClients.filter(c => !c.isClosed).length;
+            const totalEmployees = allEmployees.length;
+            
             const now = new Date();
-            let start = new Date(now);
-            let end = new Date(now);
+            const currentMonth = now.getMonth();
+            const currentYear = now.getFullYear();
+            const monthlyRevenue = allCommissions
+                .filter(c => c.month === currentMonth && c.year === currentYear)
+                .reduce((sum, c) => sum + c.receivedAmount, 0);
 
-            if (period === 'daily') {
-                start.setHours(0, 0, 0, 0);
-                end.setHours(23, 59, 59, 999);
-            } else if (period === 'weekly') {
-                const day = start.getDay();
-                start.setDate(start.getDate() - day + (day === 0 ? -6 : 1)); // Adjust to Monday
-                start.setHours(0, 0, 0, 0);
-                end = new Date(start);
-                end.setDate(end.getDate() + 6);
-                end.setHours(23, 59, 59, 999);
-            } else if (period === 'monthly') {
-                start = new Date(now.getFullYear(), now.getMonth(), 1);
-                end = new Date(now.getFullYear(), now.getMonth() + 1, 0);
-                end.setHours(23, 59, 59, 999);
-            } else if (period === 'custom') {
-                start = startDateInput.value ? new Date(startDateInput.value) : new Date(0);
-                start.setHours(0,0,0,0);
-                end = endDateInput.value ? new Date(endDateInput.value) : new Date();
-                end.setHours(23,59,59,999);
-            }
-            return { start, end };
+            document.getElementById('total-complaints').textContent = totalComplaints;
+            document.getElementById('total-clients').textContent = activeClients;
+            document.getElementById('total-employees').textContent = totalEmployees;
+            document.getElementById('monthly-revenue').textContent = `PKR ${monthlyRevenue.toLocaleString()}`;
+
+            // --- Update Charts ---
+
+            // 1. Complaint Status Chart
+            const complaintStatuses = { 'Pending': 0, 'Done': 0, 'Closed': 0 };
+            allComplaints.forEach(c => complaintStatuses[c.status] = (complaintStatuses[c.status] || 0) + 1);
+            if (complaintStatusChart) complaintStatusChart.destroy();
+            complaintStatusChart = new Chart(document.getElementById('complaintStatusChart').getContext('2d'), {
+                type: 'doughnut',
+                data: {
+                    labels: Object.keys(complaintStatuses),
+                    datasets: [{
+                        label: 'Complaint Status',
+                        data: Object.values(complaintStatuses),
+                        backgroundColor: ['#f59e0b', '#10b981', '#ef4444'],
+                    }]
+                },
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'top' } } }
+            });
+
+            const getLast12MonthsData = (data, dateField, valueField) => {
+                const monthlyData = {};
+                const today = new Date();
+                for (let i = 11; i >= 0; i--) {
+                    const d = new Date(today.getFullYear(), today.getMonth() - i, 1);
+                    const key = `${d.getFullYear()}-${d.getMonth()}`;
+                    monthlyData[key] = {
+                        label: `${months[d.getMonth()].substring(0, 3)} '${String(d.getFullYear()).slice(-2)}`,
+                        value: 0
+                    };
+                }
+
+                data.forEach(item => {
+                    let itemDate;
+                    if (dateField === 'monthYear') { 
+                        itemDate = new Date(item.year, item.month, 1);
+                    } else { 
+                        itemDate = new Date(item[dateField]);
+                    }
+                    const key = `${itemDate.getFullYear()}-${itemDate.getMonth()}`;
+                    if (monthlyData[key]) {
+                        monthlyData[key].value += (valueField ? item[valueField] : 1);
+                    }
+                });
+                return Object.values(monthlyData);
+            };
+
+            const commissionData = getLast12MonthsData(allCommissions, 'monthYear', 'receivedAmount');
+            if (monthlyCommissionChart) monthlyCommissionChart.destroy();
+            monthlyCommissionChart = new Chart(document.getElementById('monthlyCommissionChart').getContext('2d'), {
+                type: 'bar',
+                data: {
+                    labels: commissionData.map(d => d.label),
+                    datasets: [{
+                        label: 'Commission Received (PKR)',
+                        data: commissionData.map(d => d.value),
+                        backgroundColor: '#3b82f6',
+                    }]
+                },
+                options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true } } }
+            });
+
+            const clientsData = getLast12MonthsData(allClients, 'accountOpeningDate', null);
+            if (newClientsChart) newClientsChart.destroy();
+            newClientsChart = new Chart(document.getElementById('newClientsChart').getContext('2d'), {
+                type: 'line',
+                data: {
+                    labels: clientsData.map(d => d.label),
+                    datasets: [{
+                        label: 'New Clients',
+                        data: clientsData.map(d => d.value),
+                        borderColor: '#10b981',
+                        tension: 0.3,
+                        fill: true,
+                        backgroundColor: 'rgba(16, 185, 129, 0.1)'
+                    }]
+                },
+                options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } } } }
+            });
+
+            const expensesData = getLast12MonthsData(allExpenses, 'monthYear', 'amount');
+            if (monthlyExpensesChart) monthlyExpensesChart.destroy();
+            monthlyExpensesChart = new Chart(document.getElementById('monthlyExpensesChart').getContext('2d'), {
+                type: 'bar',
+                data: {
+                    labels: expensesData.map(d => d.label),
+                    datasets: [{
+                        label: 'Expenses (PKR)',
+                        data: expensesData.map(d => d.value),
+                        backgroundColor: '#ef4444',
+                    }]
+                },
+                options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true } } }
+            });
         }
 
-        function renderSalesReportTable(sales) {
-            const tableBody = document.getElementById('sales-report-table');
-            if (sales.length === 0) {
-                tableBody.innerHTML = `<tr><td colspan="4" class="text-center py-4 text-gray-500">No sales data for this period.</td></tr>`;
-                return;
-            }
-            tableBody.innerHTML = sales.sort((a,b) => b.date - a.date).map(s => `
-                <tr>
-                    <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-600">${s.date.toLocaleDateString()}</td>
-                    <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-800 font-medium">Rs ${s.totalAmount.toFixed(2)}</td>
-                    <td class="px-4 py-3 whitespace-nowrap text-sm text-green-600 font-medium">Rs ${s.totalProfit.toFixed(2)}</td>
-                    <td class="px-4 py-3 text-sm text-gray-500">${s.items.map(i => `${i.name} (x${i.quantity})`).join(', ')}</td>
-                </tr>
-            `).join('');
+
+        function updateClientDatalist() {
+            const datalist = document.getElementById('client-trading-accounts');
+            datalist.innerHTML = allClients.map(client => `<option value="${client.tradingAccount}">`).join('');
+        }
+
+        function handleTradingAccountInput(accountInputId, nameInputId) {
+            const accountInput = document.getElementById(accountInputId);
+            const nameInput = document.getElementById(nameInputId);
+            accountInput.addEventListener('input', () => {
+                const client = allClients.find(c => c.tradingAccount === accountInput.value);
+                if (client) {
+                    nameInput.value = client.name;
+                } else {
+                    nameInput.value = '';
+                }
+            });
         }
         
-        function renderExpensesTable(expenses) {
-            const tableBody = document.getElementById('expenses-table');
-             if (expenses.length === 0) {
-                tableBody.innerHTML = `<tr><td colspan="2" class="text-center py-4 text-gray-500">No expenses logged.</td></tr>`;
+        handleTradingAccountInput('complaint-trading-account', 'complaint-client-name');
+        handleTradingAccountInput('deposit-trading-account', 'deposit-client-name');
+        handleTradingAccountInput('withdrawal-trading-account', 'withdrawal-client-name');
+
+
+        // --- COMPLAINTS MODULE ---
+        const addComplaintForm = document.getElementById('add-complaint-form');
+        const complaintsList = document.getElementById('complaints-list');
+        const complaintSearch = document.getElementById('complaint-search');
+
+        addComplaintForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const clientName = addComplaintForm['complaint-client-name'].value;
+            if (!clientName) {
+                showMessage('Error', 'Please select a valid client using their trading account number.');
                 return;
             }
-            tableBody.innerHTML = expenses.sort((a,b) => b.date - a.date).map(e => `
-                <tr>
-                    <td class="px-2 py-2 text-sm text-gray-600">${e.description} on ${e.date.toLocaleDateString()}</td>
-                    <td class="px-2 py-2 text-sm text-gray-800 font-medium">Rs ${e.amount.toFixed(2)}</td>
+            showLoading();
+            const complaintData = {
+                clientName: clientName,
+                tradingAccount: addComplaintForm['complaint-trading-account'].value,
+                details: addComplaintForm['complaint-details'].value,
+                status: addComplaintForm['complaint-status'].value,
+                timestamp: firebase.firestore.FieldValue.serverTimestamp()
+            };
+            try {
+                await db.collection(`users/${currentUserId}/complaints`).add(complaintData);
+                addComplaintForm.reset();
+                showMessage('Success', 'Complaint added successfully!');
+            } catch (error) {
+                showMessage('Error', error.message);
+            } finally {
+                hideLoading();
+            }
+        });
+        
+        complaintSearch.addEventListener('input', () => renderComplaints());
+
+        function renderComplaints() {
+            const searchTerm = complaintSearch.value.toLowerCase();
+            const filteredComplaints = allComplaints.filter(c => 
+                c.clientName.toLowerCase().includes(searchTerm) || 
+                c.tradingAccount.toLowerCase().includes(searchTerm)
+            ).sort((a, b) => (b.timestamp?.toDate() || 0) - (a.timestamp?.toDate() || 0));
+
+            complaintsList.innerHTML = filteredComplaints.map(c => `
+                <tr class="hover:bg-gray-50 border-b">
+                    <td class="p-2">${c.clientName}</td>
+                    <td class="p-2">${c.tradingAccount}</td>
+                    <td class="p-2">${c.details}</td>
+                    <td class="p-2">
+                        <span class="px-2 py-1 rounded-full text-xs font-semibold
+                            ${c.status === 'Pending' ? 'bg-yellow-200 text-yellow-800' :
+                            c.status === 'Done' ? 'bg-green-200 text-green-800' :
+                            'bg-red-200 text-red-800'}">
+                            ${c.status}
+                        </span>
+                    </td>
+                    <td class="p-2">${c.timestamp ? new Date(c.timestamp.toDate()).toLocaleDateString() : 'N/A'}</td>
+                    <td class="p-2">
+                        <div class="flex space-x-2">
+                            <select data-id="${c.id}" class="complaint-status-select bg-gray-200 text-gray-700 px-2 py-1 rounded-full text-xs">
+                                <option value="Pending" ${c.status === 'Pending' ? 'selected' : ''}>Pending</option>
+                                <option value="Done" ${c.status === 'Done' ? 'selected' : ''}>Done</option>
+                                <option value="Closed" ${c.status === 'Closed' ? 'selected' : ''}>Closed</option>
+                            </select>
+                            <button data-id="${c.id}" class="delete-complaint-btn bg-red-500 text-white p-1 rounded-full hover:bg-red-600">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                                  <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm6 0a1 1 0 11-2 0v6a1 1 0 112 0V8z" clip-rule="evenodd" />
+                                </svg>
+                            </button>
+                        </div>
+                    </td>
                 </tr>
             `).join('');
-        }
 
-        document.getElementById('expense-form').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            if(!userId) return;
-            const expenseData = {
-                description: document.getElementById('expense-description').value,
-                amount: parseFloat(document.getElementById('expense-amount').value),
-                date: Timestamp.fromDate(new Date(document.getElementById('expense-date').value))
-            };
-
-            if (!expenseData.description || !expenseData.amount || !document.getElementById('expense-date').value) {
-                showAlert('Invalid Input', 'Please fill all expense fields.', 'error');
-                return;
-            }
-
-            try {
-                const expensesRef = collection(db, `artifacts/${appId}/users/${userId}/expenses`);
-                await addDoc(expensesRef, expenseData);
-                showAlert('Success', 'Expense added successfully.', 'success');
-                e.target.reset();
-                document.getElementById('expense-date').valueAsDate = new Date();
-            } catch (error) {
-                console.error("Error adding expense: ", error);
-                showAlert('Error', `Failed to add expense. ${error.message}`, 'error');
-            }
-        });
-        document.getElementById('expense-date').valueAsDate = new Date(); // set default date for expense form
-
-
-        // --- SETTINGS ---
-        document.getElementById('settings-form').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            if(!userId) return;
-            const settingsData = {
-                shopName: document.getElementById('shop-name').value,
-                shopAddress: document.getElementById('shop-address').value,
-                shopContact: document.getElementById('shop-contact').value
-            };
-            try {
-                const settingsRef = doc(db, `artifacts/${appId}/users/${userId}/settings/shop`);
-                await setDoc(settingsRef, settingsData, { merge: true });
-                showAlert('Success', 'Settings saved successfully!', 'success');
-            } catch(error) {
-                console.error("Error saving settings: ", error);
-                showAlert('Error', 'Could not save settings.', 'error');
-            }
-        });
-
-        // --- DATA EXPORT/IMPORT ---
-        function exportToCSV(data, filename) {
-            if (data.length === 0) {
-                showAlert('No Data', 'There is no data to export.', 'info');
-                return;
-            }
-            const headers = Object.keys(data[0]);
-            const csvRows = [
-                headers.join(','),
-                ...data.map(row => 
-                    headers.map(header => {
-                        const value = String(row[header]).includes(',') ? `"${row[header]}"` : row[header];
-                        return value;
-                    }).join(',')
-                )
-            ];
-            const csvString = csvRows.join('\n');
-            const blob = new Blob([csvString], { type: 'text/csv' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.setAttribute('href', url);
-            a.setAttribute('download', filename);
-            a.click();
-            URL.revokeObjectURL(url);
-        }
-
-        document.getElementById('export-products-btn').addEventListener('click', () => {
-             if (allProducts.length === 0) { showAlert('No Data', 'There are no products to export.', 'info'); return; }
-             const dataToExport = allProducts.map(({ id, lastUpdated, ...rest }) => rest);
-             exportToCSV(dataToExport, 'products-export.csv');
-        });
-
-        document.getElementById('export-sales-csv').addEventListener('click', () => {
-             let { start, end } = getDateRange();
-             const filteredSales = allSales
-                .filter(s => s.date >= start && s.date <= end)
-                .map(s => ({
-                    date: s.date.toISOString().split('T')[0],
-                    customerName: s.customerName,
-                    totalAmount: s.totalAmount,
-                    totalProfit: s.totalProfit,
-                    discountPercent: s.discountPercent,
-                    items: s.items.map(i => `${i.name}(${i.quantity})`).join(' | ')
-                }));
-            if (filteredSales.length === 0) { showAlert('No Data', 'No sales data for this period to export.', 'info'); return; }
-            exportToCSV(filteredSales, 'sales-report.csv');
-        });
-
-        document.getElementById('import-products-btn').addEventListener('click', () => {
-            document.getElementById('import-products-file').click();
-        });
-
-        document.getElementById('import-products-file').addEventListener('change', (e) => {
-            const file = e.target.files[0];
-            if (!file || !userId) return;
-            const reader = new FileReader();
-            reader.onload = async (event) => {
-                const csv = event.target.result;
-                const lines = csv.split('\n').filter(line => line);
-                if (lines.length <= 1) {
-                    showAlert('Error', 'CSV file is empty or has only headers.', 'error');
-                    return;
-                }
-                const headers = lines[0].split(',').map(h => h.trim());
-                const requiredHeaders = ['name', 'sku', 'stock', 'buyPrice', 'sellPrice', 'lowStockWarning'];
-                if(!requiredHeaders.every(h => headers.includes(h))) {
-                    showAlert('Import Error', `CSV must contain these headers: ${requiredHeaders.join(', ')}`, 'error');
-                    return;
-                }
-
-                const productsToImport = lines.slice(1).map(line => {
-                    const values = line.split(',');
-                    const product = headers.reduce((obj, header, index) => {
-                        let value = values[index] ? values[index].trim() : '';
-                        if (['stock', 'lowStockWarning'].includes(header)) {
-                            value = parseInt(value, 10);
-                        } else if (['buyPrice', 'sellPrice'].includes(header)) {
-                             value = parseFloat(value);
-                        }
-                        obj[header] = value;
-                        return obj;
-                    }, {});
-                    return product;
-                });
-
-                if (confirm(`You are about to import ${productsToImport.length} products. This may overwrite existing products with the same SKU. Continue?`)) {
+            document.querySelectorAll('.complaint-status-select').forEach(select => {
+                select.addEventListener('change', async (e) => {
+                    const id = e.currentTarget.dataset.id;
+                    const newStatus = e.currentTarget.value;
                     try {
-                        const batch = writeBatch(db);
-                        for (const product of productsToImport) {
-                            const productsRef = collection(db, `artifacts/${appId}/users/${userId}/products`);
-                            const q = query(productsRef, where("sku", "==", product.sku));
-                            const querySnapshot = await getDocs(q);
-
-                            if (!querySnapshot.empty) {
-                                // Update existing product
-                                const docRef = querySnapshot.docs[0].ref;
-                                batch.update(docRef, {...product, lastUpdated: serverTimestamp()});
-                            } else {
-                                // Add new product
-                                const newDocRef = doc(productsRef);
-                                batch.set(newDocRef, {...product, lastUpdated: serverTimestamp()});
-                            }
-                        }
-                        await batch.commit();
-                        showAlert('Success', `${productsToImport.length} products imported successfully.`, 'success');
+                        await db.collection(`users/${currentUserId}/complaints`).doc(id).update({ status: newStatus });
                     } catch (error) {
-                        console.error('Error importing products:', error);
-                        showAlert('Import Failed', `An error occurred during import: ${error.message}`, 'error');
+                        showMessage('Error', error.message);
                     }
-                }
+                });
+            });
+
+            document.querySelectorAll('.delete-complaint-btn').forEach(btn => {
+                btn.addEventListener('click', async (e) => {
+                    const id = e.currentTarget.dataset.id;
+                    if(confirm('Are you sure you want to delete this complaint?')){
+                        try {
+                            await db.collection(`users/${currentUserId}/complaints`).doc(id).delete();
+                        } catch (error) {
+                            showMessage('Error', error.message);
+                        }
+                    }
+                });
+            });
+        }
+
+        // --- DEPOSITS MODULE ---
+        const addDepositForm = document.getElementById('add-deposit-form');
+        const depositsList = document.getElementById('deposits-list');
+        const depositSearch = document.getElementById('deposit-search');
+        const depositImageInput = document.getElementById('deposit-image');
+        const depositStatusSelect = document.getElementById('deposit-status');
+        const depositReturnedReasonInput = document.getElementById('deposit-returned-reason');
+        const imagePreviewsContainer = document.getElementById('image-previews');
+
+        depositImageInput.addEventListener('change', (e) => {
+            imagePreviewsContainer.innerHTML = '';
+            Array.from(e.target.files).forEach(file => {
+                const reader = new FileReader();
+                reader.onload = (event) => {
+                    const img = document.createElement('img');
+                    img.src = event.target.result;
+                    img.className = 'h-16 w-16 object-cover rounded-md';
+                    imagePreviewsContainer.appendChild(img);
+                };
+                reader.readAsDataURL(file);
+            });
+        });
+
+        depositStatusSelect.addEventListener('change', (e) => {
+            depositReturnedReasonInput.classList.toggle('hidden', e.target.value !== 'Returned');
+            depositReturnedReasonInput.required = e.target.value === 'Returned';
+        });
+
+        addDepositForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const clientName = addDepositForm['deposit-client-name'].value;
+            if (!clientName) {
+                showMessage('Error', 'Please select a valid client using their trading account number.');
+                return;
+            }
+            showLoading();
+
+            const imageUrls = [];
+            const files = Array.from(depositImageInput.files);
+            
+            try {
+                const uploadPromises = files.map(async file => {
+                    const compressedFile = await imageCompression(file, { maxSizeMB: 1, maxWidthOrHeight: 1920 });
+                    const storageRef = storage.ref().child(`users/${currentUserId}/deposits/${Date.now()}_${compressedFile.name}`);
+                    const snapshot = await storageRef.put(compressedFile);
+                    return snapshot.ref.getDownloadURL();
+                });
+                
+                const urls = await Promise.all(uploadPromises);
+                imageUrls.push(...urls);
+
+                const depositData = {
+                    clientName: clientName,
+                    tradingAccount: addDepositForm['deposit-trading-account'].value,
+                    amount: parseFloat(addDepositForm['deposit-amount'].value),
+                    date: addDepositForm['deposit-date'].value,
+                    chequeNumber: addDepositForm['deposit-cheque-number'].value,
+                    status: addDepositForm['deposit-status'].value,
+                    returnedReason: addDepositForm['deposit-returned-reason'].value,
+                    imageUrls: imageUrls,
+                    timestamp: firebase.firestore.FieldValue.serverTimestamp()
+                };
+
+                await db.collection(`users/${currentUserId}/deposits`).add(depositData);
+                addDepositForm.reset();
+                imagePreviewsContainer.innerHTML = '';
+                depositReturnedReasonInput.classList.add('hidden');
+                showMessage('Success', 'Deposit added successfully!');
+            } catch (error) {
+                showMessage('Error', `Failed to add deposit: ${error.message}`);
+            } finally {
+                hideLoading();
+            }
+        });
+
+        depositSearch.addEventListener('input', () => renderDeposits());
+        
+        function renderDeposits() {
+            const searchTerm = depositSearch.value.toLowerCase();
+            const filteredDeposits = allDeposits.filter(d => 
+                d.clientName.toLowerCase().includes(searchTerm) || 
+                d.tradingAccount.toLowerCase().includes(searchTerm)
+            ).sort((a, b) => (b.timestamp?.toDate() || 0) - (a.timestamp?.toDate() || 0));
+
+            depositsList.innerHTML = filteredDeposits.map(d => `
+                <tr class="hover:bg-gray-50 border-b">
+                    <td class="p-2">${d.clientName}</td>
+                    <td class="p-2">${d.tradingAccount}</td>
+                    <td class="p-2">PKR ${d.amount.toLocaleString()}</td>
+                    <td class="p-2">${d.chequeNumber}</td>
+                    <td class="p-2">
+                        <span class="px-2 py-1 rounded-full text-xs font-semibold
+                            ${d.status === 'Pending' ? 'bg-yellow-200 text-yellow-800' :
+                            d.status === 'Deposited' ? 'bg-green-200 text-green-800' :
+                            'bg-red-200 text-red-800'}">
+                            ${d.status}
+                        </span>
+                        ${d.status === 'Returned' && d.returnedReason ? `<p class="text-xs text-red-500 mt-1">${d.returnedReason}</p>` : ''}
+                    </td>
+                    <td class="p-2">${new Date(d.date).toLocaleDateString()}</td>
+                    <td class="p-2">
+                        <div class="flex flex-wrap gap-1">
+                            ${(d.imageUrls || []).map(url => `<a href="${url}" target="_blank"><img src="${url}" class="h-8 w-8 object-cover rounded" alt="Cheque image"></a>`).join('')}
+                        </div>
+                    </td>
+                    <td class="p-2">
+                        <button data-id="${d.id}" class="delete-deposit-btn bg-red-500 text-white p-1 rounded-full hover:bg-red-600">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                              <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm6 0a1 1 0 11-2 0v6a1 1 0 112 0V8z" clip-rule="evenodd" />
+                            </svg>
+                        </button>
+                    </td>
+                </tr>
+            `).join('');
+
+            document.querySelectorAll('.delete-deposit-btn').forEach(btn => {
+                btn.addEventListener('click', async (e) => {
+                    const id = e.currentTarget.dataset.id;
+                     if(confirm('Are you sure you want to delete this deposit record?')){
+                        try {
+                            await db.collection(`users/${currentUserId}/deposits`).doc(id).delete();
+                        } catch (error) {
+                            showMessage('Error', error.message);
+                        }
+                    }
+                });
+            });
+        }
+
+        // --- COMMISSION MODULE ---
+        const addCommissionForm = document.getElementById('add-commission-form');
+        const commissionList = document.getElementById('commission-list');
+        const commissionChartCanvas = document.getElementById('commissionChart');
+        
+        function populateMonthDropdown(selectElement) {
+            months.forEach((month, index) => {
+                const option = document.createElement('option');
+                option.value = index;
+                option.textContent = month;
+                selectElement.appendChild(option.cloneNode(true));
+            });
+        }
+
+        populateMonthDropdown(document.getElementById('commission-month'));
+        document.getElementById('commission-year').value = new Date().getFullYear();
+
+        addCommissionForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            showLoading();
+            const commissionData = {
+                month: parseInt(addCommissionForm['commission-month'].value),
+                year: parseInt(addCommissionForm['commission-year'].value),
+                totalCommission: parseFloat(addCommissionForm['commission-total'].value),
+                requestedPayment: parseFloat(addCommissionForm['commission-requested'].value),
+                receivedAmount: parseFloat(addCommissionForm['commission-received'].value),
+                timestamp: firebase.firestore.FieldValue.serverTimestamp()
             };
-            reader.readAsText(file);
-            e.target.value = ''; // Reset file input
+            try {
+                const existing = await db.collection(`users/${currentUserId}/commissions`)
+                    .where('month', '==', commissionData.month)
+                    .where('year', '==', commissionData.year)
+                    .limit(1).get();
+
+                if (existing.empty) {
+                    await db.collection(`users/${currentUserId}/commissions`).add(commissionData);
+                    showMessage('Success', 'Commission record added successfully!');
+                } else {
+                    await db.collection(`users/${currentUserId}/commissions`).doc(existing.docs[0].id).update(commissionData);
+                    showMessage('Success', 'Commission record updated successfully!');
+                }
+                addCommissionForm.reset();
+                document.getElementById('commission-year').value = new Date().getFullYear();
+            } catch (error) {
+                showMessage('Error', error.message);
+            } finally {
+                hideLoading();
+            }
+        });
+
+        function renderCommissions() {
+            const sortedCommissions = [...allCommissions].sort((a, b) => b.year - a.year || b.month - a.month);
+            
+            commissionList.innerHTML = sortedCommissions.map(c => `
+                <tr class="hover:bg-gray-50 border-b">
+                    <td class="p-2">${months[c.month]} ${c.year}</td>
+                    <td class="p-2">PKR ${c.totalCommission.toLocaleString()}</td>
+                    <td class="p-2">PKR ${c.requestedPayment.toLocaleString()}</td>
+                    <td class="p-2">PKR ${c.receivedAmount.toLocaleString()}</td>
+                    <td class="p-2">
+                        <button data-id="${c.id}" class="delete-commission-btn bg-red-500 text-white p-1 rounded-full hover:bg-red-600">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                              <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm6 0a1 1 0 11-2 0v6a1 1 0 112 0V8z" clip-rule="evenodd" />
+                            </svg>
+                        </button>
+                    </td>
+                </tr>
+            `).join('');
+            
+            document.querySelectorAll('.delete-commission-btn').forEach(btn => {
+                btn.addEventListener('click', async (e) => {
+                    const id = e.currentTarget.dataset.id;
+                    if(confirm('Are you sure you want to delete this commission record?')){
+                        try {
+                            await db.collection(`users/${currentUserId}/commissions`).doc(id).delete();
+                        } catch (error) {
+                            showMessage('Error', error.message);
+                        }
+                    }
+                });
+            });
+
+            const chartData = sortedCommissions.slice(0, 12).reverse();
+            const labels = chartData.map(c => `${months[c.month].substring(0, 3)} '${String(c.year).slice(-2)}`);
+            if (commissionChart) commissionChart.destroy();
+            commissionChart = new Chart(commissionChartCanvas, {
+                type: 'line',
+                data: {
+                    labels,
+                    datasets: [
+                        { label: 'Total Commission', data: chartData.map(c => c.totalCommission), borderColor: '#3b82f6', tension: 0.3 },
+                        { label: 'Received Amount', data: chartData.map(c => c.receivedAmount), borderColor: '#10b981', tension: 0.3 }
+                    ]
+                },
+                options: { responsive: true, scales: { y: { beginAtZero: true } } }
+            });
+        }
+
+        // --- EXPENSES MODULE ---
+        const addExpenseForm = document.getElementById('add-expense-form');
+        const expensesList = document.getElementById('expenses-list');
+        populateMonthDropdown(document.getElementById('expense-month'));
+        populateMonthDropdown(document.getElementById('expense-report-month'));
+        document.getElementById('expense-year').value = new Date().getFullYear();
+        document.getElementById('expense-report-month').value = new Date().getMonth();
+        document.getElementById('expense-report-year').value = new Date().getFullYear();
+        const totalExpensesDisplay = document.getElementById('total-expenses-display');
+        
+        addExpenseForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            showLoading();
+            const expenseData = {
+                month: parseInt(addExpenseForm['expense-month'].value),
+                year: parseInt(addExpenseForm['expense-year'].value),
+                name: addExpenseForm['expense-name'].value,
+                amount: parseFloat(addExpenseForm['expense-amount'].value),
+                timestamp: firebase.firestore.FieldValue.serverTimestamp()
+            };
+            try {
+                await db.collection(`users/${currentUserId}/expenses`).add(expenseData);
+                addExpenseForm.reset();
+                document.getElementById('expense-year').value = new Date().getFullYear();
+                showMessage('Success', 'Expense added successfully!');
+            } catch (error) {
+                showMessage('Error', error.message);
+            } finally {
+                hideLoading();
+            }
+        });
+
+        document.getElementById('expense-report-month').addEventListener('change', () => renderExpenses());
+        document.getElementById('expense-report-year').addEventListener('input', () => renderExpenses());
+        
+        document.getElementById('print-expenses-btn').addEventListener('click', () => {
+            const monthDropdown = document.getElementById('expense-report-month');
+            const yearInput = document.getElementById('expense-report-year');
+            const selectedMonthName = monthDropdown.options[monthDropdown.selectedIndex].text;
+            const selectedYear = yearInput.value;
+
+            const printHeader = `
+                <div style="text-align:center; margin-bottom: 20px;">
+                    <h2 style="margin:0;">Darson Sargodha</h2>
+                    <h3 style="margin:0;">Expenses Report for ${selectedMonthName} ${selectedYear}</h3>
+                </div>
+            `;
+            const printContent = document.getElementById('expenses-report-container').innerHTML;
+            const printWindow = window.open('', '', 'height=600,width=800');
+            printWindow.document.write('<html><head><title>House Expenses Report</title>');
+            printWindow.document.write('<style>body{font-family:sans-serif;} table{width:100%;border-collapse:collapse;} th,td{border:1px solid #ddd;padding:8px;text-align:left;} th{background-color:#f2f2f2;}</style>');
+            printWindow.document.write('</head><body>');
+            printWindow.document.write(printHeader);
+            printWindow.document.write(printContent);
+            printWindow.document.write('</body></html>');
+            printWindow.document.close();
+            printWindow.print();
+        });
+
+        function renderExpenses() {
+            const selectedMonth = parseInt(document.getElementById('expense-report-month').value);
+            const selectedYear = parseInt(document.getElementById('expense-report-year').value);
+            
+            const filteredExpenses = allExpenses.filter(e => e.month === selectedMonth && e.year === selectedYear);
+            let total = filteredExpenses.reduce((sum, e) => sum + e.amount, 0);
+
+            expensesList.innerHTML = filteredExpenses.map(e => `
+                <tr class="hover:bg-gray-50 border-b">
+                    <td class="p-2">${e.name}</td>
+                    <td class="p-2">PKR ${e.amount.toLocaleString()}</td>
+                    <td class="p-2">
+                        <button data-id="${e.id}" class="delete-expense-btn bg-red-500 text-white p-1 rounded-full hover:bg-red-600">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                              <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm6 0a1 1 0 11-2 0v6a1 1 0 112 0V8z" clip-rule="evenodd" />
+                            </svg>
+                        </button>
+                    </td>
+                </tr>
+            `).join('');
+            totalExpensesDisplay.textContent = `Grand Total: PKR ${total.toLocaleString()}`;
+
+            document.querySelectorAll('.delete-expense-btn').forEach(btn => {
+                btn.addEventListener('click', async (e) => {
+                    const id = e.currentTarget.dataset.id;
+                    if(confirm('Are you sure you want to delete this expense?')){
+                        try {
+                            await db.collection(`users/${currentUserId}/expenses`).doc(id).delete();
+                        } catch (error) {
+                            showMessage('Error', error.message);
+                        }
+                    }
+                });
+            });
+        }
+
+        // --- CLIENT PROFILES MODULE ---
+        const addClientForm = document.getElementById('add-client-form');
+        const profilesList = document.getElementById('profiles-list');
+        const profilesSearch = document.getElementById('profiles-search');
+        const profileDetailModal = document.getElementById('profile-detail-modal');
+        const addClientPaymentForm = document.getElementById('add-client-payment-form');
+        populateMonthDropdown(document.getElementById('client-payment-month'));
+        document.getElementById('client-payment-year').value = new Date().getFullYear();
+        
+        // MODIFIED: Added logic for old client checkbox
+        const oldClientCheckbox = document.getElementById('profile-is-old-client');
+        const accountDateInput = document.getElementById('profile-account-date');
+        const accountDateWrapper = document.getElementById('profile-account-date-wrapper');
+
+        oldClientCheckbox.addEventListener('change', (e) => {
+            const isChecked = e.target.checked;
+            accountDateWrapper.classList.toggle('hidden', isChecked);
+            accountDateInput.required = !isChecked;
+        });
+
+        addClientForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            showLoading();
+            const clientData = {
+                name: addClientForm['profile-client-name'].value,
+                tradingAccount: addClientForm['profile-trading-account'].value,
+                cnic: addClientForm['profile-cnic'].value,
+                cdcAccount: addClientForm['profile-cdc-account'].value,
+                email: addClientForm['profile-email'].value,
+                contact: addClientForm['profile-contact'].value,
+                address: addClientForm['profile-address'].value,
+                accountOpeningDate: addClientForm['profile-account-date'].value,
+                isOldClient: addClientForm['profile-is-old-client'].checked,
+                isClosed: false, closureDate: null,
+                timestamp: firebase.firestore.FieldValue.serverTimestamp()
+            };
+            try {
+                await db.collection(`users/${currentUserId}/clients`).add(clientData);
+                addClientForm.reset();
+                accountDateWrapper.classList.remove('hidden'); // Reset view
+                accountDateInput.required = true;
+                showMessage('Success', 'Client profile added successfully!');
+            } catch (error) {
+                showMessage('Error', error.message);
+            } finally { hideLoading(); }
+        });
+
+        profilesSearch.addEventListener('input', () => renderProfiles());
+        
+        function renderProfiles() {
+            const searchTerm = profilesSearch.value.toLowerCase();
+            const filteredClients = allClients.filter(c => 
+                c.name.toLowerCase().includes(searchTerm) || 
+                c.tradingAccount.toLowerCase().includes(searchTerm)
+            );
+
+            profilesList.innerHTML = filteredClients.map(c => `
+                <div class="card p-6 cursor-pointer" data-id="${c.id}">
+                    <h4 class="font-bold text-lg">${c.name}</h4>
+                    <p class="text-gray-500 text-sm">${c.tradingAccount}</p>
+                    ${!c.isOldClient && c.accountOpeningDate ? `<p class="text-sm mt-2"><span class="font-semibold">Opened:</span> ${new Date(c.accountOpeningDate).toLocaleDateString()}</p>` : ''}
+                    ${c.isOldClient ? `<span class="mt-2 text-xs font-semibold text-white bg-blue-500 px-2 py-1 rounded-full">Old Client</span>` : ''}
+                    ${c.isClosed ? `<span class="mt-2 text-xs font-semibold text-white bg-red-500 px-2 py-1 rounded-full">Account Closed</span>` : ''}
+                </div>
+            `).join('');
+
+            document.querySelectorAll('#profiles-list .card').forEach(card => {
+                card.addEventListener('click', (e) => showClientProfile(e.currentTarget.dataset.id));
+            });
+        }
+        
+        async function showClientProfile(clientId) {
+            const client = allClients.find(c => c.id === clientId);
+            if (!client) return;
+
+            document.getElementById('profile-detail-name').textContent = client.name;
+            // MODIFIED: Conditional display for account opening date
+            document.getElementById('profile-detail-info').innerHTML = `
+                <div><p class="font-semibold">Trading Account:</p><p>${client.tradingAccount}</p></div>
+                <div><p class="font-semibold">CNIC:</p><p>${client.cnic || 'N/A'}</p></div>
+                <div><p class="font-semibold">CDC Account:</p><p>${client.cdcAccount || 'N/A'}</p></div>
+                <div><p class="font-semibold">Contact:</p><p>${client.contact || 'N/A'}</p></div>
+                <div><p class="font-semibold">Email:</p><p>${client.email || 'N/A'}</p></div>
+                <div class="md:col-span-2"><p class="font-semibold">Address:</p><p>${client.address || 'N/A'}</p></div>
+                ${!client.isOldClient && client.accountOpeningDate ? `<div><p class="font-semibold">Account Opened:</p><p>${new Date(client.accountOpeningDate).toLocaleDateString()}</p></div>` : `<div><p class="font-semibold">Account Type:</p><p>Old Client</p></div>`}
+                <div><p class="font-semibold">Status:</p><p>${client.isClosed ? `Closed (${new Date(client.closureDate).toLocaleDateString()})` : 'Active'}</p></div>
+            `;
+            
+            addClientPaymentForm.dataset.clientId = client.id;
+            
+            const clientDeposits = allDeposits.filter(d => d.tradingAccount === client.tradingAccount);
+            const clientPayments = allClientPayments.filter(p => p.clientId === client.id);
+
+            const financialHistory = [
+                ...clientDeposits.map(d => ({ type: 'Deposit', amount: d.amount, date: d.timestamp?.toDate(), details: `Cheque #${d.chequeNumber}` })),
+                ...clientPayments.map(p => ({ type: 'Payment', amount: p.amount, date: p.timestamp?.toDate(), details: `${months[p.month]} ${p.year}` }))
+            ].sort((a, b) => (b.date || 0) - (a.date || 0));
+
+            document.getElementById('client-financial-history').innerHTML = financialHistory.length ? financialHistory.map(item => `
+                <li class="flex justify-between items-center text-sm border-b pb-1">
+                    <div><span class="font-semibold">${item.type}:</span> PKR ${item.amount.toLocaleString()} <span class="text-xs text-gray-500">(${item.details})</span></div>
+                    <span class="text-xs text-gray-500">${item.date ? item.date.toLocaleDateString() : 'N/A'}</span>
+                </li>
+            `).join('') : '<li>No financial history found.</li>';
+            
+            const clientPaymentData = {};
+            clientPayments.forEach(p => {
+                const key = `${p.year}-${p.month}`;
+                if (!clientPaymentData[key]) {
+                    clientPaymentData[key] = {
+                        label: `${months[p.month].substring(0, 3)} '${String(p.year).slice(-2)}`,
+                        value: 0,
+                        sortKey: new Date(p.year, p.month, 1)
+                    };
+                }
+                clientPaymentData[key].value += p.amount;
+            });
+            const sortedPaymentData = Object.values(clientPaymentData).sort((a, b) => a.sortKey - b.sortKey);
+
+            if (clientCommissionChart) clientCommissionChart.destroy();
+            clientCommissionChart = new Chart('clientCommissionChart', {
+                type: 'bar',
+                data: { 
+                    labels: sortedPaymentData.map(d => d.label), 
+                    datasets: [{ 
+                        label: 'Payment Amount (PKR)', 
+                        data: sortedPaymentData.map(d => d.value), 
+                        backgroundColor: '#10b981' 
+                    }] 
+                },
+                options: { responsive: true, scales: { y: { beginAtZero: true } } }
+            });
+
+            document.getElementById('close-account-btn').dataset.id = client.id;
+            document.getElementById('close-account-btn').classList.toggle('hidden', client.isClosed);
+            
+            const profileDetailContent = profileDetailModal.querySelector('.popup-window-content');
+            profileDetailModal.classList.add('active');
+            profileDetailContent.classList.add('active');
+        }
+
+        addClientPaymentForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const paymentData = {
+                clientId: e.target.dataset.clientId,
+                month: parseInt(e.target['client-payment-month'].value),
+                year: parseInt(e.target['client-payment-year'].value),
+                amount: parseFloat(e.target['client-payment-amount'].value),
+                timestamp: firebase.firestore.FieldValue.serverTimestamp()
+            };
+            try {
+                await db.collection(`users/${currentUserId}/client_payments`).add(paymentData);
+                showMessage('Success', 'Payment added!');
+                e.target.reset();
+                document.getElementById('client-payment-year').value = new Date().getFullYear();
+                showClientProfile(paymentData.clientId);
+            } catch (error) {
+                showMessage('Error', error.message);
+            }
+        });
+
+        document.getElementById('close-profile-btn').addEventListener('click', () => {
+            const profileDetailContent = profileDetailModal.querySelector('.popup-window-content');
+            profileDetailModal.classList.remove('active');
+            profileDetailContent.classList.remove('active');
+        });
+        
+        document.getElementById('close-account-btn').addEventListener('click', (e) => {
+            document.getElementById('account-closure-form').classList.remove('hidden');
+            document.getElementById('confirm-closure-btn').dataset.id = e.target.dataset.id;
+        });
+
+        document.getElementById('confirm-closure-btn').addEventListener('click', async (e) => {
+            const closureDate = document.getElementById('closure-date-input').value;
+            if (!closureDate) { showMessage('Error', 'Please select a closure date.'); return; }
+            try {
+                await db.collection(`users/${currentUserId}/clients`).doc(e.target.dataset.id).update({ isClosed: true, closureDate });
+                
+                const profileDetailContent = profileDetailModal.querySelector('.popup-window-content');
+                profileDetailModal.classList.remove('active');
+                profileDetailContent.classList.remove('active');
+                
+                document.getElementById('account-closure-form').classList.add('hidden');
+                showMessage('Success', 'Client account has been closed.');
+            } catch (error) { showMessage('Error', error.message); }
         });
 
 
-        // --- INITIALIZATION ---
-        document.addEventListener('DOMContentLoaded', () => {
-            initializeAuth();
+        // --- EMPLOYEES MODULE ---
+        const addEmployeeForm = document.getElementById('add-employee-form');
+        const employeesList = document.getElementById('employees-list');
+        const employeeDetailModal = document.getElementById('employee-detail-modal');
+        const updateEmployeeForm = document.getElementById('update-employee-form');
+
+        addEmployeeForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            showLoading();
+            const employeeData = {
+                name: addEmployeeForm['employee-name'].value, cnic: addEmployeeForm['employee-cnic'].value,
+                address: addEmployeeForm['employee-address'].value, joiningDate: addEmployeeForm['employee-joining-date'].value,
+                designation: addEmployeeForm['employee-designation'].value, salary: parseFloat(addEmployeeForm['employee-salary'].value),
+                status: 'Active', performance: '', leaves: '', incentives: 0, allowance: 0,
+                timestamp: firebase.firestore.FieldValue.serverTimestamp()
+            };
+            try {
+                await db.collection(`users/${currentUserId}/employees`).add(employeeData);
+                addEmployeeForm.reset();
+                showMessage('Success', 'Employee added successfully!');
+            } catch (error) {
+                showMessage('Error', error.message);
+            } finally { hideLoading(); }
         });
+
+        function renderEmployees() {
+            employeesList.innerHTML = allEmployees.map(e => `
+                <tr class="hover:bg-gray-50 border-b">
+                    <td class="p-2"><a href="#" class="text-blue-600 hover:underline view-employee-btn" data-id="${e.id}">${e.name}</a></td>
+                    <td class="p-2">${e.cnic}</td><td class="p-2">${e.designation}</td>
+                    <td class="p-2">${e.joiningDate}</td>
+                    <td class="p-2"><span class="px-2 py-1 rounded-full text-xs font-semibold ${e.status === 'Active' ? 'bg-green-200 text-green-800' : 'bg-red-200 text-red-800'}">${e.status}</span></td>
+                    <td class="p-2">
+                        <div class="flex space-x-2">
+                            <select data-id="${e.id}" class="employee-status-select px-2 py-1 border rounded text-xs">
+                                ${['Active', 'Fire', 'Terminate', 'Resign'].map(s => `<option value="${s}" ${e.status === s ? 'selected' : ''}>${s}</option>`).join('')}
+                            </select>
+                            <button data-id="${e.id}" class="delete-employee-btn bg-red-500 text-white p-1 rounded-full hover:bg-red-600">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                                  <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm6 0a1 1 0 11-2 0v6a1 1 0 112 0V8z" clip-rule="evenodd" />
+                                </svg>
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+            `).join('');
+
+            document.querySelectorAll('.view-employee-btn').forEach(btn => btn.addEventListener('click', (e) => { e.preventDefault(); showEmployeeProfile(e.target.dataset.id); }));
+            document.querySelectorAll('.employee-status-select').forEach(sel => sel.addEventListener('change', (e) => db.collection(`users/${currentUserId}/employees`).doc(e.target.dataset.id).update({ status: e.target.value })));
+            document.querySelectorAll('.delete-employee-btn').forEach(btn => btn.addEventListener('click', (e) => {
+                 if(confirm('Are you sure you want to delete this employee?')){ db.collection(`users/${currentUserId}/employees`).doc(e.target.dataset.id).delete(); }
+            }));
+        }
+
+        function showEmployeeProfile(employeeId) {
+            const emp = allEmployees.find(e => e.id === employeeId);
+            if (!emp) return;
+            updateEmployeeForm.dataset.id = employeeId;
+            document.getElementById('employee-detail-name').textContent = emp.name;
+            document.getElementById('employee-detail-cnic').textContent = emp.cnic;
+            document.getElementById('employee-detail-address').textContent = emp.address;
+            document.getElementById('employee-detail-joiningdate').textContent = emp.joiningDate;
+            document.getElementById('employee-detail-designation').textContent = emp.designation;
+            document.getElementById('employee-detail-salary').textContent = `PKR ${emp.salary.toLocaleString()}`;
+            updateEmployeeForm['employee-detail-performance'].value = emp.performance || '';
+            updateEmployeeForm['employee-detail-leaves'].value = emp.leaves || '';
+            updateEmployeeForm['employee-detail-incentives'].value = emp.incentives || 0;
+            updateEmployeeForm['employee-detail-allowance'].value = emp.allowance || 0;
+            
+            const employeeDetailContent = employeeDetailModal.querySelector('.popup-window-content');
+            employeeDetailModal.classList.add('active');
+            employeeDetailContent.classList.add('active');
+        }
+
+        updateEmployeeForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const updatedData = {
+                performance: e.target['employee-detail-performance'].value,
+                leaves: e.target['employee-detail-leaves'].value,
+                incentives: parseFloat(e.target['employee-detail-incentives'].value),
+                allowance: parseFloat(e.target['employee-detail-allowance'].value),
+            };
+            try {
+                await db.collection(`users/${currentUserId}/employees`).doc(e.target.dataset.id).update(updatedData);
+                showMessage('Success', 'Employee details updated.');
+                
+                const employeeDetailContent = employeeDetailModal.querySelector('.popup-window-content');
+                employeeDetailModal.classList.remove('active');
+                employeeDetailContent.classList.remove('active');
+            } catch (error) { showMessage('Error', error.message); }
+        });
+
+        document.getElementById('close-employee-modal-btn').addEventListener('click', () => {
+            const employeeDetailContent = employeeDetailModal.querySelector('.popup-window-content');
+            employeeDetailModal.classList.remove('active');
+            employeeDetailContent.classList.remove('active');
+        });
+        
+        // --- WITHDRAWALS MODULE ---
+        const addWithdrawalForm = document.getElementById('add-withdrawal-form');
+        const withdrawalStatusSelect = document.getElementById('withdrawal-status');
+        const withdrawalReturnedReasonInput = document.getElementById('withdrawal-returned-reason');
+        const withdrawalsList = document.getElementById('withdrawals-list');
+        const withdrawalSearch = document.getElementById('withdrawal-search');
+
+        withdrawalStatusSelect.addEventListener('change', (e) => {
+            withdrawalReturnedReasonInput.classList.toggle('hidden', e.target.value !== 'Returned');
+            withdrawalReturnedReasonInput.required = e.target.value === 'Returned';
+        });
+
+        addWithdrawalForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const clientName = addWithdrawalForm['withdrawal-client-name'].value;
+            if (!clientName) {
+                showMessage('Error', 'Please select a valid client using their trading account number.');
+                return;
+            }
+            showLoading();
+            const withdrawalData = {
+                clientName: clientName,
+                tradingAccount: addWithdrawalForm['withdrawal-trading-account'].value,
+                amount: parseFloat(addWithdrawalForm['withdrawal-amount'].value),
+                status: addWithdrawalForm['withdrawal-status'].value,
+                returnedReason: addWithdrawalForm['withdrawal-returned-reason'].value,
+                timestamp: firebase.firestore.FieldValue.serverTimestamp()
+            };
+            try {
+                await db.collection(`users/${currentUserId}/withdrawals`).add(withdrawalData);
+                addWithdrawalForm.reset();
+                withdrawalReturnedReasonInput.classList.add('hidden');
+                showMessage('Success', 'Withdrawal request added successfully!');
+            } catch (error) {
+                showMessage('Error', error.message);
+            } finally {
+                hideLoading();
+            }
+        });
+
+        withdrawalSearch.addEventListener('input', () => renderWithdrawals());
+
+        function renderWithdrawals() {
+            const searchTerm = withdrawalSearch.value.toLowerCase();
+            const filteredWithdrawals = allWithdrawals.filter(w => 
+                w.clientName.toLowerCase().includes(searchTerm) || 
+                w.tradingAccount.toLowerCase().includes(searchTerm)
+            ).sort((a, b) => (b.timestamp?.toDate() || 0) - (a.timestamp?.toDate() || 0));
+
+            withdrawalsList.innerHTML = filteredWithdrawals.map(w => `
+                 <tr class="hover:bg-gray-50 border-b">
+                    <td class="p-2">${w.clientName}</td>
+                    <td class="p-2">${w.tradingAccount}</td>
+                    <td class="p-2">PKR ${w.amount.toLocaleString()}</td>
+                    <td class="p-2">
+                        <span class="px-2 py-1 rounded-full text-xs font-semibold
+                            ${w.status === 'Accepted' ? 'bg-green-200 text-green-800' : 'bg-red-200 text-red-800'}">
+                            ${w.status}
+                        </span>
+                        ${w.status === 'Returned' && w.returnedReason ? `<p class="text-xs text-red-500 mt-1">${w.returnedReason}</p>` : ''}
+                    </td>
+                    <td class="p-2">${w.timestamp ? new Date(w.timestamp.toDate()).toLocaleDateString() : 'N/A'}</td>
+                    <td class="p-2">
+                        <button data-id="${w.id}" class="delete-withdrawal-btn bg-red-500 text-white p-1 rounded-full hover:bg-red-600">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                              <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm6 0a1 1 0 11-2 0v6a1 1 0 112 0V8z" clip-rule="evenodd" />
+                            </svg>
+                        </button>
+                    </td>
+                </tr>
+            `).join('');
+
+            document.querySelectorAll('.delete-withdrawal-btn').forEach(btn => {
+                btn.addEventListener('click', async (e) => {
+                    const id = e.currentTarget.dataset.id;
+                    if(confirm('Are you sure you want to delete this withdrawal request?')){
+                        try {
+                            await db.collection(`users/${currentUserId}/withdrawals`).doc(id).delete();
+                        } catch (error) {
+                            showMessage('Error', error.message);
+                        }
+                    }
+                });
+            });
+        }
+        
     </script>
 </body>
 </html>
