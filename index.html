@@ -150,11 +150,10 @@
         </div>
     </div>
     
-    <!-- Share Modal -->
     <div id="share-modal" class="modal-overlay">
         <div class="modal-content card">
-            <h3 class="text-xl font-bold mb-4">Share Your Dashboard</h3>
-            <p class="text-gray-600 mb-4">Anyone with this link can view a live, read-only version of your dashboard.</p>
+            <h3 class="text-xl font-bold mb-4">Share Your Frontend</h3>
+            <p class="text-gray-600 mb-4">Anyone with this link can view a live, read-only version of your entire frontend. They will not be able to make any changes.</p>
             <div class="relative bg-gray-100 p-3 rounded-full">
                 <input type="text" id="share-link-input" readonly class="w-full bg-transparent outline-none pr-20">
                 <button id="copy-share-link-btn" class="absolute right-2 top-1/2 -translate-y-1/2 bg-blue-500 text-white px-3 py-1 rounded-full text-sm">Copy</button>
@@ -187,7 +186,6 @@
         </div>
     </div>
 
-    <!-- Edit Complaint Modal -->
     <div id="edit-complaint-modal" class="modal-overlay">
         <div class="modal-content card">
             <h3 class="text-xl font-bold mb-4">Edit Complaint Status</h3>
@@ -256,7 +254,6 @@
     </main>
 
     <div id="main-app" class="hidden min-h-screen">
-        <!-- Sidebar -->
         <aside id="sidebar" class="bg-white w-64 min-h-full shadow-lg fixed top-0 left-0 z-50 transform -translate-x-full md:translate-x-0 transition-transform duration-300 ease-in-out">
             <div class="p-4 border-b h-16 flex items-center">
                 <h1 class="text-2xl font-bold text-gray-800">Darson Sargodha</h1>
@@ -275,7 +272,6 @@
             </nav>
         </aside>
 
-        <!-- Main Content -->
         <div id="main-content-wrapper" class="flex-1 flex flex-col md:ml-64">
             <header class="bg-white shadow-sm p-4 sticky top-0 z-40 flex items-center justify-between h-16">
                 <div class="flex items-center">
@@ -285,7 +281,7 @@
                     <h2 id="header-title" class="text-xl font-semibold text-gray-700">Dashboard</h2>
                 </div>
                 <div class="flex items-center space-x-4">
-                    <button id="share-dashboard-btn" class="px-4 py-2 rounded-full text-sm font-medium bg-green-500 text-white hover:bg-green-600 animated-btn">Share Dashboard</button>
+                    <button id="share-dashboard-btn" class="px-4 py-2 rounded-full text-sm font-medium bg-green-500 text-white hover:bg-green-600 animated-btn">Share Frontend</button>
                     <button id="sign-out-btn" class="px-4 py-2 rounded-full text-sm font-medium bg-red-500 text-white hover:bg-red-600 animated-btn">Sign Out</button>
                 </div>
             </header>
@@ -347,7 +343,7 @@
     
                     <section id="complaints" class="section-container">
                         <h2 class="text-3xl font-bold text-gray-800 mb-6">Complaints</h2>
-                        <div class="card p-6 mb-6">
+                        <div id="add-complaint-wrapper" class="card p-6 mb-6">
                             <h3 class="text-xl font-semibold mb-4">Add New Complaint</h3>
                             <form id="add-complaint-form" class="space-y-4">
                                 <input type="text" id="complaint-trading-account" placeholder="Trading Account Number" required list="client-trading-accounts"
@@ -379,7 +375,7 @@
                                             <th class="p-2">Details</th>
                                             <th class="p-2">Status</th>
                                             <th class="p-2">Date</th>
-                                            <th class="p-2">Actions</th>
+                                            <th class="p-2 actions-header">Actions</th>
                                         </tr>
                                     </thead>
                                     <tbody id="complaints-list">
@@ -391,7 +387,7 @@
     
                     <section id="deposits" class="section-container">
                         <h2 class="text-3xl font-bold text-gray-800 mb-6">Deposit Cheques</h2>
-                        <div class="card p-6 mb-6">
+                        <div id="add-deposit-wrapper" class="card p-6 mb-6">
                             <h3 class="text-xl font-semibold mb-4">Add New Cheque Deposit</h3>
                             <form id="add-deposit-form" class="space-y-4">
                                 <input type="text" id="deposit-trading-account" placeholder="Trading Account Number" required list="client-trading-accounts"
@@ -439,7 +435,7 @@
                                             <th class="p-2">Status</th>
                                             <th class="p-2">Date</th>
                                             <th class="p-2">Images</th>
-                                            <th class="p-2">Actions</th>
+                                            <th class="p-2 actions-header">Actions</th>
                                         </tr>
                                     </thead>
                                     <tbody id="deposits-list">
@@ -451,7 +447,7 @@
     
                     <section id="withdrawals" class="section-container">
                         <h2 class="text-3xl font-bold text-gray-800 mb-6">Withdrawals</h2>
-                        <div class="card p-6 mb-6">
+                        <div id="add-withdrawal-wrapper" class="card p-6 mb-6">
                             <h3 class="text-xl font-semibold mb-4">Add New Withdrawal Request</h3>
                             <form id="add-withdrawal-form" class="space-y-4">
                                 <input type="text" id="withdrawal-trading-account" placeholder="Trading Account Number" required list="client-trading-accounts"
@@ -484,7 +480,7 @@
                                             <th class="p-2">Amount</th>
                                             <th class="p-2">Status</th>
                                             <th class="p-2">Date</th>
-                                            <th class="p-2">Actions</th>
+                                            <th class="p-2 actions-header">Actions</th>
                                         </tr>
                                     </thead>
                                     <tbody id="withdrawals-list">
@@ -496,7 +492,7 @@
     
                     <section id="commission" class="section-container">
                         <h2 class="text-3xl font-bold text-gray-800 mb-6">House Commission</h2>
-                        <div class="card p-6 mb-6">
+                        <div id="add-commission-wrapper" class="card p-6 mb-6">
                             <h3 class="text-xl font-semibold mb-4">Add Monthly Commission</h3>
                             <form id="add-commission-form" class="space-y-4">
                                 <div class="flex items-center space-x-4">
@@ -529,7 +525,7 @@
                                             <th class="p-2">Total Commission</th>
                                             <th class="p-2">Requested Payment</th>
                                             <th class="p-2">Received Amount</th>
-                                            <th class="p-2">Actions</th>
+                                            <th class="p-2 actions-header">Actions</th>
                                         </tr>
                                     </thead>
                                     <tbody id="commission-list">
@@ -542,7 +538,7 @@
                     <section id="expenses" class="section-container">
                         <h2 class="text-3xl font-bold text-gray-800 mb-6">House Expenses</h2>
                         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                            <div>
+                            <div id="add-expense-forms-wrapper">
                                 <div class="card p-6 mb-6">
                                     <h3 class="text-xl font-semibold mb-4">Petty Cash Management</h3>
                                     <div class="mb-4">
@@ -592,7 +588,7 @@
                                                 <tr class="text-gray-600 uppercase text-sm">
                                                     <th class="p-2">Date</th>
                                                     <th class="p-2">Amount</th>
-                                                    <th class="p-2">Actions</th>
+                                                    <th class="p-2 actions-header">Actions</th>
                                                 </tr>
                                             </thead>
                                             <tbody id="petty-cash-history-list"></tbody>
@@ -606,7 +602,7 @@
                                                     <th class="p-2">Date</th>
                                                     <th class="p-2">Expense</th>
                                                     <th class="p-2">Amount</th>
-                                                    <th class="p-2">Actions</th>
+                                                    <th class="p-2 actions-header">Actions</th>
                                                 </tr>
                                             </thead>
                                             <tbody id="expenses-list"></tbody>
@@ -620,7 +616,7 @@
     
                     <section id="profiles" class="section-container">
                         <h2 class="text-3xl font-bold text-gray-800 mb-6">Client Profiles</h2>
-                        <div class="card p-6 mb-6">
+                        <div id="add-client-wrapper" class="card p-6 mb-6">
                             <h3 class="text-xl font-semibold mb-4">Add New Client</h3>
                             <form id="add-client-form" class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <input type="text" id="profile-client-name" placeholder="Client Name" required
@@ -664,7 +660,7 @@
     
                     <section id="employees" class="section-container">
                         <h2 class="text-3xl font-bold text-gray-800 mb-6">Employees</h2>
-                        <div class="card p-6 mb-6">
+                        <div id="add-employee-wrapper" class="card p-6 mb-6">
                             <h3 class="text-xl font-semibold mb-4">Add New Employee</h3>
                             <form id="add-employee-form" class="space-y-4">
                                 <input type="text" id="employee-name" placeholder="Name" required
@@ -695,7 +691,7 @@
                                             <th class="p-2">Designation</th>
                                             <th class="p-2">Joining Date</th>
                                             <th class="p-2">Status</th>
-                                            <th class="p-2">Actions</th>
+                                            <th class="p-2 actions-header">Actions</th>
                                         </tr>
                                     </thead>
                                     <tbody id="employees-list">
@@ -713,7 +709,6 @@
                 </div>
             </footer>
         </div>
-        <!-- Overlay for mobile sidebar -->
         <div id="sidebar-overlay" class="fixed inset-0 bg-black bg-opacity-50 z-40 hidden md:hidden"></div>
     </div>
     
@@ -808,7 +803,7 @@
             <div class="popup-window-body">
                 <div id="employee-detail-info-wrapper">
                     <div id="employee-detail-info" class="text-gray-700 text-sm mb-6 bg-white p-6 rounded-lg shadow-sm grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4"></div>
-                    <div class="mt-6 flex justify-center gap-4">
+                    <div id="edit-employee-btn-wrapper" class="mt-6 flex justify-center gap-4">
                         <button id="edit-employee-btn" class="bg-yellow-500 text-white px-6 py-2 rounded-full font-semibold hover:bg-yellow-600 animated-btn">Edit Employee</button>
                     </div>
                 </div>
@@ -859,6 +854,7 @@
         
         let currentUserId = null;
         let unsubscribeListeners = [];
+        let isSharedView = false; // Flag for read-only mode
 
         let allComplaints = [], allDeposits = [], allCommissions = [], allExpenses = [], allClients = [], allEmployees = [], allClientPayments = [], allWithdrawals = [], allPettyCashEntries = []; 
 
@@ -1003,7 +999,6 @@
 
         async function loadSharedDashboard(shareId) {
             showLoading();
-            // Verify that the dashboard is actually shared
             try {
                 const isSharedDoc = await db.collection('public_dashboards').doc(shareId).get();
                 if (!isSharedDoc.exists || !isSharedDoc.data().isShared) {
@@ -1018,20 +1013,22 @@
                 return;
             }
 
-            // Hide auth and show a simplified app view
+            isSharedView = true; // Activate read-only mode
+
+            // Hide auth and show the app view
             authSection.style.display = 'none';
             mainApp.classList.remove('hidden');
             mainApp.classList.add('flex');
             
-            // Hide sidebar and unnecessary header buttons
-            document.getElementById('sidebar').style.display = 'none';
-            document.getElementById('main-content-wrapper').style.marginLeft = '0';
-            document.getElementById('hamburger-btn').style.display = 'none';
+            // Configure UI for read-only view
+            document.getElementById('main-content-wrapper').style.marginLeft = '0'; // Adjust for mobile view with sidebar
+            if (window.innerWidth >= 768) { // md breakpoint
+                 document.getElementById('main-content-wrapper').style.marginLeft = '16rem'; // 64 in tailwind config
+            }
             document.getElementById('sign-out-btn').style.display = 'none';
             shareDashboardBtn.style.display = 'none';
 
-            // Show only the dashboard and hide other sections
-            document.querySelectorAll('#main-nav li').forEach(li => li.style.display = 'none');
+            // Show dashboard by default
             showSection('dashboard');
             
             // Disable interactions on dashboard cards
@@ -1041,7 +1038,7 @@
             document.getElementById('active-clients-card').onclick = null;
             
             // Set header
-            document.getElementById('header-title').textContent = "Shared Dashboard (Live View)";
+            document.getElementById('header-title').textContent = "Shared Frontend (Live View)";
             
             currentUserId = shareId; // Set the user ID to the shared one for data fetching
             startRealtimeListeners();
@@ -1083,7 +1080,6 @@
             if (!currentUserId) return;
             showLoading();
             try {
-                // Set a flag in a public collection to mark this dashboard as shared
                 await db.collection('public_dashboards').doc(currentUserId).set({
                     isShared: true,
                     sharedAt: firebase.firestore.FieldValue.serverTimestamp()
@@ -1279,8 +1275,14 @@
             });
         }
         
-        document.getElementById('total-clients-card').addEventListener('click', () => showSection('profiles'));
-        document.getElementById('active-clients-card').addEventListener('click', () => showActiveClientsModal());
+        document.getElementById('total-clients-card').addEventListener('click', () => {
+            if (isSharedView) return;
+            showSection('profiles');
+        });
+        document.getElementById('active-clients-card').addEventListener('click', () => {
+            if (isSharedView) return;
+            showActiveClientsModal();
+        });
         document.getElementById('active-clients-modal-close-btn').addEventListener('click', () => {
             document.getElementById('active-clients-modal').style.display = 'none';
         });
@@ -1331,6 +1333,10 @@
         });
 
         function renderComplaints() {
+            // Hide elements in shared view
+            document.getElementById('add-complaint-wrapper').style.display = isSharedView ? 'none' : 'block';
+            document.querySelectorAll('#complaints .actions-header').forEach(el => el.style.display = isSharedView ? 'none' : 'table-cell');
+
             const searchTerm = document.getElementById('complaint-search').value.toLowerCase();
             const filtered = allComplaints.filter(c => c.clientName.toLowerCase().includes(searchTerm) || c.tradingAccount.toLowerCase().includes(searchTerm))
                                         .sort((a, b) => (b.timestamp?.toDate() || 0) - (a.timestamp?.toDate() || 0));
@@ -1342,10 +1348,11 @@
                     <td class="p-2">${c.details}</td>
                     <td class="p-2">${c.status}</td>
                     <td class="p-2">${c.timestamp ? new Date(c.timestamp.seconds * 1000).toLocaleDateString() : 'N/A'}</td>
+                    ${!isSharedView ? `
                     <td class="p-2 space-x-2">
                         <button class="text-blue-500 hover:underline" onclick="openEditComplaintModal('${c.id}', '${c.status}')">Edit</button>
                         <button class="text-red-500 hover:underline" onclick="deleteItem('complaints', '${c.id}')">Delete</button>
-                    </td>
+                    </td>` : ''}
                 </tr>
             `).join('');
         }
@@ -1408,6 +1415,9 @@
         });
 
         function renderDeposits() {
+             document.getElementById('add-deposit-wrapper').style.display = isSharedView ? 'none' : 'block';
+             document.querySelectorAll('#deposits .actions-header').forEach(el => el.style.display = isSharedView ? 'none' : 'table-cell');
+
              const searchTerm = document.getElementById('deposit-search').value.toLowerCase();
              const filtered = allDeposits.filter(d => d.clientName.toLowerCase().includes(searchTerm) || d.tradingAccount.toLowerCase().includes(searchTerm))
                                          .sort((a, b) => new Date(b.date) - new Date(a.date));
@@ -1420,7 +1430,7 @@
                     <td class="p-2">${d.status}</td>
                     <td class="p-2">${new Date(d.date).toLocaleDateString()}</td>
                     <td class="p-2">${d.imageUrls ? d.imageUrls.map(url => `<a href="${url}" target="_blank" class="text-blue-500">View</a>`).join(' ') : 'No'}</td>
-                    <td class="p-2"><button class="text-red-500 hover:underline" onclick="deleteItem('deposits', '${d.id}')">Delete</button></td>
+                    ${!isSharedView ? `<td class="p-2"><button class="text-red-500 hover:underline" onclick="deleteItem('deposits', '${d.id}')">Delete</button></td>` : ''}
                 </tr>
              `).join('');
         }
@@ -1453,6 +1463,9 @@
         });
 
         function renderWithdrawals() {
+            document.getElementById('add-withdrawal-wrapper').style.display = isSharedView ? 'none' : 'block';
+            document.querySelectorAll('#withdrawals .actions-header').forEach(el => el.style.display = isSharedView ? 'none' : 'table-cell');
+
             const searchTerm = document.getElementById('withdrawal-search').value.toLowerCase();
             const filtered = allWithdrawals.filter(w => w.clientName.toLowerCase().includes(searchTerm) || w.tradingAccount.toLowerCase().includes(searchTerm))
                                            .sort((a, b) => (b.timestamp?.toDate() || 0) - (a.timestamp?.toDate() || 0));
@@ -1463,7 +1476,7 @@
                     <td class="p-2">PKR ${w.amount.toLocaleString()}</td>
                     <td class="p-2">${w.status}</td>
                     <td class="p-2">${w.timestamp ? new Date(w.timestamp.seconds * 1000).toLocaleDateString() : 'N/A'}</td>
-                    <td class="p-2"><button class="text-red-500 hover:underline" onclick="deleteItem('withdrawals', '${w.id}')">Delete</button></td>
+                    ${!isSharedView ? `<td class="p-2"><button class="text-red-500 hover:underline" onclick="deleteItem('withdrawals', '${w.id}')">Delete</button></td>` : ''}
                 </tr>
             `).join('');
         }
@@ -1492,6 +1505,9 @@
         });
 
         function renderCommissions() {
+            document.getElementById('add-commission-wrapper').style.display = isSharedView ? 'none' : 'block';
+            document.querySelectorAll('#commission .actions-header').forEach(el => el.style.display = isSharedView ? 'none' : 'table-cell');
+
             const sorted = allCommissions.sort((a, b) => new Date(b.year, b.month) - new Date(a.year, a.month));
             document.getElementById('commission-list').innerHTML = sorted.map(c => `
                 <tr class="border-b">
@@ -1499,7 +1515,7 @@
                     <td class="p-2">PKR ${c.totalAmount.toLocaleString()}</td>
                     <td class="p-2">PKR ${c.requestedAmount.toLocaleString()}</td>
                     <td class="p-2">PKR ${c.receivedAmount.toLocaleString()}</td>
-                    <td class="p-2"><button class="text-red-500 hover:underline" onclick="deleteItem('commissions', '${c.id}')">Delete</button></td>
+                    ${!isSharedView ? `<td class="p-2"><button class="text-red-500 hover:underline" onclick="deleteItem('commissions', '${c.id}')">Delete</button></td>` : ''}
                 </tr>
             `).join('');
 
@@ -1574,6 +1590,10 @@
         });
 
         function renderExpenses() {
+            document.getElementById('add-expense-forms-wrapper').style.display = isSharedView ? 'none' : 'block';
+            document.getElementById('print-expenses-btn').style.display = isSharedView ? 'none' : 'block';
+            document.querySelectorAll('#expenses .actions-header').forEach(el => el.style.display = isSharedView ? 'none' : 'table-cell');
+
             const totalIn = allPettyCashEntries.reduce((sum, entry) => sum + entry.amount, 0);
             const totalOut = allExpenses.reduce((sum, entry) => sum + entry.amount, 0);
             const balance = totalIn - totalOut;
@@ -1600,7 +1620,7 @@
                     <td class="p-2">${new Date(e.date).toLocaleDateString()}</td>
                     <td class="p-2">${e.name}</td>
                     <td class="p-2">PKR ${e.amount.toLocaleString()}</td>
-                    <td class="p-2"><button class="text-red-500 hover:underline" onclick="deleteItem('expenses', '${e.id}')">Delete</button></td>
+                    ${!isSharedView ? `<td class="p-2"><button class="text-red-500 hover:underline" onclick="deleteItem('expenses', '${e.id}')">Delete</button></td>` : ''}
                 </tr>
             `).join('');
 
@@ -1608,7 +1628,7 @@
                 <tr class="border-b">
                     <td class="p-2">${new Date(e.date).toLocaleDateString()}</td>
                     <td class="p-2">PKR ${e.amount.toLocaleString()}</td>
-                    <td class="p-2"><button class="text-red-500 hover:underline" onclick="deleteItem('petty_cash', '${e.id}')">Delete</button></td>
+                    ${!isSharedView ? `<td class="p-2"><button class="text-red-500 hover:underline" onclick="deleteItem('petty_cash', '${e.id}')">Delete</button></td>` : ''}
                 </tr>
             `).join('');
         }
@@ -1738,6 +1758,9 @@
         });
 
         function renderEmployees() {
+            document.getElementById('add-employee-wrapper').style.display = isSharedView ? 'none' : 'block';
+            document.querySelectorAll('#employees .actions-header').forEach(el => el.style.display = isSharedView ? 'none' : 'table-cell');
+
             document.getElementById('employees-list').innerHTML = allEmployees.map(e => `
                 <tr class="border-b">
                     <td class="p-2">${e.name}</td>
@@ -1745,10 +1768,11 @@
                     <td class="p-2">${e.designation}</td>
                     <td class="p-2">${new Date(e.joiningDate).toLocaleDateString()}</td>
                     <td class="p-2">Active</td>
+                    ${!isSharedView ? `
                     <td class="p-2 space-x-2">
                         <button class="text-blue-500 hover:underline" onclick="showEmployeeProfile('${e.id}')">View</button>
                         <button class="text-red-500 hover:underline" onclick="deleteItem('employees', '${e.id}')">Delete</button>
-                    </td>
+                    </td>` : ''}
                 </tr>
             `).join('');
         }
@@ -1813,6 +1837,8 @@
         profilesSearch.addEventListener('input', () => renderProfiles());
         
         function renderProfiles() {
+            document.getElementById('add-client-wrapper').style.display = isSharedView ? 'none' : 'block';
+
             const searchTerm = profilesSearch.value.toLowerCase();
             const filtered = allClients.filter(c => c.name.toLowerCase().includes(searchTerm) || c.tradingAccount.toLowerCase().includes(searchTerm));
             profilesList.innerHTML = filtered.map(c => `
@@ -1828,6 +1854,9 @@
         async function showClientProfile(clientId) {
             const client = allClients.find(c => c.id === clientId);
             if (!client) return;
+
+            // Hide action buttons in shared view
+            document.getElementById('add-payment-and-actions-wrapper').style.display = isSharedView ? 'none' : 'block';
 
             document.getElementById('profile-detail-name').textContent = client.name;
             document.getElementById('profile-detail-info').innerHTML = `
@@ -1864,7 +1893,6 @@
             document.getElementById('edit-profile-btn').dataset.id = client.id;
             
             document.getElementById('profile-detail-info-wrapper').classList.remove('hidden');
-            document.getElementById('add-payment-and-actions-wrapper').classList.remove('hidden');
             editClientProfileForm.classList.add('hidden');
 
             const clientPayments = allClientPayments.filter(p => p.clientId === clientId);
@@ -2027,6 +2055,9 @@
         function showEmployeeProfile(employeeId) {
             const employee = allEmployees.find(e => e.id === employeeId);
             if (!employee) return;
+
+            // Hide action buttons in shared view
+            document.getElementById('edit-employee-btn-wrapper').style.display = isSharedView ? 'none' : 'block';
 
             document.getElementById('employee-detail-name').textContent = employee.name;
             document.getElementById('employee-detail-info').innerHTML = `
