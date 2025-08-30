@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <!-- This viewport meta tag is crucial for responsive design. It tells the browser to set the width of the page to the screen-width of the device. -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Darson Sargodha Brokerage</title>
     <script src="https://cdn.tailwindcss.com"></script>
@@ -60,6 +61,7 @@
             padding: 24px;
             border-radius: 12px;
             max-width: 500px;
+            /* Using width: 90% makes the modal responsive on smaller screens */
             width: 90%;
             text-align: center;
             animation: slideIn 0.3s ease-in-out;
@@ -89,7 +91,7 @@
             position: fixed;
             top: 0;
             right: -100%; 
-            width: 100%;
+            width: 100%; /* Full width on mobile */
             height: 100%;
             background-color: #f4f7f9;
             box-shadow: -4px 0 12px rgba(0,0,0,0.1);
@@ -97,6 +99,7 @@
             display: flex;
             flex-direction: column;
         }
+        /* Media query for larger screens (tablets and desktops) */
         @media (min-width: 768px) { 
             .popup-window-content {
                 width: 80%;
@@ -208,8 +211,8 @@
     </div>
 
 
-    <main id="auth-section" class="flex-grow flex items-center justify-center p-6 min-h-screen">
-        <div class="bg-white p-8 rounded-2xl shadow-xl w-full max-w-md">
+    <main id="auth-section" class="flex-grow flex items-center justify-center p-4 min-h-screen">
+        <div class="bg-white p-6 sm:p-8 rounded-2xl shadow-xl w-full max-w-md">
             <h2 class="text-2xl font-bold text-center text-gray-800 mb-6">Darson Sargodha</h2>
             <div id="auth-forms">
                 <form id="login-form" class="space-y-4">
@@ -254,6 +257,7 @@
     </main>
 
     <div id="main-app" class="hidden min-h-screen">
+        <!-- Sidebar: Hidden on mobile (using -translate-x-full), visible from medium screens up (md:translate-x-0) -->
         <aside id="sidebar" class="bg-white w-64 min-h-full shadow-lg fixed top-0 left-0 z-50 transform -translate-x-full md:translate-x-0 transition-transform duration-300 ease-in-out">
             <div class="p-4 border-b h-16 flex items-center">
                 <h1 class="text-2xl font-bold text-gray-800">Darson Sargodha</h1>
@@ -272,24 +276,29 @@
             </nav>
         </aside>
 
+        <!-- Main Content: Margin-left is applied on medium screens and up to make space for the sidebar -->
         <div id="main-content-wrapper" class="flex-1 flex flex-col md:ml-64">
             <header class="bg-white shadow-sm p-4 sticky top-0 z-40 flex items-center justify-between h-16">
                 <div class="flex items-center">
+                    <!-- Hamburger menu button is only visible on mobile (hidden from medium screens up: md:hidden) -->
                     <button id="hamburger-btn" class="md:hidden text-gray-600 focus:outline-none mr-4">
                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
                     </button>
                     <h2 id="header-title" class="text-xl font-semibold text-gray-700">Dashboard</h2>
                 </div>
-                <div class="flex items-center space-x-4">
-                    <button id="share-dashboard-btn" class="px-4 py-2 rounded-full text-sm font-medium bg-green-500 text-white hover:bg-green-600 animated-btn">Share Frontend</button>
-                    <button id="sign-out-btn" class="px-4 py-2 rounded-full text-sm font-medium bg-red-500 text-white hover:bg-red-600 animated-btn">Sign Out</button>
+                <!-- UPDATE: Added responsive spacing and padding to prevent overflow on small screens -->
+                <div class="flex items-center space-x-2 sm:space-x-4">
+                    <button id="share-dashboard-btn" class="px-2 sm:px-4 py-2 rounded-full text-sm font-medium bg-green-500 text-white hover:bg-green-600 animated-btn flex-shrink-0">Share Frontend</button>
+                    <button id="sign-out-btn" class="px-2 sm:px-4 py-2 rounded-full text-sm font-medium bg-red-500 text-white hover:bg-red-600 animated-btn flex-shrink-0">Sign Out</button>
                 </div>
             </header>
 
-            <main class="flex-grow p-6">
+            <!-- UPDATE: Added responsive padding (p-4 on small screens, p-6 on medium and up) -->
+            <main class="flex-grow p-4 md:p-6">
                 <div class="container mx-auto">
                     <section id="dashboard" class="section-container active">
                         <h2 class="text-3xl font-bold text-gray-800 mb-6">Dashboard</h2>
+                        <!-- Responsive Grid: Stacks on mobile (grid-cols-1), two columns on tablet (md:grid-cols-2), five on desktop (lg:grid-cols-5) -->
                         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 mb-8">
                             <div class="card p-6 text-center">
                                 <h3 class="text-gray-500 text-sm">Total Complaints</h3>
@@ -313,6 +322,7 @@
                             </div>
                         </div>
                         
+                        <!-- Responsive Grid for charts: Stacks on mobile, two columns on large screens -->
                         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
                             <div class="card p-6">
                                 <h3 class="text-xl font-semibold mb-4">Complaints Status</h3>
@@ -366,6 +376,7 @@
                             <h3 class="text-xl font-semibold mb-4">View Complaints</h3>
                             <input type="text" id="complaint-search" placeholder="Search by Client Name or Account Number..."
                                    class="w-full px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500 mb-4">
+                            <!-- This wrapper makes the table horizontally scrollable on small screens -->
                             <div class="overflow-x-auto">
                                 <table class="w-full text-left table-auto">
                                     <thead class="border-b-2">
@@ -394,7 +405,8 @@
                                        class="w-full px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500">
                                 <input type="text" id="deposit-client-name" placeholder="Client Name (auto-filled)" readonly
                                        class="w-full px-4 py-2 border rounded-full bg-gray-100">
-                                <div class="flex items-center space-x-4">
+                                <!-- Flex container for responsive input fields -->
+                                <div class="flex flex-col sm:flex-row items-center space-y-4 sm:space-y-0 sm:space-x-4">
                                     <input type="number" id="deposit-amount" placeholder="Amount (PKR)" required
                                            class="w-full px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500">
                                     <input type="date" id="deposit-date" required
@@ -495,11 +507,11 @@
                         <div id="add-commission-wrapper" class="card p-6 mb-6">
                             <h3 class="text-xl font-semibold mb-4">Add Monthly Commission</h3>
                             <form id="add-commission-form" class="space-y-4">
-                                <div class="flex items-center space-x-4">
-                                    <select id="commission-month" required class="w-1/2 px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                <div class="flex flex-col sm:flex-row items-center space-y-4 sm:space-y-0 sm:space-x-4">
+                                    <select id="commission-month" required class="w-full sm:w-1/2 px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500">
                                         </select>
                                     <input type="number" id="commission-year" placeholder="Year" required
-                                           class="w-1/2 px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                           class="w-full sm:w-1/2 px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500">
                                 </div>
                                 <input type="number" id="commission-total" placeholder="Total Commission (PKR)" required
                                        class="w-full px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500">
@@ -572,11 +584,11 @@
                             </div>
                             <div class="card p-6">
                                 <h3 class="text-xl font-semibold mb-4">Monthly Petty Cash Ledger</h3>
-                                <div class="flex items-center space-x-4 mb-4">
-                                    <select id="expense-report-month" class="px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500"></select>
+                                <div class="flex flex-col sm:flex-row items-center space-y-4 sm:space-y-0 sm:space-x-4 mb-4">
+                                    <select id="expense-report-month" class="w-full sm:w-auto px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500"></select>
                                     <input type="number" id="expense-report-year" placeholder="Year"
-                                           class="px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500">
-                                    <button id="print-expenses-btn" class="bg-gray-700 text-white px-6 py-2 rounded-full font-semibold hover:bg-gray-800 animated-btn">
+                                           class="w-full sm:w-auto px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                    <button id="print-expenses-btn" class="w-full sm:w-auto bg-gray-700 text-white px-6 py-2 rounded-full font-semibold hover:bg-gray-800 animated-btn">
                                         Print Report
                                     </button>
                                 </div>
@@ -709,6 +721,7 @@
                 </div>
             </footer>
         </div>
+        <!-- Sidebar overlay for mobile, shown when sidebar is open -->
         <div id="sidebar-overlay" class="fixed inset-0 bg-black bg-opacity-50 z-40 hidden md:hidden"></div>
     </div>
     
@@ -761,11 +774,11 @@
                     <div class="mt-6 border-t pt-4 bg-white p-4 rounded-lg shadow-sm">
                          <h4 class="font-semibold text-lg mb-2">Add Client Payment</h4>
                          <form id="add-client-payment-form" class="space-y-3">
-                            <div class="flex items-center space-x-4">
-                                <select id="client-payment-month" required class="w-1/2 px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <div class="flex flex-col sm:flex-row items-center space-y-3 sm:space-y-0 sm:space-x-4">
+                                <select id="client-payment-month" required class="w-full sm:w-1/2 px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500">
                                     </select>
                                 <input type="number" id="client-payment-year" placeholder="Year" required
-                                       class="w-1/2 px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                       class="w-full sm:w-1/2 px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500">
                             </div>
                             <input type="number" id="client-payment-amount" placeholder="Amount Paid (PKR)" required
                                    class="w-full px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500">
@@ -1021,10 +1034,7 @@
             mainApp.classList.add('flex');
             
             // Configure UI for read-only view
-            document.getElementById('main-content-wrapper').style.marginLeft = '0'; // Adjust for mobile view with sidebar
-            if (window.innerWidth >= 768) { // md breakpoint
-                 document.getElementById('main-content-wrapper').style.marginLeft = '16rem'; // 64 in tailwind config
-            }
+            // UPDATE: Removed manual style manipulation. Tailwind classes will handle the layout correctly.
             document.getElementById('sign-out-btn').style.display = 'none';
             shareDashboardBtn.style.display = 'none';
 
