@@ -182,7 +182,7 @@
     
     <div id="active-clients-modal" class="modal-overlay">
         <div class="modal-content card">
-            <h3 class="text-xl font-bold mb-4">Active Clients (This Month)</h3>
+            <h3 class="text-xl font-bold mb-4">Active Clients (Pichle 2 Mahine)</h3>
             <div id="active-clients-list" class="text-left max-h-96 overflow-y-auto">
             </div>
             <button id="active-clients-modal-close-btn" class="mt-4 bg-blue-500 text-white px-6 py-2 rounded-full font-semibold hover:bg-blue-600 focus:outline-none">Close</button>
@@ -309,7 +309,7 @@
                                 <p id="total-clients" class="text-3xl font-bold text-gray-800 mt-2">0</p>
                             </div>
                             <div id="active-clients-card" class="card p-6 text-center cursor-pointer">
-                                <h3 class="text-gray-500 text-sm">Active Clients (This Month)</h3>
+                                <h3 class="text-gray-500 text-sm">Active Clients (Pichle 2 Mahine)</h3>
                                 <p id="active-clients" class="text-3xl font-bold text-gray-800 mt-2">0</p>
                             </div>
                             <div id="dashboard-revenue-card" class="card p-6 text-center cursor-pointer">
@@ -674,20 +674,28 @@
                         <h2 class="text-3xl font-bold text-gray-800 mb-6">Employees</h2>
                         <div id="add-employee-wrapper" class="card p-6 mb-6">
                             <h3 class="text-xl font-semibold mb-4">Add New Employee</h3>
-                            <form id="add-employee-form" class="space-y-4">
+                            <form id="add-employee-form" class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <input type="text" id="employee-name" placeholder="Name" required
                                        class="w-full px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500">
                                 <input type="text" id="employee-cnic" placeholder="CNIC" required
                                        class="w-full px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500">
-                                <input type="text" id="employee-address" placeholder="Address" required
-                                       class="w-full px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500">
-                                <input type="date" id="employee-joining-date" required
+                                <input type="text" id="employee-contact" placeholder="Contact Number" required
                                        class="w-full px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500">
                                 <input type="text" id="employee-designation" placeholder="Designation" required
                                        class="w-full px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                <input type="text" id="employee-address" placeholder="Address" required
+                                       class="w-full px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500 md:col-span-2">
+                                <div>
+                                    <label for="employee-joining-date" class="text-sm text-gray-600 ml-2">Joining Date</label>
+                                    <input type="date" id="employee-joining-date" required class="w-full px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                </div>
                                 <input type="number" id="employee-salary" placeholder="Salary (PKR)" required
                                        class="w-full px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500">
-                                <button type="submit" class="w-full bg-blue-500 text-white py-2 rounded-full font-semibold hover:bg-blue-600 animated-btn">
+                                <input type="number" id="employee-incentives" placeholder="Incentives (PKR)" value="0" required
+                                       class="w-full px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                <input type="number" id="employee-allowance" placeholder="Allowance (PKR)" value="0" required
+                                       class="w-full px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                <button type="submit" class="w-full bg-blue-500 text-white py-2 rounded-full font-semibold hover:bg-blue-600 animated-btn md:col-span-2">
                                     Save Employee
                                 </button>
                             </form>
@@ -699,8 +707,8 @@
                                     <thead class="border-b-2">
                                         <tr class="text-gray-600 uppercase text-sm">
                                             <th class="p-2">Name</th>
-                                            <th class="p-2">CNIC</th>
                                             <th class="p-2">Designation</th>
+                                            <th class="p-2">Contact</th>
                                             <th class="p-2">Joining Date</th>
                                             <th class="p-2">Status</th>
                                             <th class="p-2 actions-header">Actions</th>
@@ -826,8 +834,11 @@
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <input type="text" id="edit-employee-name" placeholder="Name" required class="w-full px-4 py-2 border rounded-full">
                         <input type="text" id="edit-employee-cnic" placeholder="CNIC" required class="w-full px-4 py-2 border rounded-full">
+                        <input type="text" id="edit-employee-contact" placeholder="Contact" required class="w-full px-4 py-2 border rounded-full">
                         <input type="text" id="edit-employee-designation" placeholder="Designation" required class="w-full px-4 py-2 border rounded-full">
                         <input type="number" id="edit-employee-salary" placeholder="Salary (PKR)" required class="w-full px-4 py-2 border rounded-full">
+                        <input type="number" id="edit-employee-incentives" placeholder="Incentives (PKR)" required class="w-full px-4 py-2 border rounded-full">
+                        <input type="number" id="edit-employee-allowance" placeholder="Allowance (PKR)" required class="w-full px-4 py-2 border rounded-full">
                         <input type="text" id="edit-employee-address" placeholder="Address" required class="w-full px-4 py-2 border rounded-full md:col-span-2">
                     </div>
                     <div class="flex justify-end gap-4 mt-4">
@@ -835,6 +846,38 @@
                         <button type="submit" class="bg-blue-500 text-white px-6 py-2 rounded-full font-semibold">Save Changes</button>
                     </div>
                 </form>
+
+                <div id="employee-performance-wrapper" class="mt-6">
+                    <div class="bg-white p-4 rounded-lg shadow-sm">
+                        <h4 class="font-semibold text-lg mb-2">Add Monthly Performance</h4>
+                        <form id="add-performance-form" class="space-y-3">
+                           <div class="flex flex-col sm:flex-row items-center space-y-3 sm:space-y-0 sm:space-x-4">
+                               <select id="performance-month" required class="w-full sm:w-1/2 px-4 py-2 border rounded-full"></select>
+                               <input type="number" id="performance-year" placeholder="Year" required class="w-full sm:w-1/2 px-4 py-2 border rounded-full">
+                           </div>
+                           <input type="number" id="performance-points" placeholder="Performance Points" required class="w-full px-4 py-2 border rounded-full">
+                           <button type="submit" class="w-full bg-green-500 text-white py-2 rounded-full font-semibold hover:bg-green-600 animated-btn">
+                               Save Points
+                           </button>
+                        </form>
+                    </div>
+                    <div class="bg-white p-4 rounded-lg shadow-sm mt-4">
+                        <h4 class="font-semibold text-lg mb-2">Performance History</h4>
+                        <div class="max-h-64 overflow-y-auto">
+                            <table class="w-full text-left table-auto">
+                                <thead class="border-b-2 sticky top-0 bg-white">
+                                    <tr class="text-gray-600 uppercase text-sm">
+                                        <th class="p-2">Month/Year</th>
+                                        <th class="p-2">Points</th>
+                                        <th class="p-2 actions-header">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="performance-history-list"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
             </div>
         </div>
     </div>
@@ -869,7 +912,7 @@
         let unsubscribeListeners = [];
         let isSharedView = false; // Flag for read-only mode
 
-        let allComplaints = [], allDeposits = [], allCommissions = [], allExpenses = [], allClients = [], allEmployees = [], allClientPayments = [], allWithdrawals = [], allPettyCashEntries = []; 
+        let allComplaints = [], allDeposits = [], allCommissions = [], allExpenses = [], allClients = [], allEmployees = [], allClientPayments = [], allWithdrawals = [], allPettyCashEntries = [], allEmployeePerformance = []; 
 
         const loading = document.getElementById('loading');
         const authSection = document.getElementById('auth-section');
@@ -1115,7 +1158,7 @@
         // --- REALTIME DATA LISTENERS ---
         function startRealtimeListeners() {
             if (unsubscribeListeners.length > 0) return; 
-            const collections = ['complaints', 'deposits', 'commissions', 'expenses', 'clients', 'employees', 'client_payments', 'withdrawals', 'petty_cash'];
+            const collections = ['complaints', 'deposits', 'commissions', 'expenses', 'clients', 'employees', 'client_payments', 'withdrawals', 'petty_cash', 'employee_performance'];
             const dataHandlers = {
                 complaints: data => { allComplaints = data; renderComplaints(); updateDashboard(); },
                 deposits: data => { allDeposits = data; renderDeposits(); },
@@ -1133,7 +1176,14 @@
                     }
                 },
                 withdrawals: data => { allWithdrawals = data; renderWithdrawals(); },
-                petty_cash: data => { allPettyCashEntries = data; renderExpenses(); }
+                petty_cash: data => { allPettyCashEntries = data; renderExpenses(); },
+                employee_performance: data => {
+                    allEmployeePerformance = data;
+                    const currentlyOpenEmployeeId = document.getElementById('add-performance-form').dataset.employeeId;
+                     if(employeeDetailModal.classList.contains('active') && currentlyOpenEmployeeId) {
+                       showEmployeeProfile(currentlyOpenEmployeeId);
+                    }
+                }
             };
 
             collections.forEach(col => {
@@ -1188,15 +1238,24 @@
             const now = new Date();
             const currentMonth = now.getMonth();
             const currentYear = now.getFullYear();
-            const monthlyPayments = allClientPayments.filter(p => p.month === currentMonth && p.year === currentYear);
-            const activeClientIds = [...new Set(monthlyPayments.map(p => p.clientId))];
+
+            const previousMonthDate = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+            const previousYear = previousMonthDate.getFullYear();
+            const previousMonth = previousMonthDate.getMonth();
+
+            const relevantPayments = allClientPayments.filter(p =>
+                (p.year === currentYear && p.month === currentMonth) ||
+                (p.year === previousYear && p.month === previousMonth)
+            );
+            const activeClientIds = new Set(relevantPayments.map(p => p.clientId));
+
             const monthlyRevenue = allCommissions
                 .filter(c => c.month === currentMonth && c.year === currentYear)
                 .reduce((sum, c) => sum + (c.receivedAmount || 0), 0);
 
             document.getElementById('total-complaints').textContent = allComplaints.length;
             document.getElementById('total-clients').textContent = totalClientsCount;
-            document.getElementById('active-clients').textContent = activeClientIds.length;
+            document.getElementById('active-clients').textContent = activeClientIds.size; 
             document.getElementById('total-employees').textContent = allEmployees.length;
             document.getElementById('monthly-revenue').textContent = `PKR ${monthlyRevenue.toLocaleString()}`;
 
@@ -1298,29 +1357,51 @@
             document.getElementById('active-clients-modal').style.display = 'none';
         });
 
-        function showActiveClientsModal() { 
+        function showActiveClientsModal() {
             const now = new Date();
-            const currentMonth = now.getMonth();
             const currentYear = now.getFullYear();
+            const currentMonth = now.getMonth();
+            const previousMonthDate = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+            const previousYear = previousMonthDate.getFullYear();
+            const previousMonth = previousMonthDate.getMonth();
 
-            const activeClientIds = new Set(
-                allClientPayments
-                    .filter(p => p.month === currentMonth && p.year === currentYear)
-                    .map(p => p.clientId)
+            const relevantPayments = allClientPayments.filter(p =>
+                (p.year === currentYear && p.month === currentMonth) ||
+                (p.year === previousYear && p.month === previousMonth)
             );
 
-            const activeClients = allClients.filter(c => activeClientIds.has(c.id));
+            const clientCommissions = {};
+            relevantPayments.forEach(payment => {
+                if (!clientCommissions[payment.clientId]) {
+                    clientCommissions[payment.clientId] = 0;
+                }
+                clientCommissions[payment.clientId] += payment.amount;
+            });
+
+            const activeClientIds = Object.keys(clientCommissions);
+            const activeClientsDetails = allClients.filter(client => activeClientIds.includes(client.id));
+
+            const sortedActiveClients = activeClientsDetails.map(client => ({
+                ...client,
+                commission: clientCommissions[client.id] || 0
+            })).sort((a, b) => b.commission - a.commission);
 
             const listElement = document.getElementById('active-clients-list');
-            if (activeClients.length > 0) {
-                listElement.innerHTML = activeClients.map(client => `
-                    <div class="p-2 border-b">
-                        <p class="font-semibold">${client.name}</p>
-                        <p class="text-sm text-gray-500">${client.tradingAccount}</p>
+            if (sortedActiveClients.length > 0) {
+                listElement.innerHTML = sortedActiveClients.map(client => `
+                    <div class="p-3 border-b flex justify-between items-center">
+                        <div>
+                            <p class="font-semibold text-gray-800">${client.name}</p>
+                            <p class="text-sm text-gray-500">${client.tradingAccount}</p>
+                        </div>
+                        <div class="text-right">
+                            <p class="font-bold text-green-600">PKR ${client.commission.toLocaleString()}</p>
+                            <p class="text-xs text-gray-400">Total Commission</p>
+                        </div>
                     </div>
                 `).join('');
             } else {
-                listElement.innerHTML = '<p class="text-gray-500">No clients have made payments this month.</p>';
+                listElement.innerHTML = '<p class="text-gray-500 p-4 text-center">Pichle 2 mahino me koi active client nahi hai.</p>';
             }
             document.getElementById('active-clients-modal').style.display = 'flex';
         }
@@ -1369,7 +1450,6 @@
         });
 
         function renderComplaints() {
-            // Hide elements in shared view
             document.getElementById('add-complaint-wrapper').style.display = isSharedView ? 'none' : 'block';
             document.querySelectorAll('#complaints .actions-header').forEach(el => el.style.display = isSharedView ? 'none' : 'table-cell');
 
@@ -1777,10 +1857,13 @@
             const employeeData = {
                 name: form['employee-name'].value,
                 cnic: form['employee-cnic'].value,
+                contact: form['employee-contact'].value,
                 address: form['employee-address'].value,
                 joiningDate: form['employee-joining-date'].value,
                 designation: form['employee-designation'].value,
-                salary: parseFloat(form['employee-salary'].value)
+                salary: parseFloat(form['employee-salary'].value),
+                incentives: parseFloat(form['employee-incentives'].value) || 0,
+                allowance: parseFloat(form['employee-allowance'].value) || 0,
             };
             try {
                 await db.collection(`users/${currentUserId}/employees`).add(employeeData);
@@ -1800,8 +1883,8 @@
             document.getElementById('employees-list').innerHTML = allEmployees.map(e => `
                 <tr class="border-b">
                     <td class="p-2">${e.name}</td>
-                    <td class="p-2">${e.cnic}</td>
                     <td class="p-2">${e.designation}</td>
+                    <td class="p-2">${e.contact || 'N/A'}</td>
                     <td class="p-2">${new Date(e.joiningDate).toLocaleDateString()}</td>
                     <td class="p-2">Active</td>
                     ${!isSharedView ? `
@@ -1879,7 +1962,6 @@
             const currentMonth = now.getMonth();
             const currentYear = now.getFullYear();
 
-            // Create a set of client IDs who have paid this month for efficient lookup
             const paidClientIds = new Set(
                 allClientPayments
                     .filter(p => p.month === currentMonth && p.year === currentYear)
@@ -1891,7 +1973,6 @@
             
             profilesList.innerHTML = filtered.map(c => {
                 const hasPaidThisMonth = paidClientIds.has(c.id);
-                // Add a green border and a light green background if they've paid
                 const cardClasses = hasPaidThisMonth 
                     ? 'card p-6 cursor-pointer bg-green-50 border-2 border-green-400' 
                     : 'card p-6 cursor-pointer';
@@ -1912,7 +1993,6 @@
             const client = allClients.find(c => c.id === clientId);
             if (!client) return;
 
-            // Hide action buttons in shared view
             document.getElementById('add-payment-and-actions-wrapper').style.display = isSharedView ? 'none' : 'block';
 
             document.getElementById('profile-detail-name').textContent = client.name;
@@ -2108,25 +2188,43 @@
         // --- EMPLOYEE DETAIL MODAL ---
         const employeeDetailModal = document.getElementById('employee-detail-modal');
         const editEmployeeForm = document.getElementById('edit-employee-form');
+        const addPerformanceForm = document.getElementById('add-performance-form');
 
         function showEmployeeProfile(employeeId) {
             const employee = allEmployees.find(e => e.id === employeeId);
             if (!employee) return;
 
-            // Hide action buttons in shared view
             document.getElementById('edit-employee-btn-wrapper').style.display = isSharedView ? 'none' : 'block';
+             document.getElementById('employee-performance-wrapper').style.display = isSharedView ? 'none' : 'block';
 
             document.getElementById('employee-detail-name').textContent = employee.name;
             document.getElementById('employee-detail-info').innerHTML = `
                 <div><p class="font-semibold">CNIC:</p><p>${employee.cnic || 'N/A'}</p></div>
+                <div><p class="font-semibold">Contact:</p><p>${employee.contact || 'N/A'}</p></div>
                 <div><p class="font-semibold">Designation:</p><p>${employee.designation || 'N/A'}</p></div>
-                <div><p class="font-semibold">Salary:</p><p>PKR ${employee.salary ? employee.salary.toLocaleString() : 'N/A'}</p></div>
                 <div><p class="font-semibold">Joining Date:</p><p>${employee.joiningDate ? new Date(employee.joiningDate).toLocaleDateString() : 'N/A'}</p></div>
+                <div><p class="font-semibold">Salary:</p><p>PKR ${employee.salary ? employee.salary.toLocaleString() : 'N/A'}</p></div>
+                <div><p class="font-semibold">Incentives:</p><p>PKR ${employee.incentives ? employee.incentives.toLocaleString() : '0'}</p></div>
+                <div><p class="font-semibold">Allowance:</p><p>PKR ${employee.allowance ? employee.allowance.toLocaleString() : '0'}</p></div>
                 <div class="md:col-span-2"><p class="font-semibold">Address:</p><p>${employee.address || 'N/A'}</p></div>
             `;
             
             document.getElementById('edit-employee-btn').dataset.id = employee.id;
             editEmployeeForm.dataset.id = employee.id;
+            addPerformanceForm.dataset.employeeId = employee.id;
+
+            const performanceHistory = allEmployeePerformance
+                .filter(p => p.employeeId === employeeId)
+                .sort((a,b) => new Date(b.year, b.month) - new Date(a.year, a.month));
+            
+            document.getElementById('performance-history-list').innerHTML = performanceHistory.map(p => `
+                 <tr class="border-b">
+                    <td class="p-2">${months[p.month]} ${p.year}</td>
+                    <td class="p-2">${p.points}</td>
+                    ${!isSharedView ? `<td class="p-2"><button class="text-red-500 hover:underline" onclick="deleteItem('employee_performance', '${p.id}')">Delete</button></td>` : ''}
+                </tr>
+            `).join('');
+
 
             document.getElementById('employee-detail-info-wrapper').classList.remove('hidden');
             editEmployeeForm.classList.add('hidden');
@@ -2150,16 +2248,21 @@
 
             document.getElementById('edit-employee-name').value = employee.name || '';
             document.getElementById('edit-employee-cnic').value = employee.cnic || '';
+            document.getElementById('edit-employee-contact').value = employee.contact || '';
             document.getElementById('edit-employee-designation').value = employee.designation || '';
             document.getElementById('edit-employee-salary').value = employee.salary || '';
+            document.getElementById('edit-employee-incentives').value = employee.incentives || 0;
+            document.getElementById('edit-employee-allowance').value = employee.allowance || 0;
             document.getElementById('edit-employee-address').value = employee.address || '';
 
             document.getElementById('employee-detail-info-wrapper').classList.add('hidden');
+            document.getElementById('employee-performance-wrapper').classList.add('hidden');
             editEmployeeForm.classList.remove('hidden');
         });
 
         document.getElementById('cancel-edit-employee-btn').addEventListener('click', () => {
             document.getElementById('employee-detail-info-wrapper').classList.remove('hidden');
+            document.getElementById('employee-performance-wrapper').classList.remove('hidden');
             editEmployeeForm.classList.add('hidden');
         });
 
@@ -2171,8 +2274,11 @@
             const updatedData = {
                 name: document.getElementById('edit-employee-name').value,
                 cnic: document.getElementById('edit-employee-cnic').value,
+                contact: document.getElementById('edit-employee-contact').value,
                 designation: document.getElementById('edit-employee-designation').value,
                 salary: parseFloat(document.getElementById('edit-employee-salary').value),
+                incentives: parseFloat(document.getElementById('edit-employee-incentives').value) || 0,
+                allowance: parseFloat(document.getElementById('edit-employee-allowance').value) || 0,
                 address: document.getElementById('edit-employee-address').value,
             };
 
@@ -2182,12 +2288,46 @@
                     await db.collection(`users/${currentUserId}/employees`).doc(employeeId).update(updatedData);
                     showMessage('Success', 'Employee details updated!');
                     showEmployeeProfile(employeeId); // Refresh view
+                    document.getElementById('employee-performance-wrapper').classList.remove('hidden');
                 } catch (error) {
                     showMessage('Error', 'Failed to update: ' + error.message);
                 } finally {
                     hideLoading();
                 }
             });
+        });
+
+        addPerformanceForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const form = e.target;
+            const employeeId = form.dataset.employeeId;
+            if (!employeeId) return showMessage('Error', 'No employee selected.');
+
+            const points = parseFloat(form['performance-points'].value);
+            if (isNaN(points)) {
+                return showMessage('Error', 'Please enter valid points.');
+            }
+
+            showLoading();
+            const performanceData = {
+                employeeId: employeeId,
+                month: parseInt(form['performance-month'].value),
+                year: parseInt(form['performance-year'].value),
+                points: points,
+                timestamp: firebase.firestore.FieldValue.serverTimestamp()
+            };
+
+            try {
+                await db.collection(`users/${currentUserId}/employee_performance`).add(performanceData);
+                form.reset();
+                populateMonthDropdown(document.getElementById('performance-month'));
+                document.getElementById('performance-year').value = new Date().getFullYear();
+                showMessage('Success', 'Performance points added successfully!');
+            } catch (error) {
+                showMessage('Error', `Failed to add points: ${error.message}`);
+            } finally {
+                hideLoading();
+            }
         });
         
         // --- Initialize App ---
@@ -2211,6 +2351,7 @@
             });
             populateMonthDropdown(document.getElementById('commission-month'));
             populateMonthDropdown(document.getElementById('expense-report-month'));
+            populateMonthDropdown(document.getElementById('performance-month'));
         });
 
     </script>
