@@ -1034,18 +1034,11 @@
             mainApp.classList.add('flex');
             
             // Configure UI for read-only view
-            // UPDATE: Removed manual style manipulation. Tailwind classes will handle the layout correctly.
             document.getElementById('sign-out-btn').style.display = 'none';
             shareDashboardBtn.style.display = 'none';
 
             // Show dashboard by default
             showSection('dashboard');
-            
-            // Disable interactions on dashboard cards
-            document.getElementById('total-clients-card').style.cursor = 'default';
-            document.getElementById('active-clients-card').style.cursor = 'default';
-            document.getElementById('total-clients-card').onclick = null;
-            document.getElementById('active-clients-card').onclick = null;
             
             // Set header
             document.getElementById('header-title').textContent = "Shared Frontend (Live View)";
@@ -1287,23 +1280,18 @@
         }
         
         document.getElementById('dashboard-complaints-card').addEventListener('click', () => {
-            if (isSharedView) return;
             showSection('complaints');
         });
         document.getElementById('total-clients-card').addEventListener('click', () => {
-            if (isSharedView) return;
             showSection('profiles');
         });
         document.getElementById('dashboard-revenue-card').addEventListener('click', () => {
-            if (isSharedView) return;
             showSection('commission');
         });
         document.getElementById('dashboard-employees-card').addEventListener('click', () => {
-            if (isSharedView) return;
             showSection('employees');
         });
         document.getElementById('active-clients-card').addEventListener('click', () => {
-            if (isSharedView) return;
             showActiveClientsModal();
         });
         document.getElementById('active-clients-modal-close-btn').addEventListener('click', () => {
