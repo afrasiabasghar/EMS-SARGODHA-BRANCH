@@ -300,7 +300,7 @@
                         <h2 class="text-3xl font-bold text-gray-800 mb-6">Dashboard</h2>
                         <!-- Responsive Grid: Stacks on mobile (grid-cols-1), two columns on tablet (md:grid-cols-2), five on desktop (lg:grid-cols-5) -->
                         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 mb-8">
-                            <div class="card p-6 text-center">
+                            <div id="dashboard-complaints-card" class="card p-6 text-center cursor-pointer">
                                 <h3 class="text-gray-500 text-sm">Total Complaints</h3>
                                 <p id="total-complaints" class="text-3xl font-bold text-gray-800 mt-2">0</p>
                             </div>
@@ -312,11 +312,11 @@
                                 <h3 class="text-gray-500 text-sm">Active Clients (This Month)</h3>
                                 <p id="active-clients" class="text-3xl font-bold text-gray-800 mt-2">0</p>
                             </div>
-                            <div class="card p-6 text-center">
+                            <div id="dashboard-revenue-card" class="card p-6 text-center cursor-pointer">
                                 <h3 class="text-gray-500 text-sm">This Month's Revenue</h3>
                                 <p id="monthly-revenue" class="text-3xl font-bold text-green-600 mt-2">PKR 0</p>
                             </div>
-                            <div class="card p-6 text-center">
+                            <div id="dashboard-employees-card" class="card p-6 text-center cursor-pointer">
                                 <h3 class="text-gray-500 text-sm">Total Employees</h3>
                                 <p id="total-employees" class="text-3xl font-bold text-gray-800 mt-2">0</p>
                             </div>
@@ -1133,6 +1133,7 @@
                 client_payments: data => { 
                     allClientPayments = data; 
                     updateDashboard();
+                    renderProfiles(); // Re-render profiles to update colors
                     const currentlyOpenClientId = document.getElementById('add-client-payment-form').dataset.clientId;
                     if(profileDetailModal.classList.contains('active') && currentlyOpenClientId) {
                        showClientProfile(currentlyOpenClientId);
@@ -1285,9 +1286,21 @@
             });
         }
         
+        document.getElementById('dashboard-complaints-card').addEventListener('click', () => {
+            if (isSharedView) return;
+            showSection('complaints');
+        });
         document.getElementById('total-clients-card').addEventListener('click', () => {
             if (isSharedView) return;
             showSection('profiles');
+        });
+        document.getElementById('dashboard-revenue-card').addEventListener('click', () => {
+            if (isSharedView) return;
+            showSection('commission');
+        });
+        document.getElementById('dashboard-employees-card').addEventListener('click', () => {
+            if (isSharedView) return;
+            showSection('employees');
         });
         document.getElementById('active-clients-card').addEventListener('click', () => {
             if (isSharedView) return;
@@ -1297,7 +1310,32 @@
             document.getElementById('active-clients-modal').style.display = 'none';
         });
 
-        function showActiveClientsModal() { }
+        function showActiveClientsModal() { 
+            const now = new Date();
+            const currentMonth = now.getMonth();
+            const currentYear = now.getFullYear();
+
+            const activeClientIds = new Set(
+                allClientPayments
+                    .filter(p => p.month === currentMonth && p.year === currentYear)
+                    .map(p => p.clientId)
+            );
+
+            const activeClients = allClients.filter(c => activeClientIds.has(c.id));
+
+            const listElement = document.getElementById('active-clients-list');
+            if (activeClients.length > 0) {
+                listElement.innerHTML = activeClients.map(client => `
+                    <div class="p-2 border-b">
+                        <p class="font-semibold">${client.name}</p>
+                        <p class="text-sm text-gray-500">${client.tradingAccount}</p>
+                    </div>
+                `).join('');
+            } else {
+                listElement.innerHTML = '<p class="text-gray-500">No clients have made payments this month.</p>';
+            }
+            document.getElementById('active-clients-modal').style.display = 'flex';
+        }
 
         function updateClientDatalist() {
             document.getElementById('client-trading-accounts').innerHTML = allClients.map(c => `<option value="${c.tradingAccount}">`).join('');
@@ -1849,15 +1887,36 @@
         function renderProfiles() {
             document.getElementById('add-client-wrapper').style.display = isSharedView ? 'none' : 'block';
 
+            const now = new Date();
+            const currentMonth = now.getMonth();
+            const currentYear = now.getFullYear();
+
+            // Create a set of client IDs who have paid this month for efficient lookup
+            const paidClientIds = new Set(
+                allClientPayments
+                    .filter(p => p.month === currentMonth && p.year === currentYear)
+                    .map(p => p.clientId)
+            );
+
             const searchTerm = profilesSearch.value.toLowerCase();
             const filtered = allClients.filter(c => c.name.toLowerCase().includes(searchTerm) || c.tradingAccount.toLowerCase().includes(searchTerm));
-            profilesList.innerHTML = filtered.map(c => `
-                <div class="card p-6 cursor-pointer" data-id="${c.id}">
-                    <h4 class="font-bold text-lg">${c.name}</h4>
-                    <p class="text-gray-500 text-sm">${c.tradingAccount}</p>
-                    ${c.isClosed ? `<span class="mt-2 text-xs font-semibold text-white bg-red-500 px-2 py-1 rounded-full">Account Closed</span>` : ''}
-                </div>
-            `).join('');
+            
+            profilesList.innerHTML = filtered.map(c => {
+                const hasPaidThisMonth = paidClientIds.has(c.id);
+                // Add a green border and a light green background if they've paid
+                const cardClasses = hasPaidThisMonth 
+                    ? 'card p-6 cursor-pointer bg-green-50 border-2 border-green-400' 
+                    : 'card p-6 cursor-pointer';
+
+                return `
+                    <div class="${cardClasses}" data-id="${c.id}">
+                        <h4 class="font-bold text-lg">${c.name}</h4>
+                        <p class="text-gray-500 text-sm">${c.tradingAccount}</p>
+                        ${c.isClosed ? `<span class="mt-2 text-xs font-semibold text-white bg-red-500 px-2 py-1 rounded-full">Account Closed</span>` : ''}
+                    </div>
+                `;
+            }).join('');
+
             profilesList.querySelectorAll('.card').forEach(card => card.addEventListener('click', (e) => showClientProfile(e.currentTarget.dataset.id)));
         }
         
@@ -1954,7 +2013,7 @@
 
         document.getElementById('cancel-edit-profile-btn').addEventListener('click', () => {
              document.getElementById('profile-detail-info-wrapper').classList.remove('hidden');
-            document.getElementById('add-payment-and-actions-wrapper').classList.remove('hidden');
+            document.getElementById('add-payment-and-actions-wrapper').remove('hidden');
             editClientProfileForm.classList.add('hidden');
         });
         
