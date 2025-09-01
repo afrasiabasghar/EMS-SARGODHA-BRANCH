@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -515,9 +516,9 @@
                                 </div>
                                 <input type="number" id="commission-total" placeholder="Total Commission (PKR)" required
                                        class="w-full px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500">
-                                <input type="number" id="commission-requested" placeholder="Requested Payment (PKR)" required
+                                <input type="number" id="commission-requested" placeholder="Requested Payment (PKR)"
                                        class="w-full px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500">
-                                <input type="number" id="commission-received" placeholder="Received Amount (PKR)" required
+                                <input type="number" id="commission-received" placeholder="Received Amount (PKR)"
                                        class="w-full px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500">
                                 <button type="submit" class="w-full bg-blue-500 text-white py-2 rounded-full font-semibold hover:bg-blue-600 animated-btn">
                                     Save Commission
@@ -1249,9 +1250,12 @@
             );
             const activeClientIds = new Set(relevantPayments.map(p => p.clientId));
 
+            // ### UPDATE START ###
+            // Calculate revenue based on Total Commission for the current month
             const monthlyRevenue = allCommissions
                 .filter(c => c.month === currentMonth && c.year === currentYear)
-                .reduce((sum, c) => sum + (c.receivedAmount || 0), 0);
+                .reduce((sum, c) => sum + (c.totalAmount || 0), 0);
+            // ### UPDATE END ###
 
             document.getElementById('total-complaints').textContent = allComplaints.length;
             document.getElementById('total-clients').textContent = totalClientsCount;
@@ -1602,13 +1606,16 @@
             e.preventDefault();
             const form = e.target;
             showLoading();
+            // ### UPDATE START ###
+            // Use || 0 to default empty optional fields to zero
             const commissionData = {
                 month: parseInt(form['commission-month'].value),
                 year: parseInt(form['commission-year'].value),
-                totalAmount: parseFloat(form['commission-total'].value),
-                requestedAmount: parseFloat(form['commission-requested'].value),
-                receivedAmount: parseFloat(form['commission-received'].value)
+                totalAmount: parseFloat(form['commission-total'].value) || 0,
+                requestedAmount: parseFloat(form['commission-requested'].value) || 0,
+                receivedAmount: parseFloat(form['commission-received'].value) || 0
             };
+            // ### UPDATE END ###
             try {
                 await db.collection(`users/${currentUserId}/commissions`).add(commissionData);
                 form.reset();
