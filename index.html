@@ -302,7 +302,7 @@
                         <!-- Responsive Grid: Stacks on mobile (grid-cols-1), two columns on tablet (md:grid-cols-2), five on desktop (lg:grid-cols-5) -->
                         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 mb-8">
                             <div id="dashboard-complaints-card" class="card p-6 text-center cursor-pointer">
-                                <h3 class="text-gray-500 text-sm">Total Complaints</h3>
+                                <h3 class="text-gray-500 text-sm">Active Complaints</h3>
                                 <p id="total-complaints" class="text-3xl font-bold text-gray-800 mt-2">0</p>
                             </div>
                             <div id="total-clients-card" class="card p-6 text-center cursor-pointer">
@@ -326,7 +326,7 @@
                         <!-- Responsive Grid for charts: Stacks on mobile, two columns on large screens -->
                         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
                             <div class="card p-6">
-                                <h3 class="text-xl font-semibold mb-4">Complaints Status</h3>
+                                <h3 class="text-xl font-semibold mb-4">Active Complaints Status</h3>
                                 <div class="relative max-h-80 mx-auto">
                                      <canvas id="complaintStatusChart"></canvas>
                                 </div>
@@ -467,8 +467,12 @@
                                        class="w-full px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500">
                                 <input type="text" id="withdrawal-client-name" placeholder="Client Name (auto-filled)" readonly
                                        class="w-full px-4 py-2 border rounded-full bg-gray-100">
-                                <input type="number" id="withdrawal-amount" placeholder="Requested Amount (PKR)" required
-                                       class="w-full px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                <div class="flex flex-col sm:flex-row items-center space-y-4 sm:space-y-0 sm:space-x-4">
+                                    <input type="number" id="withdrawal-amount" placeholder="Requested Amount (PKR)" required
+                                           class="w-full px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                    <input type="date" id="withdrawal-date" required
+                                           class="w-full px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                </div>
                                 <select id="withdrawal-status" class="w-full px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500">
                                     <option value="Accepted">Accepted</option>
                                     <option value="Returned">Returned</option>
@@ -555,7 +559,7 @@
                                 <div class="card p-6 mb-6">
                                     <h3 class="text-xl font-semibold mb-4">Petty Cash Management</h3>
                                     <div class="mb-4">
-                                        <p class="text-gray-500">Remaining Balance</p>
+                                        <p class="text-gray-500">Overall Remaining Balance</p>
                                         <p id="petty-cash-balance" class="text-3xl font-bold text-blue-600">PKR 0</p>
                                     </div>
                                     <form id="add-petty-cash-form" class="space-y-4">
@@ -593,35 +597,32 @@
                                         Print Report
                                     </button>
                                 </div>
-                                <div id="expenses-report-container" class="space-y-4">
-                                    <h4 class="font-semibold mt-4">Cash In History (This Month)</h4>
-                                    <div class="overflow-y-auto max-h-40">
+                                <div id="expenses-report-container">
+                                    <div class="flex justify-between items-center mb-2 p-2 bg-gray-50 rounded-lg">
+                                        <span class="font-semibold">Opening Balance:</span>
+                                        <span id="opening-balance-display" class="font-bold text-gray-700">PKR 0</span>
+                                    </div>
+                                    <div class="overflow-y-auto max-h-80">
                                         <table class="w-full text-left table-auto">
                                             <thead class="border-b-2 sticky top-0 bg-white">
                                                 <tr class="text-gray-600 uppercase text-sm">
                                                     <th class="p-2">Date</th>
-                                                    <th class="p-2">Amount</th>
+                                                    <th class="p-2">Description</th>
+                                                    <th class="p-2 text-right">Debit (DR)</th>
+                                                    <th class="p-2 text-right">Credit (CR)</th>
+                                                    <th class="p-2 text-right">Balance</th>
                                                     <th class="p-2 actions-header">Actions</th>
                                                 </tr>
                                             </thead>
-                                            <tbody id="petty-cash-history-list"></tbody>
+                                            <tbody id="expense-statement-list">
+                                                <!-- Rows will be generated by JS -->
+                                            </tbody>
                                         </table>
                                     </div>
-                                    <h4 class="font-semibold mt-4">Expenses (This Month)</h4>
-                                     <div class="overflow-y-auto max-h-40">
-                                        <table class="w-full text-left table-auto">
-                                            <thead class="border-b-2 sticky top-0 bg-white">
-                                                <tr class="text-gray-600 uppercase text-sm">
-                                                    <th class="p-2">Date</th>
-                                                    <th class="p-2">Expense</th>
-                                                    <th class="p-2">Amount</th>
-                                                    <th class="p-2 actions-header">Actions</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody id="expenses-list"></tbody>
-                                        </table>
+                                    <div class="flex justify-between items-center mt-2 p-2 bg-gray-50 rounded-lg">
+                                        <span class="font-semibold">Closing Balance:</span>
+                                        <span id="closing-balance-display" class="font-bold text-blue-600">PKR 0</span>
                                     </div>
-                                    <p id="total-expenses-display" class="text-xl font-bold text-gray-800 mt-4 text-right"></p>
                                 </div>
                             </div>
                         </div>
@@ -748,16 +749,29 @@
                 <div id="profile-detail-info-wrapper">
                     <div id="profile-detail-info" class="text-gray-700 text-sm mb-6 bg-white p-6 rounded-lg shadow-sm grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4"></div>
                     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                        <div class="bg-white p-4 rounded-lg shadow-sm">
+                        <div class="bg-white p-4 rounded-lg shadow-sm lg:col-span-2">
                             <h4 class="font-semibold text-lg mb-2">Client Payment History</h4>
                             <div class="relative h-64">
                                 <canvas id="clientCommissionChart"></canvas>
                             </div>
                         </div>
-                        <div class="bg-white p-4 rounded-lg shadow-sm">
+                        <div class="bg-white p-4 rounded-lg shadow-sm lg:col-span-2">
                             <h4 class="font-semibold text-lg mb-2">Financial History (Deposits & Withdrawals)</h4>
-                            <ul id="client-financial-history" class="space-y-3 text-gray-700 max-h-64 overflow-y-auto pr-2">
-                            </ul>
+                            <div class="max-h-64 overflow-y-auto">
+                                <table class="w-full text-left table-auto text-sm">
+                                    <thead class="border-b-2 sticky top-0 bg-white">
+                                        <tr class="text-gray-600 uppercase text-xs">
+                                            <th class="p-2">Date</th>
+                                            <th class="p-2">Description</th>
+                                            <th class="p-2 text-right">Deposit (CR)</th>
+                                            <th class="p-2 text-right">Withdrawal (DR)</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="client-financial-history-list">
+                                        <!-- Populated by JS -->
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -1250,32 +1264,40 @@
             );
             const activeClientIds = new Set(relevantPayments.map(p => p.clientId));
 
-            // ### UPDATE START ###
-            // Calculate revenue based on Total Commission for the current month
             const monthlyRevenue = allCommissions
                 .filter(c => c.month === currentMonth && c.year === currentYear)
                 .reduce((sum, c) => sum + (c.totalAmount || 0), 0);
+
+            // ### UPDATE START: Only count active complaints (Not "Closed") ###
+            const activeComplaints = allComplaints.filter(c => c.status !== 'Closed');
+            document.getElementById('total-complaints').textContent = activeComplaints.length;
             // ### UPDATE END ###
 
-            document.getElementById('total-complaints').textContent = allComplaints.length;
             document.getElementById('total-clients').textContent = totalClientsCount;
             document.getElementById('active-clients').textContent = activeClientIds.size; 
             document.getElementById('total-employees').textContent = allEmployees.length;
             document.getElementById('monthly-revenue').textContent = `PKR ${monthlyRevenue.toLocaleString()}`;
 
-            const complaintStatusData = { Pending: 0, Done: 0, Closed: 0 };
-            allComplaints.forEach(c => {
-                if (complaintStatusData.hasOwnProperty(c.status)) complaintStatusData[c.status]++;
+            // ### UPDATE START: Chart for active complaints only ###
+            const complaintStatusData = { Pending: 0, Done: 0 };
+            activeComplaints.forEach(c => {
+                if (complaintStatusData.hasOwnProperty(c.status)) {
+                    complaintStatusData[c.status]++;
+                }
             });
             if (complaintStatusChart) complaintStatusChart.destroy();
             complaintStatusChart = new Chart('complaintStatusChart', {
                 type: 'doughnut',
                 data: {
-                    labels: Object.keys(complaintStatusData),
-                    datasets: [{ data: Object.values(complaintStatusData), backgroundColor: ['#f59e0b', '#10b981', '#6b7280'] }]
+                    labels: ['Pending', 'Done'],
+                    datasets: [{ 
+                        data: [complaintStatusData.Pending, complaintStatusData.Done], 
+                        backgroundColor: ['#f59e0b', '#10b981'] 
+                    }]
                 },
                 options: { responsive: true, maintainAspectRatio: false }
             });
+            // ### UPDATE END ###
 
             const commissionByMonth = {};
             allCommissions.forEach(c => {
@@ -1567,6 +1589,7 @@
                 clientName: form['withdrawal-client-name'].value,
                 tradingAccount: form['withdrawal-trading-account'].value,
                 amount: parseFloat(form['withdrawal-amount'].value),
+                date: form['withdrawal-date'].value, // Added date field
                 status: form['withdrawal-status'].value,
                 returnedReason: form['withdrawal-returned-reason'].value,
                 timestamp: firebase.firestore.FieldValue.serverTimestamp()
@@ -1588,14 +1611,14 @@
 
             const searchTerm = document.getElementById('withdrawal-search').value.toLowerCase();
             const filtered = allWithdrawals.filter(w => w.clientName.toLowerCase().includes(searchTerm) || w.tradingAccount.toLowerCase().includes(searchTerm))
-                                           .sort((a, b) => (b.timestamp?.toDate() || 0) - (a.timestamp?.toDate() || 0));
+                                           .sort((a, b) => new Date(b.date) - new Date(a.date)); // Sort by date
             document.getElementById('withdrawals-list').innerHTML = filtered.map(w => `
                 <tr class="border-b">
                     <td class="p-2">${w.clientName}</td>
                     <td class="p-2">${w.tradingAccount}</td>
                     <td class="p-2">PKR ${w.amount.toLocaleString()}</td>
                     <td class="p-2">${w.status}</td>
-                    <td class="p-2">${w.timestamp ? new Date(w.timestamp.seconds * 1000).toLocaleDateString() : 'N/A'}</td>
+                    <td class="p-2">${w.date ? new Date(w.date).toLocaleDateString() : (w.timestamp ? new Date(w.timestamp.seconds * 1000).toLocaleDateString() : 'N/A')}</td>
                     ${!isSharedView ? `<td class="p-2"><button class="text-red-500 hover:underline" onclick="deleteItem('withdrawals', '${w.id}')">Delete</button></td>` : ''}
                 </tr>
             `).join('');
@@ -1606,8 +1629,6 @@
             e.preventDefault();
             const form = e.target;
             showLoading();
-            // ### UPDATE START ###
-            // Use || 0 to default empty optional fields to zero
             const commissionData = {
                 month: parseInt(form['commission-month'].value),
                 year: parseInt(form['commission-year'].value),
@@ -1615,7 +1636,6 @@
                 requestedAmount: parseFloat(form['commission-requested'].value) || 0,
                 receivedAmount: parseFloat(form['commission-received'].value) || 0
             };
-            // ### UPDATE END ###
             try {
                 await db.collection(`users/${currentUserId}/commissions`).add(commissionData);
                 form.reset();
@@ -1714,7 +1734,6 @@
 
         function renderExpenses() {
             document.getElementById('add-expense-forms-wrapper').style.display = isSharedView ? 'none' : 'block';
-            document.getElementById('print-expenses-btn').style.display = isSharedView ? 'none' : 'block';
             document.querySelectorAll('#expenses .actions-header').forEach(el => el.style.display = isSharedView ? 'none' : 'table-cell');
 
             const totalIn = allPettyCashEntries.reduce((sum, entry) => sum + entry.amount, 0);
@@ -1722,38 +1741,50 @@
             const balance = totalIn - totalOut;
             document.getElementById('petty-cash-balance').textContent = `PKR ${balance.toLocaleString()}`;
 
-            const month = parseInt(document.getElementById('expense-report-month').value);
-            const year = parseInt(document.getElementById('expense-report-year').value);
+            const selectedMonth = parseInt(document.getElementById('expense-report-month').value);
+            const selectedYear = parseInt(document.getElementById('expense-report-year').value);
+
+            const firstDayOfSelectedMonth = new Date(selectedYear, selectedMonth, 1);
+            const previousCashIn = allPettyCashEntries
+                .filter(e => new Date(e.date) < firstDayOfSelectedMonth)
+                .reduce((sum, e) => sum + e.amount, 0);
+            const previousExpenses = allExpenses
+                .filter(e => new Date(e.date) < firstDayOfSelectedMonth)
+                .reduce((sum, e) => sum + e.amount, 0);
+            const openingBalance = previousCashIn - previousExpenses;
+            document.getElementById('opening-balance-display').textContent = `PKR ${openingBalance.toLocaleString()}`;
+
+            const cashInThisMonth = allPettyCashEntries
+                .filter(e => {
+                    const date = new Date(e.date);
+                    return date.getMonth() === selectedMonth && date.getFullYear() === selectedYear;
+                })
+                .map(e => ({ id: e.id, date: e.date, description: 'Petty Cash In', cr: e.amount, dr: 0, type: 'petty_cash' }));
+            const expensesThisMonth = allExpenses
+                .filter(e => {
+                    const date = new Date(e.date);
+                    return date.getMonth() === selectedMonth && date.getFullYear() === selectedYear;
+                })
+                .map(e => ({ id: e.id, date: e.date, description: e.name, cr: 0, dr: e.amount, type: 'expenses' }));
+            const transactions = [...cashInThisMonth, ...expensesThisMonth].sort((a, b) => new Date(a.date) - new Date(b.date));
+
+            const statementList = document.getElementById('expense-statement-list');
+            let runningBalance = openingBalance;
+            statementList.innerHTML = transactions.map(t => {
+                runningBalance += t.cr - t.dr;
+                return `
+                    <tr class="border-b">
+                        <td class="p-2">${new Date(t.date).toLocaleDateString()}</td>
+                        <td class="p-2">${t.description}</td>
+                        <td class="p-2 text-right text-red-600">${t.dr > 0 ? `PKR ${t.dr.toLocaleString()}` : '-'}</td>
+                        <td class="p-2 text-right text-green-600">${t.cr > 0 ? `PKR ${t.cr.toLocaleString()}` : '-'}</td>
+                        <td class="p-2 text-right font-semibold">${`PKR ${runningBalance.toLocaleString()}`}</td>
+                        ${!isSharedView ? `<td class="p-2"><button class="text-red-500 hover:underline" onclick="deleteItem('${t.type}', '${t.id}')">Delete</button></td>` : ''}
+                    </tr>
+                `;
+            }).join('');
             
-            const filteredExpenses = allExpenses.filter(e => {
-                const date = new Date(e.date);
-                return date.getMonth() === month && date.getFullYear() === year;
-            }).sort((a,b) => new Date(a.date) - new Date(b.date));
-            
-            const filteredCashIn = allPettyCashEntries.filter(e => {
-                const date = new Date(e.date);
-                return date.getMonth() === month && date.getFullYear() === year;
-            }).sort((a,b) => new Date(a.date) - new Date(b.date));
-
-            const totalMonthExpenses = filteredExpenses.reduce((sum, e) => sum + e.amount, 0);
-            document.getElementById('total-expenses-display').textContent = `Monthly Total: PKR ${totalMonthExpenses.toLocaleString()}`;
-
-            document.getElementById('expenses-list').innerHTML = filteredExpenses.map(e => `
-                <tr class="border-b">
-                    <td class="p-2">${new Date(e.date).toLocaleDateString()}</td>
-                    <td class="p-2">${e.name}</td>
-                    <td class="p-2">PKR ${e.amount.toLocaleString()}</td>
-                    ${!isSharedView ? `<td class="p-2"><button class="text-red-500 hover:underline" onclick="deleteItem('expenses', '${e.id}')">Delete</button></td>` : ''}
-                </tr>
-            `).join('');
-
-            document.getElementById('petty-cash-history-list').innerHTML = filteredCashIn.map(e => `
-                <tr class="border-b">
-                    <td class="p-2">${new Date(e.date).toLocaleDateString()}</td>
-                    <td class="p-2">PKR ${e.amount.toLocaleString()}</td>
-                    ${!isSharedView ? `<td class="p-2"><button class="text-red-500 hover:underline" onclick="deleteItem('petty_cash', '${e.id}')">Delete</button></td>` : ''}
-                </tr>
-            `).join('');
+            document.getElementById('closing-balance-display').textContent = `PKR ${runningBalance.toLocaleString()}`;
         }
         
         document.getElementById('expense-report-month').addEventListener('change', renderExpenses);
@@ -1765,84 +1796,78 @@
             const year = parseInt(document.getElementById('expense-report-year').value);
             const monthName = months[month];
 
-            const filteredExpenses = allExpenses.filter(e => {
-                const date = new Date(e.date);
-                return date.getMonth() === month && date.getFullYear() === year;
-            }).sort((a,b) => new Date(a.date) - new Date(b.date));
-            
-            const filteredCashIn = allPettyCashEntries.filter(e => {
-                const date = new Date(e.date);
-                return date.getMonth() === month && date.getFullYear() === year;
-            }).sort((a,b) => new Date(a.date) - new Date(b.date));
+            const firstDayOfSelectedMonth = new Date(year, month, 1);
+            const previousCashIn = allPettyCashEntries.filter(e => new Date(e.date) < firstDayOfSelectedMonth).reduce((sum, e) => sum + e.amount, 0);
+            const previousExpenses = allExpenses.filter(e => new Date(e.date) < firstDayOfSelectedMonth).reduce((sum, e) => sum + e.amount, 0);
+            const openingBalance = previousCashIn - previousExpenses;
 
-            const totalMonthCashIn = filteredCashIn.reduce((sum, e) => sum + e.amount, 0);
-            const totalMonthExpenses = filteredExpenses.reduce((sum, e) => sum + e.amount, 0);
-            const closingBalance = totalMonthCashIn - totalMonthExpenses;
+            const cashInThisMonth = allPettyCashEntries.filter(e => { const date = new Date(e.date); return date.getMonth() === month && date.getFullYear() === year; }).map(e => ({ date: e.date, description: 'Petty Cash In', cr: e.amount, dr: 0 }));
+            const expensesThisMonth = allExpenses.filter(e => { const date = new Date(e.date); return date.getMonth() === month && date.getFullYear() === year; }).map(e => ({ date: e.date, description: e.name, cr: 0, dr: e.amount }));
+            const transactions = [...cashInThisMonth, ...expensesThisMonth].sort((a, b) => new Date(a.date) - new Date(b.date));
 
-            const cashInRows = filteredCashIn.map(e => `
-                <tr>
-                    <td>${new Date(e.date).toLocaleDateString()}</td>
-                    <td>Cash In</td>
-                    <td>PKR ${e.amount.toLocaleString()}</td>
-                </tr>`).join('');
+            let runningBalance = openingBalance;
+            const transactionRows = transactions.map(t => {
+                runningBalance += t.cr - t.dr;
+                return `
+                    <tr>
+                        <td>${new Date(t.date).toLocaleDateString()}</td>
+                        <td>${t.description}</td>
+                        <td class="text-right">${t.dr > 0 ? `(PKR ${t.dr.toLocaleString()})` : '-'}</td>
+                        <td class="text-right">${t.cr > 0 ? `PKR ${t.cr.toLocaleString()}` : '-'}</td>
+                        <td class="text-right">PKR ${runningBalance.toLocaleString()}</td>
+                    </tr>
+                `;
+            }).join('');
 
-            const expenseRows = filteredExpenses.map(e => `
-                <tr>
-                    <td>${new Date(e.date).toLocaleDateString()}</td>
-                    <td>${e.name}</td>
-                    <td>(PKR ${e.amount.toLocaleString()})</td>
-                </tr>`).join('');
+            const closingBalance = runningBalance;
 
             const reportHtml = `
                 <html>
                 <head>
                     <title>Petty Cash Report - ${monthName} ${year}</title>
                     <style>
-                        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; padding: 20px; }
-                        .header { text-align: center; margin-bottom: 30px; }
-                        .header h1 { margin: 0; font-size: 24px; }
-                        .header p { margin: 5px 0; font-size: 16px; }
-                        table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
-                        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+                        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 20px; }
+                        .header { text-align: center; margin-bottom: 20px; }
+                        h1, h2, p { margin: 5px 0; }
+                        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+                        th, td { border: 1px solid #ccc; padding: 8px; text-align: left; }
                         th { background-color: #f2f2f2; }
-                        .summary { margin-top: 30px; float: right; width: 300px; }
-                        .summary table { width: 100%; }
-                        .summary td { font-weight: bold; }
-                        .summary td:last-child { text-align: right; }
-                        @media print {
-                            body { -webkit-print-color-adjust: exact; }
-                        }
+                        .summary-table { width: 40%; margin-left: 60%; margin-top: 20px; }
+                        .summary-table td { font-weight: bold; }
+                        .text-right { text-align: right; }
+                        @media print { body { -webkit-print-color-adjust: exact; } }
                     </style>
                 </head>
                 <body>
                     <div class="header">
                         <h1>Darson Sargodha</h1>
-                        <p>Petty Cash Report</p>
+                        <h2>Petty Cash Ledger</h2>
                         <p>For the month of ${monthName}, ${year}</p>
                     </div>
-                    
-                    <h3>Transactions</h3>
                     <table>
                         <thead>
                             <tr>
                                 <th>Date</th>
                                 <th>Description</th>
-                                <th>Amount</th>
+                                <th class="text-right">Debit (DR)</th>
+                                <th class="text-right">Credit (CR)</th>
+                                <th class="text-right">Balance</th>
                             </tr>
                         </thead>
                         <tbody>
-                            ${cashInRows}
-                            ${expenseRows}
+                            <tr>
+                                <td colspan="4"><strong>Opening Balance</strong></td>
+                                <td class="text-right"><strong>PKR ${openingBalance.toLocaleString()}</strong></td>
+                            </tr>
+                            ${transactionRows}
                         </tbody>
                     </table>
-
-                    <div class="summary">
-                         <table>
-                            <tr><td>Total Cash In:</td><td>PKR ${totalMonthCashIn.toLocaleString()}</td></tr>
-                            <tr><td>Total Expenses:</td><td>PKR ${totalMonthExpenses.toLocaleString()}</td></tr>
-                            <tr><td>Closing Balance:</td><td>PKR ${closingBalance.toLocaleString()}</td></tr>
-                        </table>
-                    </div>
+                    <table class="summary-table">
+                        <tr>
+                            <td><strong>Closing Balance</strong></td>
+                            <td class="text-right"><strong>PKR ${closingBalance.toLocaleString()}</strong></td>
+                        </tr>
+                    </table>
                 </body>
                 </html>
             `;
@@ -1850,10 +1875,7 @@
             const reportWindow = window.open('', '_blank');
             reportWindow.document.write(reportHtml);
             reportWindow.document.close();
-            setTimeout(() => {
-                reportWindow.print();
-                reportWindow.close();
-            }, 250);
+            setTimeout(() => { reportWindow.print(); }, 500);
         }
 
         // --- EMPLOYEES MODULE ---
@@ -2013,24 +2035,41 @@
                 <div class="md:col-span-2"><p class="font-semibold">Status:</p><p>${client.isClosed ? `Closed (${client.closureDate ? new Date(client.closureDate).toLocaleDateString() : 'N/A'})` : 'Active'}</p></div>
             `;
             
-            const clientDeposits = allDeposits.filter(d => d.tradingAccount === client.tradingAccount);
-            const clientWithdrawals = allWithdrawals.filter(w => w.tradingAccount === client.tradingAccount);
-            const financialHistory = [...clientDeposits, ...clientWithdrawals]
-                .sort((a,b) => (b.timestamp?.toDate() || new Date(b.date)) - (a.timestamp?.toDate() || new Date(a.date)));
+            const clientDeposits = allDeposits
+                .filter(d => d.tradingAccount === client.tradingAccount)
+                .map(d => ({
+                    date: d.date,
+                    description: `Cheque Deposit #${d.chequeNumber}`,
+                    cr: d.amount,
+                    dr: 0
+                }));
 
-            const historyList = document.getElementById('client-financial-history');
-            historyList.innerHTML = financialHistory.length ? financialHistory.map(item => {
-                const isDeposit = !!item.chequeNumber;
-                const date = item.timestamp ? new Date(item.timestamp.seconds * 1000).toLocaleDateString() : new Date(item.date).toLocaleDateString();
-                const amountColor = isDeposit ? 'text-green-600' : 'text-red-600';
-                const type = isDeposit ? 'Deposit' : 'Withdrawal';
-                return `<li class="flex justify-between items-center text-sm p-2 rounded-md hover:bg-gray-50">
-                            <span>
-                                <strong class="${amountColor}">${type}</strong> on ${date}
-                            </span>
-                            <span class="font-semibold ${amountColor}">PKR ${item.amount.toLocaleString()}</span>
-                        </li>`;
-            }).join('') : '<li>No financial history found.</li>';
+            const clientWithdrawals = allWithdrawals
+                .filter(w => w.tradingAccount === client.tradingAccount)
+                .map(w => ({
+                    // Use withdrawal date if available, otherwise fallback to timestamp for older records
+                    date: w.date || (w.timestamp ? new Date(w.timestamp.seconds * 1000).toISOString().split('T')[0] : 'N/A'),
+                    description: `Withdrawal Request (${w.status})`,
+                    cr: 0,
+                    dr: w.amount
+                }));
+
+            const financialHistory = [...clientDeposits, ...clientWithdrawals]
+                .sort((a, b) => new Date(b.date) - new Date(a.date));
+
+            const historyList = document.getElementById('client-financial-history-list');
+            if (financialHistory.length > 0) {
+                historyList.innerHTML = financialHistory.map(item => `
+                    <tr class="border-b">
+                        <td class="p-2">${new Date(item.date).toLocaleDateString()}</td>
+                        <td class="p-2">${item.description}</td>
+                        <td class="p-2 text-right text-green-600">${item.cr > 0 ? `PKR ${item.cr.toLocaleString()}` : '-'}</td>
+                        <td class="p-2 text-right text-red-600">${item.dr > 0 ? `PKR ${item.dr.toLocaleString()}` : '-'}</td>
+                    </tr>
+                `).join('');
+            } else {
+                historyList.innerHTML = '<tr><td colspan="4" class="p-4 text-center text-gray-500">No financial history found.</td></tr>';
+            }
 
             addClientPaymentForm.dataset.clientId = client.id;
             editClientProfileForm.dataset.clientId = client.id; 
@@ -2348,6 +2387,12 @@
                 initializeAuthentication();
             }
             
+            // ### UPDATE START: Add event listeners for search inputs ###
+            document.getElementById('complaint-search').addEventListener('input', renderComplaints);
+            document.getElementById('deposit-search').addEventListener('input', renderDeposits);
+            document.getElementById('withdrawal-search').addEventListener('input', renderWithdrawals);
+            // ### UPDATE END ###
+
             const currentYear = new Date().getFullYear();
             const currentDate = new Date().toISOString().split("T")[0];
             document.querySelectorAll('input[id*="-year"]').forEach(input => {
