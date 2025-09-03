@@ -1735,6 +1735,7 @@
         function renderExpenses() {
             document.getElementById('add-expense-forms-wrapper').style.display = isSharedView ? 'none' : 'block';
             document.querySelectorAll('#expenses .actions-header').forEach(el => el.style.display = isSharedView ? 'none' : 'table-cell');
+            document.getElementById('print-expenses-btn').style.display = isSharedView ? 'none' : 'block'; // Yeh line report button ko frontend per hide kar degi
 
             const totalIn = allPettyCashEntries.reduce((sum, entry) => sum + entry.amount, 0);
             const totalOut = allExpenses.reduce((sum, entry) => sum + entry.amount, 0);
