@@ -13,7 +13,8 @@
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
         body {
             font-family: 'Inter', sans-serif;
-            background-color: #f4f7f9;
+            /* UPDATED: Switched to a cleaner, lighter background color from the 'slate' palette */
+            background-color: #f8fafc; /* Tailwind 'slate-50' */
         }
         .section-container {
             display: none;
@@ -31,17 +32,21 @@
         }
         .animated-btn:hover {
             transform: translateY(-2px);
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            /* UPDATED: Uses Tailwind's shadow utility classes for consistency */
         }
         .card {
             background-color: #ffffff;
             border-radius: 12px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            /* UPDATED: Added a light border for a cleaner look */
+            border: 1px solid #e2e8f0; /* slate-200 */
+            /* UPDATED: Switched to a softer, more modern shadow */
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.07), 0 2px 4px -2px rgb(0 0 0 / 0.07);
             transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
         }
         .card:hover {
             transform: translateY(-3px);
-            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+            /* UPDATED: A slightly more pronounced hover shadow */
+            box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.07), 0 4px 6px -4px rgb(0 0 0 / 0.07);
         }
         .modal-overlay {
             position: fixed;
@@ -94,7 +99,8 @@
             right: -100%; 
             width: 100%; /* Full width on mobile */
             height: 100%;
-            background-color: #f4f7f9;
+            /* UPDATED: Changed background to match body */
+            background-color: #f8fafc; /* slate-50 */
             box-shadow: -4px 0 12px rgba(0,0,0,0.1);
             transition: right 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
             display: flex;
@@ -116,7 +122,8 @@
             align-items: center;
             padding: 1rem 1.5rem;
             background-color: white;
-            border-bottom: 1px solid #e5e7eb;
+            /* UPDATED: Consistent border */
+            border-bottom: 1px solid #e2e8f0; /* slate-200 */
             flex-shrink: 0;
         }
         .popup-window-body {
@@ -140,42 +147,49 @@
         }
     </style>
 </head>
-<body class="bg-gray-100">
+<!-- UPDATED: Body background color -->
+<body class="bg-slate-50">
 
-    <div id="loading" class="fixed inset-0 bg-gray-200 bg-opacity-75 flex items-center justify-center z-50 hidden">
-        <div class="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-blue-500"></div>
+    <!-- UPDATED: Loading spinner color -->
+    <div id="loading" class="fixed inset-0 bg-slate-200 bg-opacity-75 flex items-center justify-center z-50 hidden">
+        <div class="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-indigo-600"></div>
     </div>
 
     <div id="messageModal" class="modal-overlay">
         <div class="modal-content card">
             <h3 id="modalTitle" class="text-xl font-bold mb-2"></h3>
-            <p id="modalMessage" class="text-gray-600 mb-4"></p>
-            <button id="modalCloseBtn" class="bg-blue-500 text-white px-6 py-2 rounded-full font-semibold hover:bg-blue-600 focus:outline-none">OK</button>
+            <p id="modalMessage" class="text-slate-600 mb-4"></p>
+            <!-- UPDATED: Button color -->
+            <button id="modalCloseBtn" class="bg-indigo-600 text-white px-6 py-2 rounded-full font-semibold hover:bg-indigo-700 focus:outline-none">OK</button>
         </div>
     </div>
     
     <div id="share-modal" class="modal-overlay">
         <div class="modal-content card">
             <h3 class="text-xl font-bold mb-4">Share Your Frontend</h3>
-            <p class="text-gray-600 mb-4">Anyone with this link can view a live, read-only version of your entire frontend. They will not be able to make any changes.</p>
-            <div class="relative bg-gray-100 p-3 rounded-full">
+            <p class="text-slate-600 mb-4">Anyone with this link can view a live, read-only version of your entire frontend. They will not be able to make any changes.</p>
+            <div class="relative bg-slate-100 p-3 rounded-full">
                 <input type="text" id="share-link-input" readonly class="w-full bg-transparent outline-none pr-20">
-                <button id="copy-share-link-btn" class="absolute right-2 top-1/2 -translate-y-1/2 bg-blue-500 text-white px-3 py-1 rounded-full text-sm">Copy</button>
+                <!-- UPDATED: Button color -->
+                <button id="copy-share-link-btn" class="absolute right-2 top-1/2 -translate-y-1/2 bg-indigo-600 text-white px-3 py-1 rounded-full text-sm">Copy</button>
             </div>
-            <button id="share-modal-close-btn" class="mt-4 bg-gray-500 text-white px-6 py-2 rounded-full font-semibold hover:bg-gray-600 focus:outline-none">Close</button>
+            <!-- UPDATED: Button color -->
+            <button id="share-modal-close-btn" class="mt-4 bg-slate-500 text-white px-6 py-2 rounded-full font-semibold hover:bg-slate-600 focus:outline-none">Close</button>
         </div>
     </div>
 
     <div id="password-verification-modal" class="modal-overlay">
         <div class="modal-content card">
             <h3 class="text-xl font-bold mb-2">Verify Action</h3>
-            <p class="text-gray-600 mb-4">Please enter your login password to confirm this change.</p>
+            <p class="text-slate-600 mb-4">Please enter your login password to confirm this change.</p>
             <form id="password-verification-form">
+                <!-- UPDATED: Focus ring color -->
                 <input type="password" id="verification-password" placeholder="Your Password" required
-                       class="w-full px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500 mb-4">
+                       class="w-full px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-indigo-500 mb-4">
                 <div class="flex justify-center gap-4">
-                    <button type="button" id="cancel-verification-btn" class="bg-gray-300 text-gray-800 px-6 py-2 rounded-full font-semibold hover:bg-gray-400">Cancel</button>
-                    <button type="submit" class="bg-blue-500 text-white px-6 py-2 rounded-full font-semibold hover:bg-blue-600">Confirm</button>
+                    <!-- UPDATED: Button color -->
+                    <button type="button" id="cancel-verification-btn" class="bg-slate-300 text-slate-800 px-6 py-2 rounded-full font-semibold hover:bg-slate-400">Cancel</button>
+                    <button type="submit" class="bg-indigo-600 text-white px-6 py-2 rounded-full font-semibold hover:bg-indigo-700">Confirm</button>
                 </div>
             </form>
         </div>
@@ -186,7 +200,8 @@
             <h3 class="text-xl font-bold mb-4">Active Clients (Last Two Months)</h3>
             <div id="active-clients-list" class="text-left max-h-96 overflow-y-auto">
             </div>
-            <button id="active-clients-modal-close-btn" class="mt-4 bg-blue-500 text-white px-6 py-2 rounded-full font-semibold hover:bg-blue-600 focus:outline-none">Close</button>
+            <!-- UPDATED: Button color -->
+            <button id="active-clients-modal-close-btn" class="mt-4 bg-indigo-600 text-white px-6 py-2 rounded-full font-semibold hover:bg-indigo-700 focus:outline-none">Close</button>
         </div>
     </div>
 
@@ -194,85 +209,75 @@
         <div class="modal-content card">
             <h3 class="text-xl font-bold mb-4">Edit Complaint Status</h3>
             <form id="edit-complaint-form">
-                <input type="hidden" id="edit-complaint-id">
                 <div class="text-left mb-4">
-                    <label for="edit-complaint-status" class="block text-sm font-medium text-gray-700 mb-1">Status</label>
-                    <select id="edit-complaint-status" class="w-full px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <!-- UPDATED: Text color -->
+                    <label for="edit-complaint-status" class="block text-sm font-medium text-slate-700 mb-1">Status</label>
+                    <!-- UPDATED: Focus ring color -->
+                    <select id="edit-complaint-status" class="w-full px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-indigo-500">
                         <option value="Pending">Pending</option>
                         <option value="Done">Done</option>
                         <option value="Closed">Closed</option>
                     </select>
                 </div>
                 <div class="flex justify-center gap-4">
-                    <button type="button" id="cancel-edit-complaint-btn" class="bg-gray-300 text-gray-800 px-6 py-2 rounded-full font-semibold hover:bg-gray-400">Cancel</button>
-                    <button type="submit" class="bg-blue-500 text-white px-6 py-2 rounded-full font-semibold hover:bg-blue-600">Save Changes</button>
+                    <!-- UPDATED: Button colors -->
+                    <button type="button" id="cancel-edit-complaint-btn" class="bg-slate-300 text-slate-800 px-6 py-2 rounded-full font-semibold hover:bg-slate-400">Cancel</button>
+                    <button type="submit" class="bg-indigo-600 text-white px-6 py-2 rounded-full font-semibold hover:bg-indigo-700">Save Changes</button>
                 </div>
             </form>
         </div>
     </div>
 
-    <!-- NEW: Courier Edit Modal -->
-    <div id="edit-courier-modal" class="modal-overlay">
-        <div class="modal-content card">
-            <h3 class="text-xl font-bold mb-4">Edit Courier Status</h3>
-            <form id="edit-courier-form">
-                <input type="hidden" id="edit-courier-id">
-                <div class="text-left mb-4">
-                    <label for="edit-courier-status" class="block text-sm font-medium text-gray-700 mb-1">Status</label>
-                    <select id="edit-courier-status" class="w-full px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500">
-                        <option value="Pending">Pending</option>
-                        <option value="Delivered">Delivered</option>
-                        <option value="Received">Received</option>
-                    </select>
-                </div>
-                <div class="flex justify-center gap-4">
-                    <button type="button" id="cancel-edit-courier-btn" class="bg-gray-300 text-gray-800 px-6 py-2 rounded-full font-semibold hover:bg-gray-400">Cancel</button>
-                    <button type="submit" class="bg-blue-500 text-white px-6 py-2 rounded-full font-semibold hover:bg-blue-600">Save Changes</button>
-                </div>
-            </form>
-        </div>
-    </div>
-
+    <!-- REMOVED: Courier Edit Modal -->
 
     <main id="auth-section" class="flex-grow flex items-center justify-center p-4 min-h-screen">
         <div class="bg-white p-6 sm:p-8 rounded-2xl shadow-xl w-full max-w-md">
-            <h2 class="text-2xl font-bold text-center text-gray-800 mb-6">Darson Sargodha</h2>
+            <!-- UPDATED: Text color -->
+            <h2 class="text-2xl font-bold text-center text-slate-800 mb-6">Darson Sargodha</h2>
             <div id="auth-forms">
                 <form id="login-form" class="space-y-4">
                     <h3 class="text-xl font-semibold mb-4 text-center">Login to your account</h3>
                     <div>
+                        <!-- UPDATED: Focus ring color -->
                         <input type="email" id="login-email" placeholder="Email Address" required
-                               class="w-full px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500">
+                               class="w-full px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-indigo-500">
                     </div>
                     <div>
+                        <!-- UPDATED: Focus ring color -->
                         <input type="password" id="login-password" placeholder="Password" required
-                               class="w-full px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500">
+                               class="w-full px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-indigo-500">
                     </div>
+                    <!-- UPDATED: Button color -->
                     <button type="submit"
-                            class="w-full bg-blue-500 text-white py-2 rounded-full font-semibold hover:bg-blue-600 transition duration-200">
+                            class="w-full bg-indigo-600 text-white py-2 rounded-full font-semibold hover:bg-indigo-700 transition duration-200">
                         Login
                     </button>
-                    <p class="text-center text-sm text-gray-600 mt-4">
-                        Don't have an account? <a href="#" id="show-signup" class="text-blue-500 font-medium hover:underline">Sign up</a>
+                    <!-- UPDATED: Text colors -->
+                    <p class="text-center text-sm text-slate-600 mt-4">
+                        Don't have an account? <a href="#" id="show-signup" class="text-indigo-600 font-medium hover:underline">Sign up</a>
                     </p>
                 </form>
 
                 <form id="signup-form" class="space-y-4 hidden">
                     <h3 class="text-xl font-semibold mb-4 text-center">Create a new account</h3>
                     <div>
+                        <!-- UPDATED: Focus ring color -->
                         <input type="email" id="signup-email" placeholder="Email Address" required
-                               class="w-full px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500">
+                               class="w-full px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-indigo-500">
                     </div>
                     <div>
+                        <!-- UPDATED: Focus ring color -->
                         <input type="password" id="signup-password" placeholder="Password" required
-                               class="w-full px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500">
+                               class="w-full px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-indigo-500">
                     </div>
+                    <!-- UPDATED: Button color -->
                     <button type="submit"
-                            class="w-full bg-blue-500 text-white py-2 rounded-full font-semibold hover:bg-blue-600 transition duration-200">
+                            class="w-full bg-indigo-600 text-white py-2 rounded-full font-semibold hover:bg-indigo-700 transition duration-200">
                         Sign Up
                     </button>
-                    <p class="text-center text-sm text-gray-600 mt-4">
-                        Already have an account? <a href="#" id="show-login" class="text-blue-500 font-medium hover:underline">Log in</a>
+                    <!-- UPDATED: Text colors -->
+                    <p class="text-center text-sm text-slate-600 mt-4">
+                        Already have an account? <a href="#" id="show-login" class="text-indigo-600 font-medium hover:underline">Log in</a>
                     </p>
                 </form>
             </div>
@@ -281,41 +286,44 @@
 
     <div id="main-app" class="hidden min-h-screen">
         <!-- Sidebar: Hidden on mobile (using -translate-x-full), visible from medium screens up (md:translate-x-0) -->
-        <aside id="sidebar" class="bg-white w-64 min-h-full shadow-lg fixed top-0 left-0 z-50 transform -translate-x-full md:translate-x-0 transition-transform duration-300 ease-in-out">
-            <div class="p-4 border-b h-16 flex items-center">
-                <h1 class="text-2xl font-bold text-gray-800">Darson Sargodha</h1>
+        <!-- UPDATED: Removed shadow, added border for a cleaner look -->
+        <aside id="sidebar" class="bg-white w-64 min-h-full border-r border-slate-200 fixed top-0 left-0 z-50 transform -translate-x-full md:translate-x-0 transition-transform duration-300 ease-in-out">
+            <div class="p-4 border-b border-slate-200 h-16 flex items-center">
+                <!-- UPDATED: Text color -->
+                <h1 class="text-2xl font-bold text-slate-800">Darson Sargodha</h1>
             </div>
             <nav class="p-4">
                 <ul id="main-nav" class="space-y-2">
-                    <li><button data-section="dashboard" class="nav-btn bg-blue-500 text-white">Dashboard</button></li>
-                    <li><button data-section="complaints" class="nav-btn bg-gray-200 text-gray-700 hover:bg-gray-300">Complaints</button></li>
-                    <li><button data-section="deposits" class="nav-btn bg-gray-200 text-gray-700 hover:bg-gray-300">Deposits</button></li>
-                    <li><button data-section="withdrawals" class="nav-btn bg-gray-200 text-gray-700 hover:bg-gray-300">Withdrawals</button></li>
-                    <li><button data-section="commission" class="nav-btn bg-gray-200 text-gray-700 hover:bg-gray-300">Commission</button></li>
-                    <li><button data-section="calculator" class="nav-btn bg-gray-200 text-gray-700 hover:bg-gray-300">CGS</button></li>
-                    <li><button data-section="expenses" class="nav-btn bg-gray-200 text-gray-700 hover:bg-gray-300">Expenses</button></li>
-                    <li><button data-section="profiles" class="nav-btn bg-gray-200 text-gray-700 hover:bg-gray-300">Profiles</button></li>
-                    <li><button data-section="employees" class="nav-btn bg-gray-200 text-gray-700 hover:bg-gray-300">Employees</button></li>
-                    <!-- NEW: Courier Records Button -->
-                    <li><button data-section="courier-records" class="nav-btn bg-gray-200 text-gray-700 hover:bg-gray-300">Courier Records</button></li>
+                    <!-- UPDATED: Sidebar button styling. Active state is set by JS. -->
+                    <li><button data-section="dashboard" class="nav-btn bg-indigo-600 text-white">Dashboard</button></li>
+                    <li><button data-section="complaints" class="nav-btn text-slate-600 hover:bg-indigo-50 hover:text-indigo-600">Complaints</button></li>
+                    <li><button data-section="commission" class="nav-btn text-slate-600 hover:bg-indigo-50 hover:text-indigo-600">Commission</button></li>
+                    <li><button data-section="calculator" class="nav-btn text-slate-600 hover:bg-indigo-50 hover:text-indigo-600">CGS</button></li>
+                    <li><button data-section="expenses" class="nav-btn text-slate-600 hover:bg-indigo-50 hover:text-indigo-600">Expenses</button></li>
+                    <li><button data-section="profiles" class="nav-btn text-slate-600 hover:bg-indigo-50 hover:text-indigo-600">Profiles</button></li>
+                    <li><button data-section="employees" class="nav-btn text-slate-600 hover:bg-indigo-50 hover:text-indigo-600">Employees</button></li>
                 </ul>
             </nav>
         </aside>
 
         <!-- Main Content: Margin-left is applied on medium screens and up to make space for the sidebar -->
         <div id="main-content-wrapper" class="flex-1 flex flex-col md:ml-64">
-            <header class="bg-white shadow-sm p-4 sticky top-0 z-40 flex items-center justify-between h-16">
+            <!-- UPDATED: Replaced shadow with a border for a cleaner look -->
+            <header class="bg-white border-b border-slate-200 p-4 sticky top-0 z-40 flex items-center justify-between h-16">
                 <div class="flex items-center">
                     <!-- Hamburger menu button is only visible on mobile (hidden from medium screens up: md:hidden) -->
-                    <button id="hamburger-btn" class="md:hidden text-gray-600 focus:outline-none mr-4">
+                    <!-- UPDATED: Text color -->
+                    <button id="hamburger-btn" class="md:hidden text-slate-600 focus:outline-none mr-4">
                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
                     </button>
-                    <h2 id="header-title" class="text-xl font-semibold text-gray-700">Dashboard</h2>
+                    <!-- UPDATED: Text color -->
+                    <h2 id="header-title" class="text-xl font-semibold text-slate-700">Dashboard</h2>
                 </div>
                 <!-- UPDATE: Added responsive spacing and padding to prevent overflow on small screens -->
                 <div class="flex items-center space-x-2 sm:space-x-4">
-                    <button id="share-dashboard-btn" class="px-2 sm:px-4 py-2 rounded-full text-sm font-medium bg-green-500 text-white hover:bg-green-600 animated-btn flex-shrink-0">Share Frontend</button>
-                    <button id="sign-out-btn" class="px-2 sm:px-4 py-2 rounded-full text-sm font-medium bg-red-500 text-white hover:bg-red-600 animated-btn flex-shrink-0">Sign Out</button>
+                    <!-- UPDATED: Button colors -->
+                    <button id="share-dashboard-btn" class="px-2 sm:px-4 py-2 rounded-full text-sm font-medium bg-emerald-600 text-white hover:bg-emerald-700 animated-btn flex-shrink-0">Share Frontend</button>
+                    <button id="sign-out-btn" class="px-2 sm:px-4 py-2 rounded-full text-sm font-medium bg-rose-600 text-white hover:bg-rose-700 animated-btn flex-shrink-0">Sign Out</button>
                 </div>
             </header>
 
@@ -323,28 +331,43 @@
             <main class="flex-grow p-4 md:p-6">
                 <div class="container mx-auto">
                     <section id="dashboard" class="section-container active">
-                        <h2 class="text-3xl font-bold text-gray-800 mb-6">Dashboard</h2>
-                        <!-- Responsive Grid: Stacks on mobile (grid-cols-1), two columns on tablet (md:grid-cols-2), five on desktop (lg:grid-cols-5) -->
-                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 mb-8">
-                            <div id="dashboard-complaints-card" class="card p-6 text-center cursor-pointer">
-                                <h3 class="text-gray-500 text-sm">Active Complaints</h3>
-                                <p id="total-complaints" class="text-3xl font-bold text-gray-800 mt-2">0</p>
+                        <!-- UPDATED: Text color -->
+                        <h2 class="text-3xl font-bold text-slate-800 mb-6">Dashboard</h2>
+                        <!-- 
+                          UPDATED: Responsive Grid
+                          - Was: grid-cols-1 md:grid-cols-2 lg:grid-cols-5
+                          - Now: grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-5
+                          - This provides a more balanced 3-column layout on standard desktops (md/lg)
+                            and only goes to 5 columns on extra-large screens (xl).
+                        -->
+                        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-5 gap-6 mb-8">
+                            <!-- 
+                              UPDATED: Dashboard Card Structure
+                              - Changed padding from p-6 to p-5
+                              - Removed text-center, added flex-col
+                              - Updated h3 styling (uppercase, tracking)
+                              - Updated p styling (responsive text-2xl xl:text-3xl, break-words)
+                            -->
+                            <div id="dashboard-complaints-card" class="card p-5 flex flex-col justify-between cursor-pointer">
+                                <h3 class="text-slate-500 text-sm font-medium uppercase tracking-wider">Active Complaints</h3>
+                                <p id="total-complaints" class="text-2xl xl:text-3xl font-bold text-slate-800 mt-2 break-words">0</p>
                             </div>
-                            <div id="total-clients-card" class="card p-6 text-center cursor-pointer">
-                                <h3 class="text-gray-500 text-sm">Total Clients</h3>
-                                <p id="total-clients" class="text-3xl font-bold text-gray-800 mt-2">0</p>
+                            <div id="total-clients-card" class="card p-5 flex flex-col justify-between cursor-pointer">
+                                <h3 class="text-slate-500 text-sm font-medium uppercase tracking-wider">Total Clients</h3>
+                                <p id="total-clients" class="text-2xl xl:text-3xl font-bold text-slate-800 mt-2 break-words">0</p>
                             </div>
-                            <div id="active-clients-card" class="card p-6 text-center cursor-pointer">
-                                <h3 class="text-gray-500 text-sm">Active Clients (Last Two Months)</h3>
-                                <p id="active-clients" class="text-3xl font-bold text-gray-800 mt-2">0</p>
+                            <div id="active-clients-card" class="card p-5 flex flex-col justify-between cursor-pointer">
+                                <h3 class="text-slate-500 text-sm font-medium uppercase tracking-wider">Active Clients (Last 2 Mo)</h3>
+                                <p id="active-clients" class="text-2xl xl:text-3xl font-bold text-slate-800 mt-2 break-words">0</p>
                             </div>
-                            <div id="dashboard-revenue-card" class="card p-6 text-center cursor-pointer">
-                                <h3 class="text-gray-500 text-sm">This Month's Revenue</h3>
-                                <p id="monthly-revenue" class="text-3xl font-bold text-green-600 mt-2">PKR 0</p>
+                            <div id="dashboard-revenue-card" class="card p-5 flex flex-col justify-between cursor-pointer">
+                                <h3 class="text-slate-500 text-sm font-medium uppercase tracking-wider">Commission Balance</h3>
+                                <!-- UPDATED: Changed text color to new theme -->
+                                <p id="monthly-revenue" class="text-2xl xl:text-3xl font-bold text-emerald-600 mt-2 break-words">PKR 0</p>
                             </div>
-                            <div id="dashboard-employees-card" class="card p-6 text-center cursor-pointer">
-                                <h3 class="text-gray-500 text-sm">Total Employees</h3>
-                                <p id="total-employees" class="text-3xl font-bold text-gray-800 mt-2">0</p>
+                            <div id="dashboard-employees-card" class="card p-5 flex flex-col justify-between cursor-pointer">
+                                <h3 class="text-slate-500 text-sm font-medium uppercase tracking-wider">Total Employees</h3>
+                                <p id="total-employees" class="text-2xl xl:text-3xl font-bold text-slate-800 mt-2 break-words">0</p>
                             </div>
                         </div>
                         
@@ -379,35 +402,42 @@
                     </section>
     
                     <section id="complaints" class="section-container">
-                        <h2 class="text-3xl font-bold text-gray-800 mb-6">Complaints</h2>
+                        <!-- UPDATED: Text color -->
+                        <h2 class="text-3xl font-bold text-slate-800 mb-6">Complaints</h2>
                         <div id="add-complaint-wrapper" class="card p-6 mb-6">
                             <h3 class="text-xl font-semibold mb-4">Add New Complaint</h3>
                             <form id="add-complaint-form" class="space-y-4">
+                                <!-- UPDATED: Focus ring color -->
                                 <input type="text" id="complaint-trading-account" placeholder="Trading Account Number" required list="client-trading-accounts"
-                                       class="w-full px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                       class="w-full px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-indigo-500">
                                 <input type="text" id="complaint-client-name" placeholder="Client Name (auto-filled)" readonly
-                                       class="w-full px-4 py-2 border rounded-full bg-gray-100">
+                                       class="w-full px-4 py-2 border rounded-full bg-slate-100">
+                                <!-- UPDATED: Focus ring color -->
                                 <textarea id="complaint-details" rows="4" placeholder="Complaint Details" required
-                                          class="w-full px-4 py-2 border rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"></textarea>
-                                <select id="complaint-status" class="w-full px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                          class="w-full px-4 py-2 border rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500"></textarea>
+                                <!-- UPDATED: Focus ring color -->
+                                <select id="complaint-status" class="w-full px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-indigo-500">
                                     <option value="Pending">Pending</option>
                                     <option value="Done">Done</option>
                                     <option value="Closed">Closed</option>
                                 </select>
-                                <button type="submit" class="w-full bg-blue-500 text-white py-2 rounded-full font-semibold hover:bg-blue-600 animated-btn">
+                                <!-- UPDATED: Button color -->
+                                <button type="submit" class="w-full bg-indigo-600 text-white py-2 rounded-full font-semibold hover:bg-indigo-700 animated-btn">
                                     Save Complaint
                                 </button>
                             </form>
                         </div>
                         <div class="card p-6">
                             <h3 class="text-xl font-semibold mb-4">View Complaints</h3>
+                            <!-- UPDATED: Focus ring color -->
                             <input type="text" id="complaint-search" placeholder="Search by Client Name or Account Number..."
-                                   class="w-full px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500 mb-4">
+                                   class="w-full px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-indigo-500 mb-4">
                             <!-- This wrapper makes the table horizontally scrollable on small screens -->
                             <div class="overflow-x-auto">
                                 <table class="w-full text-left table-auto">
                                     <thead class="border-b-2">
-                                        <tr class="text-gray-600 uppercase text-sm">
+                                        <!-- UPDATED: Text color -->
+                                        <tr class="text-slate-600 uppercase text-sm">
                                             <th class="p-2">Client Name</th>
                                             <th class="p-2">Account No.</th>
                                             <th class="p-2">Details</th>
@@ -423,118 +453,17 @@
                         </div>
                     </section>
     
+                    <!-- REMOVED: Deposits Section -->
                     <section id="deposits" class="section-container">
-                        <h2 class="text-3xl font-bold text-gray-800 mb-6">Deposit Cheques</h2>
-                        <div id="add-deposit-wrapper" class="card p-6 mb-6">
-                            <h3 class="text-xl font-semibold mb-4">Add New Cheque Deposit</h3>
-                            <form id="add-deposit-form" class="space-y-4">
-                                <input type="text" id="deposit-trading-account" placeholder="Trading Account Number" required list="client-trading-accounts"
-                                       class="w-full px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500">
-                                <input type="text" id="deposit-client-name" placeholder="Client Name (auto-filled)" readonly
-                                       class="w-full px-4 py-2 border rounded-full bg-gray-100">
-                                <!-- Flex container for responsive input fields -->
-                                <div class="flex flex-col sm:flex-row items-center space-y-4 sm:space-y-0 sm:space-x-4">
-                                    <input type="number" id="deposit-amount" placeholder="Amount (PKR)" required
-                                           class="w-full px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500">
-                                    <input type="date" id="deposit-date" required
-                                           class="w-full px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500">
-                                </div>
-                                <input type="text" id="deposit-cheque-number" placeholder="Cheque Number" required
-                                       class="w-full px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500">
-                                <div>
-                                    <label for="deposit-image" class="block text-gray-700 font-medium mb-2">Upload Cheque Image (Max 3MB, PNG/JPG)</label>
-                                    <input type="file" id="deposit-image" multiple accept="image/png, image/jpeg"
-                                           class="w-full px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500">
-                                    <div id="image-previews" class="flex flex-wrap gap-2 mt-2"></div>
-                                </div>
-                                <select id="deposit-status" class="w-full px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500">
-                                    <option value="Pending">Pending</option>
-                                    <option value="Deposited">Deposited</option>
-                                    <option value="Returned">Returned</option>
-                                </select>
-                                <input type="text" id="deposit-returned-reason" placeholder="Reason for return (if applicable)"
-                                       class="w-full px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500 hidden">
-                                <button type="submit" class="w-full bg-blue-500 text-white py-2 rounded-full font-semibold hover:bg-blue-600 animated-btn">
-                                    Save Deposit
-                                </button>
-                            </form>
-                        </div>
-                        <div class="card p-6">
-                            <h3 class="text-xl font-semibold mb-4">View Deposits</h3>
-                            <input type="text" id="deposit-search" placeholder="Search by Client Name or Account Number..."
-                                   class="w-full px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500 mb-4">
-                            <div class="overflow-x-auto">
-                                <table class="w-full text-left table-auto">
-                                    <thead class="border-b-2">
-                                        <tr class="text-gray-600 uppercase text-sm">
-                                            <th class="p-2">Client Name</th>
-                                            <th class="p-2">Account No.</th>
-                                            <th class="p-2">Amount</th>
-                                            <th class="p-2">Cheque No.</th>
-                                            <th class="p-2">Status</th>
-                                            <th class="p-2">Date</th>
-                                            <th class="p-2">Images</th>
-                                            <th class="p-2 actions-header">Actions</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody id="deposits-list">
-                                        </tbody>
-                                </table>
-                            </div>
-                        </div>
                     </section>
     
+                    <!-- REMOVED: Withdrawals Section -->
                     <section id="withdrawals" class="section-container">
-                        <h2 class="text-3xl font-bold text-gray-800 mb-6">Withdrawals</h2>
-                        <div id="add-withdrawal-wrapper" class="card p-6 mb-6">
-                            <h3 class="text-xl font-semibold mb-4">Add New Withdrawal Request</h3>
-                            <form id="add-withdrawal-form" class="space-y-4">
-                                <input type="text" id="withdrawal-trading-account" placeholder="Trading Account Number" required list="client-trading-accounts"
-                                       class="w-full px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500">
-                                <input type="text" id="withdrawal-client-name" placeholder="Client Name (auto-filled)" readonly
-                                       class="w-full px-4 py-2 border rounded-full bg-gray-100">
-                                <div class="flex flex-col sm:flex-row items-center space-y-4 sm:space-y-0 sm:space-x-4">
-                                    <input type="number" id="withdrawal-amount" placeholder="Requested Amount (PKR)" required
-                                           class="w-full px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500">
-                                    <input type="date" id="withdrawal-date" required
-                                           class="w-full px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500">
-                                </div>
-                                <select id="withdrawal-status" class="w-full px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500">
-                                    <option value="Accepted">Accepted</option>
-                                    <option value="Returned">Returned</option>
-                                </select>
-                                <textarea id="withdrawal-returned-reason" rows="3" placeholder="Reason for return (if applicable)"
-                                          class="w-full px-4 py-2 border rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 hidden"></textarea>
-                                <button type="submit" class="w-full bg-blue-500 text-white py-2 rounded-full font-semibold hover:bg-blue-600 animated-btn">
-                                    Save Withdrawal
-                                </button>
-                            </form>
-                        </div>
-                        <div class="card p-6">
-                            <h3 class="text-xl font-semibold mb-4">View Withdrawals</h3>
-                            <input type="text" id="withdrawal-search" placeholder="Search by Client Name or Account Number..."
-                                   class="w-full px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500 mb-4">
-                            <div class="overflow-x-auto">
-                                <table class="w-full text-left table-auto">
-                                    <thead class="border-b-2">
-                                        <tr class="text-gray-600 uppercase text-sm">
-                                            <th class="p-2">Client Name</th>
-                                            <th class="p-2">Account No.</th>
-                                            <th class="p-2">Amount</th>
-                                            <th class="p-2">Status</th>
-                                            <th class="p-2">Date</th>
-                                            <th class="p-2 actions-header">Actions</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody id="withdrawals-list">
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
                     </section>
     
                     <section id="commission" class="section-container">
-                        <h2 class="text-3xl font-bold text-gray-800 mb-6">House Commission</h2>
+                        <!-- UPDATED: Text color -->
+                        <h2 class="text-3xl font-bold text-slate-800 mb-6">House Commission</h2>
                         <!-- Commission section is now a two-column layout on larger screens -->
                         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
                             <!-- Left column for adding commission and received payments -->
@@ -542,13 +471,15 @@
                                 <div class="card p-6 mb-6">
                                     <h3 class="text-xl font-semibold mb-4">Add Daily Commission (CR)</h3>
                                     <form id="add-daily-commission-form" class="space-y-4">
-                                        <input type="date" id="daily-commission-date" required class="w-full px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500">
-                                        <input type="number" id="daily-commission-total" placeholder="Total Commission (PKR)" required class="w-full px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500">
-                                        <input type="number" id="daily-commission-headoffice" placeholder="Head Office Commission (PKR)" required class="w-full px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500">
-                                        <input type="number" id="daily-commission-tax" placeholder="Tax (PKR)" required class="w-full px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500">
-                                        <input type="number" id="daily-commission-house" placeholder="House Commission (Auto-calculated)" readonly class="w-full px-4 py-2 border rounded-full bg-gray-100">
-                                        <input type="text" id="daily-commission-description" placeholder="Description (Default: Daily Commission)" class="w-full px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500">
-                                        <button type="submit" class="w-full bg-blue-500 text-white py-2 rounded-full font-semibold hover:bg-blue-600 animated-btn">
+                                        <!-- UPDATED: Focus ring color -->
+                                        <input type="date" id="daily-commission-date" required class="w-full px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                                        <input type="number" id="daily-commission-total" placeholder="Total Commission (PKR)" required class="w-full px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                                        <input type="number" id="daily-commission-headoffice" placeholder="Head Office Commission (PKR)" required class="w-full px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                                        <input type="number" id="daily-commission-tax" placeholder="Tax (PKR)" required class="w-full px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                                        <input type="number" id="daily-commission-house" placeholder="House Commission (Auto-calculated)" readonly class="w-full px-4 py-2 border rounded-full bg-slate-100">
+                                        <input type="text" id="daily-commission-description" placeholder="Description (Default: Daily Commission)" class="w-full px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                                        <!-- UPDATED: Button color -->
+                                        <button type="submit" class="w-full bg-indigo-600 text-white py-2 rounded-full font-semibold hover:bg-indigo-700 animated-btn">
                                             Save Daily Commission
                                         </button>
                                     </form>
@@ -556,10 +487,12 @@
                                 <div class="card p-6">
                                     <h3 class="text-xl font-semibold mb-4">Record Received Payment (DR)</h3>
                                     <form id="add-commission-received-form" class="space-y-4">
-                                        <input type="date" id="commission-received-date" required class="w-full px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500">
-                                        <input type="number" id="commission-received-amount" placeholder="Received Amount (PKR)" required class="w-full px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500">
-                                        <input type="text" id="commission-received-description" placeholder="Description (e.g., Bank Transfer)" class="w-full px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500">
-                                        <button type="submit" class="w-full bg-green-500 text-white py-2 rounded-full font-semibold hover:bg-green-600 animated-btn">
+                                        <!-- UPDATED: Focus ring color -->
+                                        <input type="date" id="commission-received-date" required class="w-full px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                                        <input type="number" id="commission-received-amount" placeholder="Received Amount (PKR)" required class="w-full px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                                        <input type="text" id="commission-received-description" placeholder="Description (e.g., Bank Transfer)" class="w-full px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                                        <!-- UPDATED: Button color -->
+                                        <button type="submit" class="w-full bg-emerald-600 text-white py-2 rounded-full font-semibold hover:bg-emerald-700 animated-btn">
                                             Record Payment
                                         </button>
                                     </form>
@@ -574,21 +507,25 @@
                                 
                                 <h3 class="text-xl font-semibold mb-4 border-t pt-4">Monthly Commission Statement</h3>
                                 <div class="flex flex-col sm:flex-row items-center space-y-4 sm:space-y-0 sm:space-x-4 mb-4">
-                                    <select id="commission-statement-month" class="w-full sm:w-auto px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500"></select>
-                                    <input type="number" id="commission-statement-year" placeholder="Year" class="w-full sm:w-auto px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500">
-                                    <button id="print-commission-btn" class="w-full sm:w-auto bg-gray-700 text-white px-6 py-2 rounded-full font-semibold hover:bg-gray-800 animated-btn">
+                                    <!-- UPDATED: Focus ring color -->
+                                    <select id="commission-statement-month" class="w-full sm:w-auto px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-indigo-500"></select>
+                                    <input type="number" id="commission-statement-year" placeholder="Year" class="w-full sm:w-auto px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                                    <!-- UPDATED: Button color -->
+                                    <button id="print-commission-btn" class="w-full sm:w-auto bg-slate-700 text-white px-6 py-2 rounded-full font-semibold hover:bg-slate-800 animated-btn">
                                         Print Statement
                                     </button>
                                 </div>
                                 <div id="commission-statement-container">
-                                    <div class="flex justify-between items-center mb-2 p-2 bg-gray-50 rounded-lg">
+                                    <div class="flex justify-between items-center mb-2 p-2 bg-slate-50 rounded-lg">
                                         <span class="font-semibold">Opening Balance:</span>
-                                        <span id="commission-opening-balance" class="font-bold text-gray-700">PKR 0</span>
+                                        <!-- UPDATED: Text color -->
+                                        <span id="commission-opening-balance" class="font-bold text-slate-700">PKR 0</span>
                                     </div>
                                     <div class="overflow-y-auto max-h-80">
                                         <table class="w-full text-left table-auto">
                                             <thead class="border-b-2 sticky top-0 bg-white">
-                                                <tr class="text-gray-600 uppercase text-sm">
+                                                <!-- UPDATED: Text color -->
+                                                <tr class="text-slate-600 uppercase text-sm">
                                                     <th class="p-2">Date</th>
                                                     <th class="p-2">Description</th>
                                                     <th class="p-2 text-right">Debit (DR)</th>
@@ -602,9 +539,10 @@
                                             </tbody>
                                         </table>
                                     </div>
-                                    <div class="flex justify-between items-center mt-2 p-2 bg-gray-50 rounded-lg">
+                                    <div class="flex justify-between items-center mt-2 p-2 bg-slate-50 rounded-lg">
                                         <span class="font-semibold">Closing Balance:</span>
-                                        <span id="commission-closing-balance" class="font-bold text-blue-600">PKR 0</span>
+                                        <!-- UPDATED: Text color -->
+                                        <span id="commission-closing-balance" class="font-bold text-indigo-600">PKR 0</span>
                                     </div>
                                 </div>
                             </div>
@@ -612,50 +550,61 @@
                     </section>
     
                     <section id="calculator" class="section-container">
-                        <h2 class="text-3xl font-bold text-gray-800 mb-6">Commission Generator System</h2>
+                        <!-- UPDATED: Text color -->
+                        <h2 class="text-3xl font-bold text-slate-800 mb-6">Commission Generator System</h2>
                         <div class="card p-6">
                             <div class="mb-6 p-4 border rounded-lg bg-indigo-50">
                                 <h3 class="text-lg font-semibold mb-2 text-indigo-700">Select Date for Transactions</h3>
                                 <div class="flex flex-col sm:flex-row gap-4 items-end">
                                     <div class="flex-grow">
-                                        <label for="calculatorDateInput" class="block text-sm font-medium text-gray-700">Transaction Date:</label>
+                                        <!-- UPDATED: Text color -->
+                                        <label for="calculatorDateInput" class="block text-sm font-medium text-slate-700">Transaction Date:</label>
                                         <input type="date" id="calculatorDateInput" class="mt-1 p-2 border rounded-md w-full">
                                     </div>
-                                     <button id="loadCalculatorDateBtn" class="bg-blue-500 text-white py-2 px-4 rounded-full font-semibold hover:bg-blue-600 animated-btn w-full sm:w-auto"><i class="fas fa-calendar-day mr-2"></i>Load/Refresh</button>
+                                     <!-- UPDATED: Button color -->
+                                     <button id="loadCalculatorDateBtn" class="bg-indigo-600 text-white py-2 px-4 rounded-full font-semibold hover:bg-indigo-700 animated-btn w-full sm:w-auto"><i class="fas fa-calendar-day mr-2"></i>Load/Refresh</button>
                                 </div>
                             </div>
                             <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
                                 <div>
-                                    <label for="stockName" class="block text-sm font-medium text-gray-700">Stock Name</label>
+                                    <!-- UPDATED: Text color -->
+                                    <label for="stockName" class="block text-sm font-medium text-slate-700">Stock Name</label>
                                     <input type="text" id="stockName" class="mt-1 p-2 border rounded-md w-full">
                                 </div>
                                 <div>
-                                    <label for="quantity" class="block text-sm font-medium text-gray-700">Quantity</label>
+                                    <!-- UPDATED: Text color -->
+                                    <label for="quantity" class="block text-sm font-medium text-slate-700">Quantity</label>
                                     <input type="number" id="quantity" class="mt-1 p-2 border rounded-md w-full" min="0">
                                 </div>
                                 <div>
-                                    <label for="rate" class="block text-sm font-medium text-gray-700">Rate (PKR)</label>
+                                    <!-- UPDATED: Text color -->
+                                    <label for="rate" class="block text-sm font-medium text-slate-700">Rate (PKR)</label>
                                     <input type="number" id="rate" step="0.01" class="mt-1 p-2 border rounded-md w-full" min="0">
                                 </div>
                             </div>
                             <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+                                <!-- UPDATED: Changed <p> to <input> -->
                                 <div>
-                                    <label class="block text-sm font-medium text-gray-700">Commission per Stock</label>
-                                    <p id="commissionPerStock" class="mt-1 p-2 bg-gray-100 rounded-md">PKR 0.00</p>
+                                    <!-- UPDATED: Text color -->
+                                    <label for="commissionPerStock" class="block text-sm font-medium text-slate-700">Commission per Stock</label>
+                                    <input type="number" id="commissionPerStock" step="0.0001" class="mt-1 p-2 border rounded-md w-full" value="0.00">
                                 </div>
                                 <div>
-                                    <label class="block text-sm font-medium text-gray-700">Total Stock Commission</label>
-                                    <p id="totalStockCommission" class="mt-1 p-2 bg-gray-100 rounded-md">PKR 0.00</p>
+                                    <!-- UPDATED: Text color -->
+                                    <label class="block text-sm font-medium text-slate-700">Total Stock Commission</label>
+                                    <p id="totalStockCommission" class="mt-1 p-2 bg-slate-100 rounded-md">PKR 0.00</p>
                                 </div>
                                 <div class="flex items-end">
-                                    <button id="addTransactionBtn" class="w-full bg-blue-500 text-white py-2 rounded-full font-semibold hover:bg-blue-600 animated-btn"><i class="fas fa-plus-circle mr-2"></i>Add Transaction</button>
+                                    <!-- UPDATED: Button color -->
+                                    <button id="addTransactionBtn" class="w-full bg-indigo-600 text-white py-2 rounded-full font-semibold hover:bg-indigo-700 animated-btn"><i class="fas fa-plus-circle mr-2"></i>Add Transaction</button>
                                 </div>
                             </div>
                             <h3 class="text-xl font-semibold mb-4 mt-8">Transactions for <span id="calculatorDateDisplay"></span></h3>
                             <div class="overflow-x-auto mb-6">
                                 <table id="calculatorTransactionsTable" class="w-full text-left table-auto">
                                     <thead>
-                                        <tr class="text-gray-600 uppercase text-sm">
+                                        <!-- UPDATED: Text color -->
+                                        <tr class="text-slate-600 uppercase text-sm">
                                             <th class="p-2">Stock Name</th>
                                             <th class="p-2">Quantity</th>
                                             <th class="p-2">Rate</th>
@@ -667,37 +616,44 @@
                                     <tbody></tbody>
                                 </table>
                             </div>
-                            <div id="calculatorSummary" class="p-4 bg-gray-50 rounded-lg shadow">
+                            <div id="calculatorSummary" class="p-4 bg-slate-50 rounded-lg shadow">
                                 <h4 class="text-lg font-semibold mb-2">Summary for <span id="summaryDateDisplay"></span></h4>
                                 <p>Gross Commission: <span id="calculatorGrossCommission" class="font-bold">PKR 0.00</span></p>
                                 <p>Head Office Deduction (40%): <span id="calculatorHODeduction" class="font-bold">PKR 0.00</span></p>
                                 <p>Tax Deduction (12% of remaining): <span id="calculatorTaxDeduction" class="font-bold">PKR 0.00</span></p>
-                                <p class="text-blue-600">Final House Commission: <span id="calculatorFinalHouseCommission" class="font-bold text-xl">PKR 0.00</span></p>
+                                <!-- UPDATED: Text color -->
+                                <p class="text-indigo-600">Final House Commission: <span id="calculatorFinalHouseCommission" class="font-bold text-xl">PKR 0.00</span></p>
                             </div>
                             <div class="mt-6 flex flex-wrap justify-end gap-3">
-                                <button id="printCgsReportBtn" class="bg-gray-700 text-white px-6 py-2 rounded-full font-semibold hover:bg-gray-800 animated-btn"><i class="fas fa-print mr-2"></i>Print Report</button>
-                                <button id="saveCgsTransactionsBtn" class="bg-blue-500 text-white px-6 py-2 rounded-full font-semibold hover:bg-blue-600 animated-btn"><i class="fas fa-save mr-2"></i>Save Daily Entries</button>
-                                <button id="saveCalculatedCommissionBtn" class="bg-green-500 text-white px-6 py-2 rounded-full font-semibold hover:bg-green-600 animated-btn"><i class="fas fa-check-circle mr-2"></i>Finalize & Add to Commission</button>
+                                <!-- UPDATED: Button colors -->
+                                <button id="printCgsReportBtn" class="bg-slate-700 text-white px-6 py-2 rounded-full font-semibold hover:bg-slate-800 animated-btn"><i class="fas fa-print mr-2"></i>Print Report</button>
+                                <button id="saveCgsTransactionsBtn" class="bg-indigo-600 text-white px-6 py-2 rounded-full font-semibold hover:bg-indigo-700 animated-btn"><i class="fas fa-save mr-2"></i>Save Daily Entries</button>
+                                <button id="saveCalculatedCommissionBtn" class="bg-emerald-600 text-white px-6 py-2 rounded-full font-semibold hover:bg-emerald-700 animated-btn"><i class="fas fa-check-circle mr-2"></i>Finalize & Add to Commission</button>
                             </div>
                         </div>
                     </section>
     
                     <section id="expenses" class="section-container">
-                        <h2 class="text-3xl font-bold text-gray-800 mb-6">House Expenses</h2>
+                        <!-- UPDATED: Text color -->
+                        <h2 class="text-3xl font-bold text-slate-800 mb-6">House Expenses</h2>
                         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
                             <div id="add-expense-forms-wrapper">
                                 <div class="card p-6 mb-6">
                                     <h3 class="text-xl font-semibold mb-4">Petty Cash Management</h3>
                                     <div class="mb-4">
-                                        <p class="text-gray-500">Overall Remaining Balance</p>
-                                        <p id="petty-cash-balance" class="text-3xl font-bold text-blue-600">PKR 0</p>
+                                        <!-- UPDATED: Text color -->
+                                        <p class="text-slate-500">Overall Remaining Balance</p>
+                                        <!-- UPDATED: Text color -->
+                                        <p id="petty-cash-balance" class="text-3xl font-bold text-indigo-600">PKR 0</p>
                                     </div>
                                     <form id="add-petty-cash-form" class="space-y-4">
+                                        <!-- UPDATED: Focus ring color -->
                                         <input type="number" id="petty-cash-amount" placeholder="Cash In Amount (PKR)" required
-                                               class="w-full px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                               class="w-full px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-indigo-500">
                                         <input type="date" id="petty-cash-date" required
-                                               class="w-full px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500">
-                                        <button type="submit" class="w-full bg-green-500 text-white py-2 rounded-full font-semibold hover:bg-green-600 animated-btn">
+                                               class="w-full px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                                        <!-- UPDATED: Button color -->
+                                        <button type="submit" class="w-full bg-emerald-600 text-white py-2 rounded-full font-semibold hover:bg-emerald-700 animated-btn">
                                             Add Cash In
                                         </button>
                                     </form>
@@ -705,13 +661,15 @@
                                 <div class="card p-6 mb-6">
                                     <h3 class="text-xl font-semibold mb-4">Add New Expense</h3>
                                     <form id="add-expense-form" class="space-y-4">
+                                        <!-- UPDATED: Focus ring color -->
                                         <input type="text" id="expense-name" placeholder="Expense Name (e.g., Electricity Bill)" required
-                                               class="w-full px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                               class="w-full px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-indigo-500">
                                         <input type="number" id="expense-amount" placeholder="Amount (PKR)" required
-                                               class="w-full px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                               class="w-full px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-indigo-500">
                                         <input type="date" id="expense-date" required
-                                               class="w-full px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500">
-                                        <button type="submit" class="w-full bg-blue-500 text-white py-2 rounded-full font-semibold hover:bg-blue-600 animated-btn">
+                                               class="w-full px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                                        <!-- UPDATED: Button color -->
+                                        <button type="submit" class="w-full bg-indigo-600 text-white py-2 rounded-full font-semibold hover:bg-indigo-700 animated-btn">
                                             Save Expense
                                         </button>
                                     </form>
@@ -720,22 +678,26 @@
                             <div class="card p-6">
                                 <h3 class="text-xl font-semibold mb-4">Monthly Petty Cash Ledger</h3>
                                 <div class="flex flex-col sm:flex-row items-center space-y-4 sm:space-y-0 sm:space-x-4 mb-4">
-                                    <select id="expense-report-month" class="w-full sm:w-auto px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500"></select>
+                                    <!-- UPDATED: Focus ring color -->
+                                    <select id="expense-report-month" class="w-full sm:w-auto px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-indigo-500"></select>
                                     <input type="number" id="expense-report-year" placeholder="Year"
-                                           class="w-full sm:w-auto px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500">
-                                    <button id="print-expenses-btn" class="w-full sm:w-auto bg-gray-700 text-white px-6 py-2 rounded-full font-semibold hover:bg-gray-800 animated-btn">
+                                           class="w-full sm:w-auto px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                                    <!-- UPDATED: Button color -->
+                                    <button id="print-expenses-btn" class="w-full sm:w-auto bg-slate-700 text-white px-6 py-2 rounded-full font-semibold hover:bg-slate-800 animated-btn">
                                         Print Report
                                     </button>
                                 </div>
                                 <div id="expenses-report-container">
-                                    <div class="flex justify-between items-center mb-2 p-2 bg-gray-50 rounded-lg">
+                                    <div class="flex justify-between items-center mb-2 p-2 bg-slate-50 rounded-lg">
                                         <span class="font-semibold">Opening Balance:</span>
-                                        <span id="opening-balance-display" class="font-bold text-gray-700">PKR 0</span>
+                                        <!-- UPDATED: Text color -->
+                                        <span id="opening-balance-display" class="font-bold text-slate-700">PKR 0</span>
                                     </div>
                                     <div class="overflow-y-auto max-h-80">
                                         <table class="w-full text-left table-auto">
                                             <thead class="border-b-2 sticky top-0 bg-white">
-                                                <tr class="text-gray-600 uppercase text-sm">
+                                                <!-- UPDATED: Text color -->
+                                                <tr class="text-slate-600 uppercase text-sm">
                                                     <th class="p-2">Date</th>
                                                     <th class="p-2">Description</th>
                                                     <th class="p-2 text-right">Debit (DR)</th>
@@ -749,9 +711,10 @@
                                             </tbody>
                                         </table>
                                     </div>
-                                    <div class="flex justify-between items-center mt-2 p-2 bg-gray-50 rounded-lg">
+                                    <div class="flex justify-between items-center mt-2 p-2 bg-slate-50 rounded-lg">
                                         <span class="font-semibold">Closing Balance:</span>
-                                        <span id="closing-balance-display" class="font-bold text-blue-600">PKR 0</span>
+                                        <!-- UPDATED: Text color -->
+                                        <span id="closing-balance-display" class="font-bold text-indigo-600">PKR 0</span>
                                     </div>
                                 </div>
                             </div>
@@ -759,43 +722,54 @@
                     </section>
     
                     <section id="profiles" class="section-container">
-                        <h2 class="text-3xl font-bold text-gray-800 mb-6">Client Profiles</h2>
+                        <!-- UPDATED: Text color -->
+                        <h2 class="text-3xl font-bold text-slate-800 mb-6">Client Profiles</h2>
                         <div id="add-client-wrapper" class="card p-6 mb-6">
                             <h3 class="text-xl font-semibold mb-4">Add New Client</h3>
                             <form id="add-client-form" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <!-- UPDATED: Focus ring color -->
                                 <input type="text" id="profile-client-name" placeholder="Client Name" required
-                                       class="w-full px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                       class="w-full px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-indigo-500">
                                 <input type="text" id="profile-trading-account" placeholder="Trading Account Number" required
-                                       class="w-full px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                       class="w-full px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-indigo-500">
                                 <input type="text" id="profile-cnic" placeholder="CNIC" required
-                                       class="w-full px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                       class="w-full px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-indigo-500">
                                 <input type="text" id="profile-cdc-account" placeholder="CDC Account Number"
-                                       class="w-full px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                       class="w-full px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-indigo-500">
                                 <input type="email" id="profile-email" placeholder="Email Address"
-                                       class="w-full px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                       class="w-full px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-indigo-500">
                                 <input type="text" id="profile-contact" placeholder="Contact Number"
-                                       class="w-full px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                       class="w-full px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-indigo-500">
                                  <input type="text" id="profile-address" placeholder="Address"
-                                       class="w-full px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500 md:col-span-2">
+                                       class="w-full px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-indigo-500 md:col-span-2">
                                 <div id="profile-account-date-wrapper">
-                                    <label for="profile-account-date" class="text-sm text-gray-600 ml-2">Account Opening Date</label>
+                                    <!-- UPDATED: Text color -->
+                                    <label for="profile-account-date" class="text-sm text-slate-600 ml-2">Account Opening Date</label>
                                     <input type="date" id="profile-account-date" required
-                                           class="w-full px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                           class="w-full px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-indigo-500">
                                 </div>
                                 <div class="flex items-center space-x-2 md:col-span-2">
-                                    <input type="checkbox" id="profile-is-old-client" class="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500">
-                                    <label for="profile-is-old-client" class="text-gray-700">Old Client (before software)</label>
+                                    <!-- UPDATED: Checkbox color -->
+                                    <input type="checkbox" id="profile-is-old-client" class="h-4 w-4 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500">
+                                    <!-- UPDATED: Text color -->
+                                    <label for="profile-is-old-client" class="text-slate-700">Old Client (before software)</label>
                                 </div>
-                                <button type="submit" class="w-full bg-blue-500 text-white py-2 rounded-full font-semibold hover:bg-blue-600 animated-btn md:col-span-2">
+                                <!-- UPDATED: Button color -->
+                                <button type="submit" class="w-full bg-indigo-600 text-white py-2 rounded-full font-semibold hover:bg-indigo-700 animated-btn md:col-span-2">
                                     Save Client Profile
                                 </button>
                             </form>
                         </div>
                         <div class="card p-6">
                             <h3 class="text-xl font-semibold mb-4">View Client Profiles</h3>
-                            <div class="flex flex-wrap items-center gap-4 mb-4">
+                            <!-- UPDATED: Added justify-between and the new Download Report button -->
+                            <div class="flex flex-wrap items-center justify-between gap-4 mb-4">
                                 <input type="text" id="profiles-search" placeholder="Search by Client Name or Account Number..."
-                                       class="flex-grow px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                       class="flex-grow px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                                <!-- ADDED: Download Report Button -->
+                                <button id="download-client-report-btn" class="bg-indigo-600 text-white px-5 py-2 rounded-full font-semibold hover:bg-indigo-700 animated-btn flex-shrink-0">
+                                    <i class="fas fa-download mr-2"></i>Download Report
+                                </button>
                             </div>
                             <div id="profiles-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                             </div>
@@ -803,31 +777,35 @@
                     </section>
     
                     <section id="employees" class="section-container">
-                        <h2 class="text-3xl font-bold text-gray-800 mb-6">Employees</h2>
+                        <!-- UPDATED: Text color -->
+                        <h2 class="text-3xl font-bold text-slate-800 mb-6">Employees</h2>
                         <div id="add-employee-wrapper" class="card p-6 mb-6">
                             <h3 class="text-xl font-semibold mb-4">Add New Employee</h3>
                             <form id="add-employee-form" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <!-- UPDATED: Focus ring color -->
                                 <input type="text" id="employee-name" placeholder="Name" required
-                                       class="w-full px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                       class="w-full px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-indigo-500">
                                 <input type="text" id="employee-cnic" placeholder="CNIC" required
-                                       class="w-full px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                       class="w-full px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-indigo-500">
                                 <input type="text" id="employee-contact" placeholder="Contact Number" required
-                                       class="w-full px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                       class="w-full px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-indigo-500">
                                 <input type="text" id="employee-designation" placeholder="Designation" required
-                                       class="w-full px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                       class="w-full px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-indigo-500">
                                 <input type="text" id="employee-address" placeholder="Address" required
-                                       class="w-full px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500 md:col-span-2">
+                                       class="w-full px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-indigo-500 md:col-span-2">
                                 <div>
-                                    <label for="employee-joining-date" class="text-sm text-gray-600 ml-2">Joining Date</label>
-                                    <input type="date" id="employee-joining-date" required class="w-full px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                    <!-- UPDATED: Text color -->
+                                    <label for="employee-joining-date" class="text-sm text-slate-600 ml-2">Joining Date</label>
+                                    <input type="date" id="employee-joining-date" required class="w-full px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-indigo-500">
                                 </div>
                                 <input type="number" id="employee-salary" placeholder="Salary (PKR)" required
-                                       class="w-full px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                       class="w-full px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-indigo-500">
                                 <input type="number" id="employee-incentives" placeholder="Incentives (PKR)" value="0" required
-                                       class="w-full px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                       class="w-full px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-indigo-500">
                                 <input type="number" id="employee-allowance" placeholder="Allowance (PKR)" value="0" required
-                                       class="w-full px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500">
-                                <button type="submit" class="w-full bg-blue-500 text-white py-2 rounded-full font-semibold hover:bg-blue-600 animated-btn md:col-span-2">
+                                       class="w-full px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                                <!-- UPDATED: Button color -->
+                                <button type="submit" class="w-full bg-indigo-600 text-white py-2 rounded-full font-semibold hover:bg-indigo-700 animated-btn md:col-span-2">
                                     Save Employee
                                 </button>
                             </form>
@@ -837,7 +815,8 @@
                             <div class="overflow-x-auto">
                                 <table class="w-full text-left table-auto">
                                     <thead class="border-b-2">
-                                        <tr class="text-gray-600 uppercase text-sm">
+                                        <!-- UPDATED: Text color -->
+                                        <tr class="text-slate-600 uppercase text-sm">
                                             <th class="p-2">Name</th>
                                             <th class="p-2">Designation</th>
                                             <th class="p-2">Contact</th>
@@ -853,61 +832,15 @@
                         </div>
                     </section>
 
-                    <!-- NEW: Courier Records Section -->
+                    <!-- REMOVED: Courier Records Section -->
                     <section id="courier-records" class="section-container">
-                        <h2 class="text-3xl font-bold text-gray-800 mb-6">Courier Records</h2>
-                        <div id="add-courier-wrapper" class="card p-6 mb-6">
-                            <h3 class="text-xl font-semibold mb-4">Add New Courier Entry</h3>
-                            <form id="add-courier-form" class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <select id="courier-type" required class="w-full px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500">
-                                    <option value="Outgoing">Outgoing</option>
-                                    <option value="Incoming">Incoming</option>
-                                </select>
-                                <input type="date" id="courier-date" required class="w-full px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500">
-                                <input type="text" id="courier-track-id" placeholder="Track ID" class="w-full px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500 md:col-span-2">
-                                <input type="text" id="courier-sender" placeholder="Sender Name" required class="w-full px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500">
-                                <input type="text" id="courier-receiver" placeholder="Receiver Name" required class="w-full px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500">
-                                <input type="text" id="courier-destination-origin" placeholder="Destination / Origin" required class="w-full px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500">
-                                <select id="courier-status" required class="w-full px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500">
-                                    <option value="Pending">Pending</option>
-                                    <option value="Delivered">Delivered</option>
-                                    <option value="Received">Received</option>
-                                </select>
-                                <textarea id="courier-description" rows="3" placeholder="Description" class="w-full px-4 py-2 border rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 md:col-span-2"></textarea>
-                                <button type="submit" class="w-full bg-blue-500 text-white py-2 rounded-full font-semibold hover:bg-blue-600 animated-btn md:col-span-2">
-                                    Save Courier Record
-                                </button>
-                            </form>
-                        </div>
-                        <div class="card p-6">
-                            <h3 class="text-xl font-semibold mb-4">View Courier Records</h3>
-                            <input type="text" id="courier-search" placeholder="Search by Sender, Receiver, or Track ID..."
-                                   class="w-full px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500 mb-4">
-                            <div class="overflow-x-auto">
-                                <table class="w-full text-left table-auto">
-                                    <thead class="border-b-2">
-                                        <tr class="text-gray-600 uppercase text-sm">
-                                            <th class="p-2">Type</th>
-                                            <th class="p-2">Date</th>
-                                            <th class="p-2">Track ID</th>
-                                            <th class="p-2">Sender</th>
-                                            <th class="p-2">Receiver</th>
-                                            <th class="p-2">Dest./Origin</th>
-                                            <th class="p-2">Status</th>
-                                            <th class="p-2 actions-header">Actions</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody id="courier-records-list">
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
                     </section>
 
                 </div>
             </main>
             
-            <footer class="bg-gray-800 text-gray-300 p-4 mt-auto">
+            <!-- UPDATED: Footer theme -->
+            <footer class="bg-slate-800 text-slate-300 p-4 mt-auto">
                 <div class="container mx-auto text-center text-sm">
                     Developed by Next Gen Sites | Developer Afrasiab Asghar | Contact: +923060406003 | www.nextgensites.org
                 </div>
@@ -920,8 +853,10 @@
     <div id="profile-detail-modal" class="popup-window-overlay">
         <div class="popup-window-content">
             <div class="popup-window-header">
-                <h3 id="profile-detail-name" class="text-2xl font-bold text-gray-800"></h3>
-                <button id="close-profile-btn" class="text-gray-500 hover:text-gray-800">
+                <!-- UPDATED: Text color -->
+                <h3 id="profile-detail-name" class="text-2xl font-bold text-slate-800"></h3>
+                <!-- UPDATED: Text color -->
+                <button id="close-profile-btn" class="text-slate-500 hover:text-slate-800">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
                     </svg>
@@ -929,7 +864,8 @@
             </div>
             <div class="popup-window-body">
                 <div id="profile-detail-info-wrapper">
-                    <div id="profile-detail-info" class="text-gray-700 text-sm mb-6 bg-white p-6 rounded-lg shadow-sm grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4"></div>
+                    <!-- UPDATED: Text color -->
+                    <div id="profile-detail-info" class="text-slate-700 text-sm mb-6 bg-white p-6 rounded-lg shadow-sm grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4"></div>
                     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
                         <div class="bg-white p-4 rounded-lg shadow-sm lg:col-span-2">
                             <h4 class="font-semibold text-lg mb-2">Client Payment History</h4>
@@ -937,24 +873,7 @@
                                 <canvas id="clientCommissionChart"></canvas>
                             </div>
                         </div>
-                        <div class="bg-white p-4 rounded-lg shadow-sm lg:col-span-2">
-                            <h4 class="font-semibold text-lg mb-2">Financial History (Deposits & Withdrawals)</h4>
-                            <div class="max-h-64 overflow-y-auto">
-                                <table class="w-full text-left table-auto text-sm">
-                                    <thead class="border-b-2 sticky top-0 bg-white">
-                                        <tr class="text-gray-600 uppercase text-xs">
-                                            <th class="p-2">Date</th>
-                                            <th class="p-2">Description</th>
-                                            <th class="p-2 text-right">Deposit (CR)</th>
-                                            <th class="p-2 text-right">Withdrawal (DR)</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody id="client-financial-history-list">
-                                        <!-- Populated by JS -->
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
+                        <!-- REMOVED: Financial History Section -->
                     </div>
                 </div>
                 
@@ -970,8 +889,9 @@
                         <input type="text" id="edit-profile-address" placeholder="Address" class="w-full px-4 py-2 border rounded-full md:col-span-2">
                     </div>
                     <div class="flex justify-end gap-4 mt-4">
-                        <button type="button" id="cancel-edit-profile-btn" class="bg-gray-300 text-gray-800 px-6 py-2 rounded-full font-semibold">Cancel</button>
-                        <button type="submit" class="bg-blue-500 text-white px-6 py-2 rounded-full font-semibold">Save Changes</button>
+                        <!-- UPDATED: Button colors -->
+                        <button type="button" id="cancel-edit-profile-btn" class="bg-slate-300 text-slate-800 px-6 py-2 rounded-full font-semibold">Cancel</button>
+                        <button type="submit" class="bg-indigo-600 text-white px-6 py-2 rounded-full font-semibold">Save Changes</button>
                     </div>
                 </form>
                 
@@ -980,28 +900,33 @@
                          <h4 class="font-semibold text-lg mb-2">Add Client Payment</h4>
                          <form id="add-client-payment-form" class="space-y-3">
                             <div class="flex flex-col sm:flex-row items-center space-y-3 sm:space-y-0 sm:space-x-4">
-                                <select id="client-payment-month" required class="w-full sm:w-1/2 px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                <!-- UPDATED: Focus ring color -->
+                                <select id="client-payment-month" required class="w-full sm:w-1/2 px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-indigo-500">
                                     </select>
                                 <input type="number" id="client-payment-year" placeholder="Year" required
-                                       class="w-full sm:w-1/2 px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                       class="w-full sm:w-1/2 px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-indigo-500">
                             </div>
                             <input type="number" id="client-payment-amount" placeholder="Amount Paid (PKR)" required
-                                   class="w-full px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500">
-                            <button type="submit" class="w-full bg-green-500 text-white py-2 rounded-full font-semibold hover:bg-green-600 animated-btn">
+                                   class="w-full px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                            <!-- UPDATED: Button color -->
+                            <button type="submit" class="w-full bg-emerald-600 text-white py-2 rounded-full font-semibold hover:bg-emerald-700 animated-btn">
                                 Save Payment
                             </button>
                          </form>
                     </div>
 
                     <div class="mt-6 flex justify-center gap-4">
-                        <button id="edit-profile-btn" class="bg-yellow-500 text-white px-6 py-2 rounded-full font-semibold hover:bg-yellow-600 animated-btn">Edit Profile</button>
-                        <button id="close-account-btn" class="bg-red-500 text-white px-6 py-2 rounded-full font-semibold hover:bg-red-600 animated-btn">Close Account</button>
+                        <!-- UPDATED: Button colors -->
+                        <button id="edit-profile-btn" class="bg-amber-500 text-white px-6 py-2 rounded-full font-semibold hover:bg-amber-600 animated-btn">Edit Profile</button>
+                        <button id="close-account-btn" class="bg-rose-600 text-white px-6 py-2 rounded-full font-semibold hover:bg-rose-700 animated-btn">Close Account</button>
                     </div>
                     <div id="account-closure-form" class="mt-4 hidden bg-white p-4 rounded-lg shadow-sm">
                         <label for="closure-date-input" class="block mb-2 font-medium">Select Closure Date:</label>
+                        <!-- UPDATED: Focus ring color -->
                         <input type="date" id="closure-date-input" required
-                               class="w-full px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500 mb-2">
-                        <button id="confirm-closure-btn" class="w-full bg-red-600 text-white py-2 rounded-full font-semibold hover:bg-red-700">Confirm Account Closure</button>
+                               class="w-full px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-indigo-500 mb-2">
+                        <!-- UPDATED: Button color -->
+                        <button id="confirm-closure-btn" class="w-full bg-rose-700 text-white py-2 rounded-full font-semibold hover:bg-rose-800">Confirm Account Closure</button>
                     </div>
                 </div>
             </div>
@@ -1011,8 +936,10 @@
     <div id="employee-detail-modal" class="popup-window-overlay">
         <div class="popup-window-content">
             <div class="popup-window-header">
-                <h3 id="employee-detail-name" class="text-2xl font-bold text-gray-800">Employee Details</h3>
-                <button id="close-employee-btn" class="text-gray-500 hover:text-gray-800">
+                <!-- UPDATED: Text color -->
+                <h3 id="employee-detail-name" class="text-2xl font-bold text-slate-800">Employee Details</h3>
+                <!-- UPDATED: Text color -->
+                <button id="close-employee-btn" class="text-slate-500 hover:text-slate-800">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
                     </svg>
@@ -1020,9 +947,11 @@
             </div>
             <div class="popup-window-body">
                 <div id="employee-detail-info-wrapper">
-                    <div id="employee-detail-info" class="text-gray-700 text-sm mb-6 bg-white p-6 rounded-lg shadow-sm grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4"></div>
+                    <!-- UPDATED: Text color -->
+                    <div id="employee-detail-info" class="text-slate-700 text-sm mb-6 bg-white p-6 rounded-lg shadow-sm grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4"></div>
                     <div id="edit-employee-btn-wrapper" class="mt-6 flex justify-center gap-4">
-                        <button id="edit-employee-btn" class="bg-yellow-500 text-white px-6 py-2 rounded-full font-semibold hover:bg-yellow-600 animated-btn">Edit Employee</button>
+                        <!-- UPDATED: Button color -->
+                        <button id="edit-employee-btn" class="bg-amber-500 text-white px-6 py-2 rounded-full font-semibold hover:bg-amber-600 animated-btn">Edit Employee</button>
                     </div>
                 </div>
                 
@@ -1039,8 +968,9 @@
                         <input type="text" id="edit-employee-address" placeholder="Address" required class="w-full px-4 py-2 border rounded-full md:col-span-2">
                     </div>
                     <div class="flex justify-end gap-4 mt-4">
-                        <button type="button" id="cancel-edit-employee-btn" class="bg-gray-300 text-gray-800 px-6 py-2 rounded-full font-semibold">Cancel</button>
-                        <button type="submit" class="bg-blue-500 text-white px-6 py-2 rounded-full font-semibold">Save Changes</button>
+                        <!-- UPDATED: Button colors -->
+                        <button type="button" id="cancel-edit-employee-btn" class="bg-slate-300 text-slate-800 px-6 py-2 rounded-full font-semibold">Cancel</button>
+                        <button type="submit" class="bg-indigo-600 text-white px-6 py-2 rounded-full font-semibold">Save Changes</button>
                     </div>
                 </form>
 
@@ -1053,7 +983,8 @@
                                <input type="number" id="performance-year" placeholder="Year" required class="w-full sm:w-1/2 px-4 py-2 border rounded-full">
                            </div>
                            <input type="number" id="performance-points" placeholder="Performance Points" required class="w-full px-4 py-2 border rounded-full">
-                           <button type="submit" class="w-full bg-green-500 text-white py-2 rounded-full font-semibold hover:bg-green-600 animated-btn">
+                           <!-- UPDATED: Button color -->
+                           <button type="submit" class="w-full bg-emerald-600 text-white py-2 rounded-full font-semibold hover:bg-emerald-700 animated-btn">
                                Save Points
                            </button>
                         </form>
@@ -1063,7 +994,8 @@
                         <div class="max-h-64 overflow-y-auto">
                             <table class="w-full text-left table-auto">
                                 <thead class="border-b-2 sticky top-0 bg-white">
-                                    <tr class="text-gray-600 uppercase text-sm">
+                                    <!-- UPDATED: Text color -->
+                                    <tr class="text-slate-600 uppercase text-sm">
                                         <th class="p-2">Month/Year</th>
                                         <th class="p-2">Points</th>
                                         <th class="p-2 actions-header">Actions</th>
@@ -1109,7 +1041,8 @@
         let unsubscribeListeners = [];
         let isSharedView = false; // Flag for read-only mode
 
-        let allComplaints = [], allDeposits = [], allDailyCommissions = [], allCommissionReceived = [], allExpenses = [], allClients = [], allEmployees = [], allClientPayments = [], allWithdrawals = [], allPettyCashEntries = [], allEmployeePerformance = [], allCgsEntries = {}, allCourierRecords = []; 
+        // REMOVED: allDeposits, allWithdrawals, allCourierRecords
+        let allComplaints = [], allDailyCommissions = [], allCommissionReceived = [], allExpenses = [], allClients = [], allEmployees = [], allClientPayments = [], allPettyCashEntries = [], allEmployeePerformance = [], allCgsEntries = {}; 
         let calculatedTransactions = [];
 
         const loading = document.getElementById('loading');
@@ -1193,15 +1126,22 @@
             });
         });
 
+        // UPDATED: Robustly handles adding/removing new theme classes for active/inactive states.
         function showSection(sectionId) {
             sections.forEach(section => section.classList.toggle('active', section.id === sectionId));
+            
             mainNavButtons.forEach(btn => {
                 const isActive = btn.dataset.section === sectionId;
-                btn.classList.toggle('bg-blue-500', isActive);
-                btn.classList.toggle('text-white', isActive);
-                btn.classList.toggle('bg-gray-200', !isActive);
-                btn.classList.toggle('text-gray-700', !isActive);
+                // Remove all theme classes
+                btn.classList.remove('bg-indigo-600', 'text-white', 'text-slate-600', 'hover:bg-indigo-50', 'hover:text-indigo-600');
+                
+                if (isActive) {
+                    btn.classList.add('bg-indigo-600', 'text-white');
+                } else {
+                    btn.classList.add('text-slate-600', 'hover:bg-indigo-50', 'hover:text-indigo-600');
+                }
             });
+
             const headerTitle = document.getElementById('header-title');
             if (headerTitle) {
                  if (sectionId === 'calculator') {
@@ -1308,16 +1248,17 @@
             // Hide admin-only forms and action buttons
             document.querySelectorAll('.actions-header').forEach(el => el.style.display = 'none');
             document.getElementById('add-complaint-wrapper').style.display = 'none';
-            document.getElementById('add-deposit-wrapper').style.display = 'none';
-            document.getElementById('add-withdrawal-wrapper').style.display = 'none';
             document.getElementById('add-commission-forms-wrapper').style.display = 'none';
             document.getElementById('print-commission-btn').style.display = 'none';
             document.getElementById('add-expense-forms-wrapper').style.display = 'none';
             document.getElementById('print-expenses-btn').style.display = 'none';
             document.getElementById('add-client-wrapper').style.display = 'none';
             document.getElementById('add-employee-wrapper').style.display = 'none';
-            document.getElementById('add-courier-wrapper').style.display = 'none';
             
+            // ADDED: Hide the new download report button in shared view
+            const downloadReportBtn = document.getElementById('download-client-report-btn');
+            if(downloadReportBtn) downloadReportBtn.style.display = 'none';
+
             // UPDATE: Hide CGS button for shared view
             document.querySelector('button[data-section="calculator"]').parentElement.style.display = 'none';
 
@@ -1400,10 +1341,9 @@
         // --- REALTIME DATA LISTENERS ---
         function startRealtimeListeners() {
             if (unsubscribeListeners.length > 0) return; 
-            const collections = ['complaints', 'deposits', 'daily_commissions', 'commission_received', 'expenses', 'clients', 'employees', 'client_payments', 'withdrawals', 'petty_cash', 'employee_performance', 'cgs_entries', 'courier_records'];
+            const collections = ['complaints', 'daily_commissions', 'commission_received', 'expenses', 'clients', 'employees', 'client_payments', 'petty_cash', 'employee_performance', 'cgs_entries'];
             const dataHandlers = {
                 complaints: data => { allComplaints = data; renderComplaints(); updateDashboard(); },
-                deposits: data => { allDeposits = data; renderDeposits(); },
                 daily_commissions: data => { allDailyCommissions = data; renderCommissionSection(); updateDashboard(); },
                 commission_received: data => { allCommissionReceived = data; renderCommissionSection(); },
                 expenses: data => { allExpenses = data; renderExpenses(); },
@@ -1418,7 +1358,6 @@
                        showClientProfile(currentlyOpenClientId);
                     }
                 },
-                withdrawals: data => { allWithdrawals = data; renderWithdrawals(); },
                 petty_cash: data => { allPettyCashEntries = data; renderExpenses(); },
                 employee_performance: data => {
                     allEmployeePerformance = data;
@@ -1436,7 +1375,6 @@
                         loadTransactionsForCalculator();
                     }
                 },
-                courier_records: data => { allCourierRecords = data; renderCourierRecords(); }
             };
 
             collections.forEach(col => {
@@ -1512,8 +1450,10 @@
             document.getElementById('total-clients').textContent = totalClientsCount;
             document.getElementById('active-clients').textContent = activeClientIds.size; 
             document.getElementById('total-employees').textContent = allEmployees.length;
+            // UPDATED: Card title was already changed in HTML, this ensures JS updates it if needed
             document.getElementById('dashboard-revenue-card').querySelector('h3').textContent = 'Commission Balance';
-            document.getElementById('monthly-revenue').textContent = `PKR ${commissionClosingBalance.toLocaleString()}`;
+            // UPDATED: Format number with commas
+            document.getElementById('monthly-revenue').textContent = `PKR ${commissionClosingBalance.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`;
 
             const complaintStatusData = { Pending: 0, Done: 0 };
             activeComplaints.forEach(c => {
@@ -1528,7 +1468,8 @@
                     labels: ['Pending', 'Done'],
                     datasets: [{ 
                         data: [complaintStatusData.Pending, complaintStatusData.Done], 
-                        backgroundColor: ['#f59e0b', '#10b981'] 
+                        // UPDATED: Theme colors
+                        backgroundColor: ['#f59e0b', '#10b981'] // amber-500, emerald-500
                     }]
                 },
                 options: { responsive: true, maintainAspectRatio: false }
@@ -1550,7 +1491,8 @@
                         const [year, month] = key.split('-');
                         return `${months[parseInt(month)]} '${year.slice(2)}`;
                     }),
-                    datasets: [{ label: 'House Commission (Revenue)', data: sortedCommission.map(([, value]) => value), backgroundColor: '#10b981' }]
+                    // UPDATED: Theme color
+                    datasets: [{ label: 'House Commission (Revenue)', data: sortedCommission.map(([, value]) => value), backgroundColor: '#10b981' }] // emerald-500
                 },
                 options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true } } }
             });
@@ -1573,7 +1515,8 @@
                         const [year, month] = key.split('-');
                         return `${months[parseInt(month)]} '${year.slice(2)}`;
                     }),
-                    datasets: [{ label: 'New Clients', data: sortedClients.map(([, value]) => value), borderColor: '#ef4444', tension: 0.1 }]
+                    // UPDATED: Theme color
+                    datasets: [{ label: 'New Clients', data: sortedClients.map(([, value]) => value), borderColor: '#ef4444', tension: 0.1 }] // red-500
                 },
                 options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } } } }
             });
@@ -1594,7 +1537,8 @@
                         const [year, month] = key.split('-');
                         return `${months[parseInt(month)]} '${year.slice(2)}`;
                     }),
-                    datasets: [{ label: 'Total Expenses', data: sortedExpenses.map(([, value]) => value), backgroundColor: '#8b5cf6' }]
+                    // UPDATED: Theme color
+                    datasets: [{ label: 'Total Expenses', data: sortedExpenses.map(([, value]) => value), backgroundColor: '#a855f7' }] // purple-500
                 },
                 options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true } } }
             });
@@ -1631,17 +1575,19 @@
                 listElement.innerHTML = sortedActiveClients.map(client => `
                     <div class="p-3 border-b flex justify-between items-center">
                         <div>
-                            <p class="font-semibold text-gray-800">${client.name}</p>
-                            <p class="text-sm text-gray-500">${client.tradingAccount}</p>
+                            <!-- UPDATED: Text colors -->
+                            <p class="font-semibold text-slate-800">${client.name}</p>
+                            <p class="text-sm text-slate-500">${client.tradingAccount}</p>
                         </div>
                         <div class="text-right">
-                            <p class="font-bold text-green-600">PKR ${client.commission.toLocaleString()}</p>
-                            <p class="text-xs text-gray-400">Total Commission</p>
+                            <!-- UPDATED: Text colors -->
+                            <p class="font-bold text-emerald-600">PKR ${client.commission.toLocaleString()}</p>
+                            <p class="text-xs text-slate-400">Total Commission</p>
                         </div>
                     </div>
                 `).join('');
             } else {
-                listElement.innerHTML = '<p class="text-gray-500 p-4 text-center">Pichle 2 mahino me koi active client nahi hai.</p>';
+                listElement.innerHTML = '<p class="text-slate-500 p-4 text-center">Pichle 2 mahino me koi active client nahi hai.</p>';
             }
             document.getElementById('active-clients-modal').style.display = 'flex';
         }
@@ -1660,8 +1606,6 @@
         }
         
         handleTradingAccountInput('complaint-trading-account', 'complaint-client-name');
-        handleTradingAccountInput('deposit-trading-account', 'deposit-client-name');
-        handleTradingAccountInput('withdrawal-trading-account', 'withdrawal-client-name');
 
         // --- COMPLAINTS MODULE ---
         document.getElementById('add-complaint-form').addEventListener('submit', async (e) => {
@@ -1702,8 +1646,9 @@
                     <td class="p-2">${c.timestamp ? new Date(c.timestamp.seconds * 1000).toLocaleDateString() : 'N/A'}</td>
                     ${!isSharedView ? `
                     <td class="p-2 space-x-2">
-                        <button class="text-blue-500 hover:underline" onclick="openEditComplaintModal('${c.id}', '${c.status}')">Edit</button>
-                        <button class="text-red-500 hover:underline" onclick="deleteItem('complaints', '${c.id}')">Delete</button>
+                        <!-- UPDATED: Text colors -->
+                        <button class="text-indigo-600 hover:underline" onclick="openEditComplaintModal('${c.id}', '${c.status}')">Edit</button>
+                        <button class="text-rose-600 hover:underline" onclick="deleteItem('complaints', '${c.id}')">Delete</button>
                     </td>` : ''}
                 </tr>
             `).join('');
@@ -1734,97 +1679,6 @@
             }
         });
 
-
-        // --- DEPOSITS MODULE ---
-        document.getElementById('add-deposit-form').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const form = e.target;
-             if (!form['deposit-client-name'].value) return showMessage('Error', 'Please select a valid client.');
-            showLoading();
-            const depositData = {
-                clientName: form['deposit-client-name'].value,
-                tradingAccount: form['deposit-trading-account'].value,
-                amount: parseFloat(form['deposit-amount'].value),
-                date: form['deposit-date'].value,
-                chequeNumber: form['deposit-cheque-number'].value,
-                status: form['deposit-status'].value,
-                returnedReason: form['deposit-returned-reason'].value,
-                timestamp: firebase.firestore.FieldValue.serverTimestamp()
-            };
-            try {
-                await db.collection(`users/${currentUserId}/deposits`).add(depositData);
-                form.reset();
-                showMessage('Success', 'Deposit added successfully!');
-            } catch (error) {
-                showMessage('Error', error.message);
-            } finally {
-                hideLoading();
-            }
-        });
-
-        function renderDeposits() {
-             document.getElementById('add-deposit-wrapper').style.display = isSharedView ? 'none' : 'block';
-             document.querySelectorAll('#deposits .actions-header').forEach(el => el.style.display = isSharedView ? 'none' : 'table-cell');
-
-             const searchTerm = document.getElementById('deposit-search').value.toLowerCase();
-             const filtered = allDeposits.filter(d => d.clientName.toLowerCase().includes(searchTerm) || d.tradingAccount.toLowerCase().includes(searchTerm)).sort((a, b) => new Date(b.date) - new Date(a.date));
-             document.getElementById('deposits-list').innerHTML = filtered.map(d => `
-                <tr class="border-b">
-                    <td class="p-2">${d.clientName}</td>
-                    <td class="p-2">${d.tradingAccount}</td>
-                    <td class="p-2">PKR ${d.amount.toLocaleString()}</td>
-                    <td class="p-2">${d.chequeNumber}</td>
-                    <td class="p-2">${d.status}</td>
-                    <td class="p-2">${new Date(d.date).toLocaleDateString()}</td>
-                    <td class="p-2">${d.imageUrls ? d.imageUrls.map(url => `<a href="${url}" target="_blank" class="text-blue-500">View</a>`).join(' ') : 'No'}</td>
-                    ${!isSharedView ? `<td class="p-2"><button class="text-red-500 hover:underline" onclick="deleteItem('deposits', '${d.id}')">Delete</button></td>` : ''}
-                </tr>
-             `).join('');
-        }
-        
-        // --- WITHDRAWALS MODULE ---
-        document.getElementById('add-withdrawal-form').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const form = e.target;
-            if (!form['withdrawal-client-name'].value) return showMessage('Error', 'Please select a valid client.');
-            showLoading();
-            const withdrawalData = {
-                clientName: form['withdrawal-client-name'].value,
-                tradingAccount: form['withdrawal-trading-account'].value,
-                amount: parseFloat(form['withdrawal-amount'].value),
-                date: form['withdrawal-date'].value,
-                status: form['withdrawal-status'].value,
-                returnedReason: form['withdrawal-returned-reason'].value,
-                timestamp: firebase.firestore.FieldValue.serverTimestamp()
-            };
-            try {
-                await db.collection(`users/${currentUserId}/withdrawals`).add(withdrawalData);
-                form.reset();
-                showMessage('Success', 'Withdrawal request added!');
-            } catch (error) {
-                showMessage('Error', error.message);
-            } finally {
-                hideLoading();
-            }
-        });
-
-        function renderWithdrawals() {
-            document.getElementById('add-withdrawal-wrapper').style.display = isSharedView ? 'none' : 'block';
-            document.querySelectorAll('#withdrawals .actions-header').forEach(el => el.style.display = isSharedView ? 'none' : 'table-cell');
-
-            const searchTerm = document.getElementById('withdrawal-search').value.toLowerCase();
-            const filtered = allWithdrawals.filter(w => w.clientName.toLowerCase().includes(searchTerm) || w.tradingAccount.toLowerCase().includes(searchTerm)).sort((a, b) => new Date(b.date) - new Date(a.date));
-            document.getElementById('withdrawals-list').innerHTML = filtered.map(w => `
-                <tr class="border-b">
-                    <td class="p-2">${w.clientName}</td>
-                    <td class="p-2">${w.tradingAccount}</td>
-                    <td class="p-2">PKR ${w.amount.toLocaleString()}</td>
-                    <td class="p-2">${w.status}</td>
-                    <td class="p-2">${w.date ? new Date(w.date).toLocaleDateString() : (w.timestamp ? new Date(w.timestamp.seconds * 1000).toLocaleDateString() : 'N/A')}</td>
-                    ${!isSharedView ? `<td class="p-2"><button class="text-red-500 hover:underline" onclick="deleteItem('withdrawals', '${w.id}')">Delete</button></td>` : ''}
-                </tr>
-            `).join('');
-        }
 
         // --- COMMISSION MODULE ---
         const dailyCommissionForm = document.getElementById('add-daily-commission-form');
@@ -1913,7 +1767,8 @@
                         const [year, month] = key.split('-');
                         return `${months[parseInt(month)]} '${year.slice(2)}`;
                     }),
-                    datasets: [{ label: 'House Commission (Revenue)', data: sortedChartData.map(([, value]) => value), backgroundColor: '#10b981' }]
+                    // UPDATED: Theme color
+                    datasets: [{ label: 'House Commission (Revenue)', data: sortedChartData.map(([, value]) => value), backgroundColor: '#10b981' }] // emerald-500
                 },
                 options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true }, x: { grid: { display: false } } } }
             });
@@ -1961,10 +1816,11 @@
                     <tr class="border-b">
                         <td class="p-2">${new Date(t.date).toLocaleDateString()}</td>
                         <td class="p-2">${t.description}</td>
-                        <td class="p-2 text-right text-red-600">${t.dr > 0 ? `PKR ${t.dr.toLocaleString()}` : '-'}</td>
-                        <td class="p-2 text-right text-green-600">${t.cr > 0 ? `PKR ${t.cr.toLocaleString()}` : '-'}</td>
+                        <!-- UPDATED: Text colors -->
+                        <td class="p-2 text-right text-rose-600">${t.dr > 0 ? `PKR ${t.dr.toLocaleString()}` : '-'}</td>
+                        <td class="p-2 text-right text-emerald-600">${t.cr > 0 ? `PKR ${t.cr.toLocaleString()}` : '-'}</td>
                         <td class="p-2 text-right font-semibold">${`PKR ${runningBalance.toLocaleString()}`}</td>
-                        ${showDeleteButton ? `<td class="p-2"><button class="text-red-500 hover:underline" onclick="deleteItem('${t.type}', '${t.id}')">Delete</button></td>` : '<td class="p-2"></td>'}
+                        ${showDeleteButton ? `<td class="p-2"><button class="text-rose-600 hover:underline" onclick="deleteItem('${t.type}', '${t.id}')">Delete</button></td>` : '<td class="p-2"></td>'}
                     </tr>
                 `;
             }).join('');
@@ -2053,10 +1909,22 @@
             document.getElementById('loadCalculatorDateBtn').addEventListener('click', loadTransactionsForCalculator);
             document.getElementById('quantity').addEventListener('input', updateCalculatorCommissionDisplay);
             document.getElementById('rate').addEventListener('input', updateCalculatorCommissionDisplay);
+            
+            // ADDED: Event listener for manual commission input
+            document.getElementById('commissionPerStock').addEventListener('input', updateManualTotalCommission);
+
             document.getElementById('addTransactionBtn').addEventListener('click', addTransactionToCalculator);
             document.getElementById('saveCgsTransactionsBtn').addEventListener('click', saveCgsTransactions);
             document.getElementById('saveCalculatedCommissionBtn').addEventListener('click', saveCalculatedCommission);
             document.getElementById('printCgsReportBtn').addEventListener('click', printCgsReport);
+        }
+
+        // ADDED: New function to handle manual total update
+        function updateManualTotalCommission() {
+            const quantity = parseFloat(document.getElementById('quantity').value) || 0;
+            const manualCommissionPerStock = parseFloat(document.getElementById('commissionPerStock').value) || 0;
+            const totalStockCommission = quantity * manualCommissionPerStock;
+            document.getElementById('totalStockCommission').textContent = `PKR ${totalStockCommission.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
         }
 
         function loadTransactionsForCalculator() {
@@ -2076,6 +1944,7 @@
 
         function updateCalculatorDateDisplay() {
             const date = document.getElementById('calculatorDateInput').value;
+            if (!date) return; // Add guard clause
             const formattedDate = new Date(date + 'T00:00:00').toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
             document.getElementById('calculatorDateDisplay').textContent = formattedDate;
             document.getElementById('summaryDateDisplay').textContent = formattedDate;
@@ -2085,7 +1954,10 @@
             const quantity = parseFloat(document.getElementById('quantity').value) || 0;
             const rate = parseFloat(document.getElementById('rate').value) || 0;
             const { commissionPerStock, totalStockCommission } = CommissionService.calculateCommission(rate, quantity);
-            document.getElementById('commissionPerStock').textContent = `PKR ${commissionPerStock.toFixed(4)}`;
+            
+            // UPDATED: Set value of input instead of textContent of p
+            document.getElementById('commissionPerStock').value = commissionPerStock.toFixed(4);
+            
             document.getElementById('totalStockCommission').textContent = `PKR ${totalStockCommission.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
         }
 
@@ -2099,7 +1971,11 @@
                 return;
             }
 
-            const { commissionPerStock, totalStockCommission } = CommissionService.calculateCommission(rate, quantity);
+            // UPDATED: Read values from fields instead of recalculating
+            const commissionPerStock = parseFloat(document.getElementById('commissionPerStock').value) || 0;
+            const totalStockCommissionText = document.getElementById('totalStockCommission').textContent.replace('PKR ', '').replace(/,/g, '');
+            const totalStockCommission = parseFloat(totalStockCommissionText) || 0;
+
             calculatedTransactions.push({
                 id: Date.now(),
                 stockName,
@@ -2118,7 +1994,7 @@
             const tbody = document.getElementById('calculatorTransactionsTable').querySelector('tbody');
             tbody.innerHTML = '';
             if (calculatedTransactions.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="6" class="p-4 text-center text-gray-500">No transactions added yet.</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="6" class="p-4 text-center text-slate-500">No transactions added yet.</td></tr>';
                 return;
             }
             calculatedTransactions.forEach(tx => {
@@ -2130,13 +2006,15 @@
                     <td class="p-2">PKR ${tx.commissionPerStock.toFixed(4)}</td>
                     <td class="p-2">PKR ${tx.totalStockCommission.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
                     <td class="p-2 actions-header">
-                        <button class="text-red-500 hover:underline" onclick="removeCalculatorTransaction(${tx.id})">Remove</button>
+                        <!-- UPDATED: Text color -->
+                        <button class="text-rose-600 hover:underline" onclick="removeCalculatorTransaction(${tx.id})">Remove</button>
                     </td>
                 `;
             });
         }
 
-        function removeCalculatorTransaction(id) {
+        // This function is globally accessible because it's not inside an IIFE/module
+        window.removeCalculatorTransaction = (id) => {
             calculatedTransactions = calculatedTransactions.filter(tx => tx.id !== id);
             renderCalculatorTransactionsTable();
             updateCalculatorSummary();
@@ -2157,7 +2035,7 @@
             document.getElementById('quantity').value = '';
             document.getElementById('rate').value = '';
             document.getElementById('stockName').focus();
-            updateCalculatorCommissionDisplay();
+            updateCalculatorCommissionDisplay(); // This will reset commissionPerStock and totalStockCommission
         }
         
         function resetCalculator() {
@@ -2383,6 +2261,7 @@
 
             const selectedMonth = parseInt(document.getElementById('expense-report-month').value);
             const selectedYear = parseInt(document.getElementById('expense-report-year').value);
+            if (isNaN(selectedMonth) || isNaN(selectedYear)) return; // Add guard clause
 
             const firstDayOfSelectedMonth = new Date(selectedYear, selectedMonth, 1);
             const previousCashIn = allPettyCashEntries.filter(e => new Date(e.date) < firstDayOfSelectedMonth).reduce((sum, e) => sum + e.amount, 0);
@@ -2402,10 +2281,11 @@
                     <tr class="border-b">
                         <td class="p-2">${new Date(t.date).toLocaleDateString()}</td>
                         <td class="p-2">${t.description}</td>
-                        <td class="p-2 text-right text-red-600">${t.dr > 0 ? `PKR ${t.dr.toLocaleString()}` : '-'}</td>
-                        <td class="p-2 text-right text-green-600">${t.cr > 0 ? `PKR ${t.cr.toLocaleString()}` : '-'}</td>
+                        <!-- UPDATED: Text colors -->
+                        <td class="p-2 text-right text-rose-600">${t.dr > 0 ? `PKR ${t.dr.toLocaleString()}` : '-'}</td>
+                        <td class="p-2 text-right text-emerald-600">${t.cr > 0 ? `PKR ${t.cr.toLocaleString()}` : '-'}</td>
                         <td class="p-2 text-right font-semibold">${`PKR ${runningBalance.toLocaleString()}`}</td>
-                        ${!isSharedView ? `<td class="p-2"><button class="text-red-500 hover:underline" onclick="deleteItem('${t.type}', '${t.id}')">Delete</button></td>` : ''}
+                        ${!isSharedView ? `<td class="p-2"><button class="text-rose-600 hover:underline" onclick="deleteItem('${t.type}', '${t.id}')">Delete</button></td>` : ''}
                     </tr>
                 `;
             }).join('');
@@ -2513,8 +2393,9 @@
                     <td class="p-2">Active</td>
                     ${!isSharedView ? `
                     <td class="p-2 space-x-2">
-                        <button class="text-blue-500 hover:underline" onclick="showEmployeeProfile('${e.id}')">View</button>
-                        <button class="text-red-500 hover:underline" onclick="deleteItem('employees', '${e.id}')">Delete</button>
+                        <!-- UPDATED: Text colors -->
+                        <button class="text-indigo-600 hover:underline" onclick="showEmployeeProfile('${e.id}')">View</button>
+                        <button class="text-rose-600 hover:underline" onclick="deleteItem('employees', '${e.id}')">Delete</button>
                     </td>` : ''}
                 </tr>
             `).join('');
@@ -2537,6 +2418,9 @@
                 }
             });
         }
+        
+        // Make deleteItem globally accessible for onclick attributes
+        window.deleteItem = deleteItem;
 
         // --- CLIENT PROFILES MODULE ---
         const addClientForm = document.getElementById('add-client-form');
@@ -2593,17 +2477,81 @@
             
             profilesList.innerHTML = filtered.map(c => {
                 const hasPaidThisMonth = paidClientIds.has(c.id);
-                const cardClasses = hasPaidThisMonth ? 'card p-6 cursor-pointer bg-green-50 border-2 border-green-400' : 'card p-6 cursor-pointer';
+                // UPDATED: Card theme colors
+                const cardClasses = hasPaidThisMonth ? 'card p-6 cursor-pointer bg-emerald-50 border-2 border-emerald-400' : 'card p-6 cursor-pointer';
                 return `
                     <div class="${cardClasses}" data-id="${c.id}">
                         <h4 class="font-bold text-lg">${c.name}</h4>
-                        <p class="text-gray-500 text-sm">${c.tradingAccount}</p>
-                        ${c.isClosed ? `<span class="mt-2 text-xs font-semibold text-white bg-red-500 px-2 py-1 rounded-full">Account Closed</span>` : ''}
+                        <!-- UPDATED: Text color -->
+                        <p class="text-slate-500 text-sm">${c.tradingAccount}</p>
+                        ${c.isClosed ? `<span class="mt-2 text-xs font-semibold text-white bg-rose-600 px-2 py-1 rounded-full">Account Closed</span>` : ''}
                     </div>
                 `;
             }).join('');
 
             profilesList.querySelectorAll('.card').forEach(card => card.addEventListener('click', (e) => showClientProfile(e.currentTarget.dataset.id)));
+        }
+
+        // ADDED: Function to download client report as CSV
+        function downloadClientReport() {
+            if (allClients.length === 0) {
+                showMessage('Info', 'No client data to download.');
+                return;
+            }
+
+            // Define CSV headers
+            const headers = [
+                "Name", 
+                "Contact", 
+                "Trading Account", 
+                "CNIC", 
+                "CDC Account", 
+                "Email", 
+                "Address", 
+                "Status"
+            ];
+            
+            let csvContent = headers.join(",") + "\n";
+
+            // Iterate over allClients array
+            allClients.forEach(client => {
+                const status = client.isClosed ? "Inactive" : "Active";
+                
+                // Function to escape commas and quotes in a field
+                const escapeField = (field) => {
+                    const strField = String(field || ''); // Handle null/undefined
+                    if (strField.includes(',') || strField.includes('"') || strField.includes('\n')) {
+                        return `"${strField.replace(/"/g, '""')}"`; // Escape quotes by doubling them
+                    }
+                    return strField;
+                };
+
+                const row = [
+                    escapeField(client.name),
+                    escapeField(client.contact),
+                    escapeField(client.tradingAccount),
+                    escapeField(client.cnic),
+                    escapeField(client.cdcAccount),
+                    escapeField(client.email),
+                    escapeField(client.address),
+                    escapeField(status)
+                ];
+                
+                csvContent += row.join(",") + "\n";
+            });
+
+            // Create a blob and trigger download
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement("a");
+            if (link.download !== undefined) { 
+                const url = URL.createObjectURL(blob);
+                link.setAttribute("href", url);
+                link.setAttribute("download", "darson_client_report.csv");
+                link.style.visibility = 'hidden';
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            }
         }
         
         async function showClientProfile(clientId) {
@@ -2625,24 +2573,6 @@
                 <div class="md:col-span-2"><p class="font-semibold">Status:</p><p>${client.isClosed ? `Closed (${client.closureDate ? new Date(client.closureDate).toLocaleDateString() : 'N/A'})` : 'Active'}</p></div>
             `;
             
-            const clientDeposits = allDeposits.filter(d => d.tradingAccount === client.tradingAccount).map(d => ({ date: d.date, description: `Cheque Deposit #${d.chequeNumber}`, cr: d.amount, dr: 0 }));
-            const clientWithdrawals = allWithdrawals.filter(w => w.tradingAccount === client.tradingAccount).map(w => ({ date: w.date || (w.timestamp ? new Date(w.timestamp.seconds * 1000).toISOString().split('T')[0] : 'N/A'), description: `Withdrawal Request (${w.status})`, cr: 0, dr: w.amount }));
-            const financialHistory = [...clientDeposits, ...clientWithdrawals].sort((a, b) => new Date(b.date) - new Date(a.date));
-
-            const historyList = document.getElementById('client-financial-history-list');
-            if (financialHistory.length > 0) {
-                historyList.innerHTML = financialHistory.map(item => `
-                    <tr class="border-b">
-                        <td class="p-2">${new Date(item.date).toLocaleDateString()}</td>
-                        <td class="p-2">${item.description}</td>
-                        <td class="p-2 text-right text-green-600">${item.cr > 0 ? `PKR ${item.cr.toLocaleString()}` : '-'}</td>
-                        <td class="p-2 text-right text-red-600">${item.dr > 0 ? `PKR ${item.dr.toLocaleString()}` : '-'}</td>
-                    </tr>
-                `).join('');
-            } else {
-                historyList.innerHTML = '<tr><td colspan="4" class="p-4 text-center text-gray-500">No financial history found.</td></tr>';
-            }
-
             addClientPaymentForm.dataset.clientId = client.id;
             editClientProfileForm.dataset.clientId = client.id; 
             document.getElementById('edit-profile-btn').dataset.id = client.id;
@@ -2667,7 +2597,8 @@
                 type: 'bar',
                 data: { 
                     labels: sortedPaymentData.map(d => d.label), 
-                    datasets: [{ label: 'Payment (PKR)', data: sortedPaymentData.map(d => d.value), backgroundColor: '#10b981' }] 
+                    // UPDATED: Theme color
+                    datasets: [{ label: 'Payment (PKR)', data: sortedPaymentData.map(d => d.value), backgroundColor: '#10b981' }] // emerald-500
                 },
                 options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true } } }
             });
@@ -2678,6 +2609,9 @@
             profileDetailModal.classList.add('active');
             profileDetailContent.classList.add('active');
         }
+
+        // Make showClientProfile globally accessible
+        window.showClientProfile = showClientProfile;
         
         document.getElementById('edit-profile-btn').addEventListener('click', (e) => {
             const clientId = e.currentTarget.dataset.id;
@@ -2699,7 +2633,7 @@
 
         document.getElementById('cancel-edit-profile-btn').addEventListener('click', () => {
              document.getElementById('profile-detail-info-wrapper').classList.remove('hidden');
-            document.getElementById('add-payment-and-actions-wrapper').remove('hidden');
+            document.getElementById('add-payment-and-actions-wrapper').classList.remove('hidden');
             editClientProfileForm.classList.add('hidden');
         });
         
@@ -2829,7 +2763,7 @@
                  <tr class="border-b">
                     <td class="p-2">${months[p.month]} ${p.year}</td>
                     <td class="p-2">${p.points}</td>
-                    ${!isSharedView ? `<td class="p-2"><button class="text-red-500 hover:underline" onclick="deleteItem('employee_performance', '${p.id}')">Delete</button></td>` : ''}
+                    ${!isSharedView ? `<td class="p-2"><button class="text-rose-600 hover:underline" onclick="deleteItem('employee_performance', '${p.id}')">Delete</button></td>` : ''}
                 </tr>
             `).join('');
 
@@ -2841,6 +2775,9 @@
             content.classList.add('active');
         }
         
+        // Make showEmployeeProfile globally accessible
+        window.showEmployeeProfile = showEmployeeProfile;
+
         document.getElementById('close-employee-btn').addEventListener('click', () => {
             const overlay = document.getElementById('employee-detail-modal');
             const content = overlay.querySelector('.popup-window-content');
@@ -2935,86 +2872,8 @@
             }
         });
 
-        // --- NEW: COURIER RECORDS MODULE ---
-        document.getElementById('add-courier-form').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const form = e.target;
-            showLoading();
-            const courierData = {
-                type: form['courier-type'].value,
-                date: form['courier-date'].value,
-                trackId: form['courier-track-id'].value,
-                sender: form['courier-sender'].value,
-                receiver: form['courier-receiver'].value,
-                destinationOrigin: form['courier-destination-origin'].value,
-                description: form['courier-description'].value,
-                status: form['courier-status'].value,
-                timestamp: firebase.firestore.FieldValue.serverTimestamp()
-            };
-            try {
-                await db.collection(`users/${currentUserId}/courier_records`).add(courierData);
-                form.reset();
-                showMessage('Success', 'Courier record added successfully!');
-            } catch (error) {
-                showMessage('Error', error.message);
-            } finally {
-                hideLoading();
-            }
-        });
-
-        function renderCourierRecords() {
-            document.getElementById('add-courier-wrapper').style.display = isSharedView ? 'none' : 'block';
-            document.querySelectorAll('#courier-records .actions-header').forEach(el => el.style.display = isSharedView ? 'none' : 'table-cell');
-
-            const searchTerm = document.getElementById('courier-search').value.toLowerCase();
-            const filtered = allCourierRecords.filter(c => 
-                c.sender.toLowerCase().includes(searchTerm) || 
-                c.receiver.toLowerCase().includes(searchTerm) || 
-                (c.trackId && c.trackId.toLowerCase().includes(searchTerm))
-            ).sort((a, b) => new Date(b.date) - new Date(a.date));
-            
-            document.getElementById('courier-records-list').innerHTML = filtered.map(c => `
-                <tr class="border-b">
-                    <td class="p-2">${c.type}</td>
-                    <td class="p-2">${new Date(c.date).toLocaleDateString()}</td>
-                    <td class="p-2">${c.trackId || 'N/A'}</td>
-                    <td class="p-2">${c.sender}</td>
-                    <td class="p-2">${c.receiver}</td>
-                    <td class="p-2">${c.destinationOrigin}</td>
-                    <td class="p-2">${c.status}</td>
-                    ${!isSharedView ? `
-                    <td class="p-2 space-x-2">
-                        <button class="text-blue-500 hover:underline" onclick="openEditCourierModal('${c.id}', '${c.status}')">Edit</button>
-                        <button class="text-red-500 hover:underline" onclick="deleteItem('courier_records', '${c.id}')">Delete</button>
-                    </td>` : ''}
-                </tr>
-            `).join('');
-        }
-
-        function openEditCourierModal(id, currentStatus) {
-            document.getElementById('edit-courier-id').value = id;
-            document.getElementById('edit-courier-status').value = currentStatus;
-            document.getElementById('edit-courier-modal').style.display = 'flex';
-        }
-
-        document.getElementById('cancel-edit-courier-btn').addEventListener('click', () => document.getElementById('edit-courier-modal').style.display = 'none');
-
-        document.getElementById('edit-courier-form').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const id = document.getElementById('edit-courier-id').value;
-            const newStatus = document.getElementById('edit-courier-status').value;
-            if (!id) return;
-            showLoading();
-            try {
-                await db.collection(`users/${currentUserId}/courier_records`).doc(id).update({ status: newStatus });
-                showMessage('Success', 'Courier status updated!');
-                document.getElementById('edit-courier-modal').style.display = 'none';
-            } catch (error) {
-                showMessage('Error', 'Failed to update status: ' + error.message);
-            } finally {
-                hideLoading();
-            }
-        });
+        // Make openEditComplaintModal globally accessible
+        window.openEditComplaintModal = openEditComplaintModal;
         
         // --- Initialize App ---
         document.addEventListener('DOMContentLoaded', () => {
@@ -3025,12 +2884,11 @@
                 loadSharedDashboard(shareId);
             } else {
                 initializeAuthentication();
+                // ADDED: Event listener for the new download button, only for non-shared view
+                document.getElementById('download-client-report-btn').addEventListener('click', downloadClientReport);
             }
             
             document.getElementById('complaint-search').addEventListener('input', renderComplaints);
-            document.getElementById('deposit-search').addEventListener('input', renderDeposits);
-            document.getElementById('withdrawal-search').addEventListener('input', renderWithdrawals);
-            document.getElementById('courier-search').addEventListener('input', renderCourierRecords);
             
             const currentYear = new Date().getFullYear();
             const currentDate = new Date().toISOString().split("T")[0];
