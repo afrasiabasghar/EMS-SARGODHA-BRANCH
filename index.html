@@ -9,52 +9,334 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/browser-image-compression@2.0.2/dist/browser-image-compression.js"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
-        body {
-            font-family: 'Inter', sans-serif;
-            /* UPDATED: Switched to a cleaner, lighter background color from the 'slate' palette */
-            background-color: #f8fafc; /* Tailwind 'slate-50' */
+        :root {
+            --brand-primary: #4f46e5;
+            --brand-dark: #1e1b4b;
+            --brand-mid: #6366f1;
+            --brand-light: #e0e7ff;
+            --accent-emerald: #059669;
+            --accent-rose: #e11d48;
+            --surface: #ffffff;
+            --surface-2: #f8fafc;
+            --border: #e2e8f0;
+            --text-primary: #0f172a;
+            --text-secondary: #475569;
+            --text-muted: #94a3b8;
+            --shadow-sm: 0 1px 3px rgba(79,70,229,0.08), 0 1px 2px rgba(79,70,229,0.06);
+            --shadow-md: 0 4px 16px rgba(79,70,229,0.12), 0 2px 6px rgba(79,70,229,0.08);
+            --shadow-lg: 0 20px 40px rgba(79,70,229,0.15), 0 8px 16px rgba(79,70,229,0.10);
+            --shadow-3d: 0 8px 0 #3730a3, 0 12px 20px rgba(55,48,163,0.35);
+            --shadow-3d-sm: 0 4px 0 #3730a3, 0 6px 12px rgba(55,48,163,0.3);
+            --shadow-3d-emerald: 0 4px 0 #047857, 0 6px 12px rgba(4,120,87,0.3);
+            --shadow-3d-rose: 0 4px 0 #be123c, 0 6px 12px rgba(190,18,60,0.3);
+            --shadow-3d-slate: 0 4px 0 #334155, 0 6px 12px rgba(51,65,85,0.3);
         }
+
+        * { box-sizing: border-box; }
+
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background-color: #eef2ff;
+            background-image: 
+                radial-gradient(ellipse at 20% 50%, rgba(99,102,241,0.06) 0%, transparent 60%),
+                radial-gradient(ellipse at 80% 20%, rgba(79,70,229,0.05) 0%, transparent 50%),
+                url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%234f46e5' fill-opacity='0.02'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+            min-height: 100vh;
+        }
+
+        /* ─── Typography ─────────────────────────── */
+        h1, h2, h3, h4, .font-bold { font-family: 'Syne', sans-serif; }
+
+        /* ─── Section animation ───────────────────── */
         .section-container {
             display: none;
-            animation: fadeIn 0.5s ease-in-out;
+            animation: sectionReveal 0.55s cubic-bezier(0.22, 1, 0.36, 1);
         }
-        .section-container.active {
-            display: block;
+        .section-container.active { display: block; }
+        @keyframes sectionReveal {
+            from { opacity: 0; transform: translateY(24px) scale(0.98); }
+            to   { opacity: 1; transform: translateY(0) scale(1); }
         }
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
+
+        /* ─── 3D Button System ───────────────────── */
+        .animated-btn, button[type="submit"], button[type="button"],
+        #main-nav .nav-btn, header button, .popup-window-header button {
+            position: relative;
+            transition: all 0.12s cubic-bezier(0.34, 1.56, 0.64, 1);
+            transform-style: preserve-3d;
         }
-        .animated-btn {
-            transition: all 0.2s ease-in-out;
+
+        /* Generic 3D lift on all indigo/primary buttons */
+        .bg-indigo-600, .bg-indigo-700 {
+            box-shadow: var(--shadow-3d-sm);
         }
-        .animated-btn:hover {
+        .bg-indigo-600:hover {
+            transform: translateY(-3px) scale(1.02);
+            box-shadow: 0 7px 0 #3730a3, 0 10px 20px rgba(55,48,163,0.4);
+        }
+        .bg-indigo-600:active {
+            transform: translateY(2px) scale(0.98);
+            box-shadow: 0 1px 0 #3730a3, 0 2px 6px rgba(55,48,163,0.3);
+        }
+
+        .bg-emerald-600 { box-shadow: var(--shadow-3d-emerald); }
+        .bg-emerald-600:hover {
+            transform: translateY(-3px) scale(1.02);
+            box-shadow: 0 7px 0 #047857, 0 10px 20px rgba(4,120,87,0.4);
+        }
+        .bg-emerald-600:active {
+            transform: translateY(2px) scale(0.98);
+            box-shadow: 0 1px 0 #047857, 0 2px 6px rgba(4,120,87,0.3);
+        }
+
+        .bg-rose-600 { box-shadow: var(--shadow-3d-rose); }
+        .bg-rose-600:hover {
+            transform: translateY(-3px) scale(1.02);
+            box-shadow: 0 7px 0 #be123c, 0 10px 20px rgba(190,18,60,0.4);
+        }
+        .bg-rose-600:active {
+            transform: translateY(2px) scale(0.98);
+            box-shadow: 0 1px 0 #be123c, 0 2px 6px rgba(190,18,60,0.3);
+        }
+
+        .bg-slate-700, .bg-slate-500 { box-shadow: var(--shadow-3d-slate); }
+        .bg-slate-700:hover, .bg-slate-500:hover {
+            transform: translateY(-3px) scale(1.02);
+            box-shadow: 0 7px 0 #1e293b, 0 10px 20px rgba(30,41,59,0.35);
+        }
+        .bg-slate-700:active, .bg-slate-500:active {
+            transform: translateY(2px) scale(0.98);
+            box-shadow: 0 1px 0 #1e293b;
+        }
+
+        /* Muted/Cancel buttons get subtle 3D */
+        .bg-slate-300 {
+            box-shadow: 0 4px 0 #94a3b8, 0 6px 12px rgba(148,163,184,0.25);
+        }
+        .bg-slate-300:hover {
             transform: translateY(-2px);
-            /* UPDATED: Uses Tailwind's shadow utility classes for consistency */
+            box-shadow: 0 6px 0 #94a3b8, 0 8px 16px rgba(148,163,184,0.3);
         }
+        .bg-slate-300:active {
+            transform: translateY(1px);
+            box-shadow: 0 2px 0 #94a3b8;
+        }
+
+        /* ─── Card Design ────────────────────────── */
         .card {
-            background-color: #ffffff;
-            border-radius: 12px;
-            /* UPDATED: Added a light border for a cleaner look */
-            border: 1px solid #e2e8f0; /* slate-200 */
-            /* UPDATED: Switched to a softer, more modern shadow */
-            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.07), 0 2px 4px -2px rgb(0 0 0 / 0.07);
-            transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+            background: var(--surface);
+            border-radius: 16px;
+            border: 1px solid rgba(99,102,241,0.1);
+            box-shadow: var(--shadow-sm);
+            transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1),
+                        box-shadow 0.25s ease,
+                        border-color 0.25s ease;
         }
         .card:hover {
-            transform: translateY(-3px);
-            /* UPDATED: A slightly more pronounced hover shadow */
-            box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.07), 0 4px 6px -4px rgb(0 0 0 / 0.07);
+            transform: translateY(-5px) rotateX(1deg);
+            box-shadow: var(--shadow-md);
+            border-color: rgba(99,102,241,0.2);
         }
+
+        /* ─── Dashboard Stat Cards ───────────────── */
+        .stat-card {
+            background: var(--surface);
+            border-radius: 20px;
+            border: 1px solid rgba(99,102,241,0.12);
+            padding: 1.25rem;
+            position: relative;
+            overflow: hidden;
+            transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1),
+                        box-shadow 0.3s ease;
+            box-shadow: 0 2px 8px rgba(79,70,229,0.08),
+                        0 0 0 1px rgba(99,102,241,0.05);
+            transform-style: preserve-3d;
+            perspective: 800px;
+        }
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, rgba(99,102,241,0.05) 0%, transparent 60%);
+            pointer-events: none;
+        }
+        .stat-card::after {
+            content: '';
+            position: absolute;
+            top: -40%;
+            right: -20%;
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(99,102,241,0.12), transparent 70%);
+            pointer-events: none;
+        }
+        .stat-card:hover {
+            transform: translateY(-8px) rotateX(4deg) rotateY(-2deg);
+            box-shadow: 0 20px 40px rgba(79,70,229,0.18),
+                        0 0 0 1px rgba(99,102,241,0.15),
+                        inset 0 1px 0 rgba(255,255,255,0.9);
+        }
+        .stat-card .stat-icon {
+            width: 44px; height: 44px;
+            border-radius: 12px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.2rem;
+            margin-bottom: 0.75rem;
+            box-shadow: 0 4px 12px rgba(99,102,241,0.25);
+        }
+
+        /* ─── Sidebar ────────────────────────────── */
+        aside#sidebar {
+            background: linear-gradient(160deg, #1e1b4b 0%, #312e81 60%, #4f46e5 100%) !important;
+            border-right: none !important;
+            box-shadow: 4px 0 24px rgba(30,27,75,0.25);
+        }
+        #sidebar .p-4.border-b {
+            border-bottom-color: rgba(255,255,255,0.1) !important;
+        }
+        #sidebar h1 {
+            color: #ffffff !important;
+            letter-spacing: -0.5px;
+        }
+        #main-nav .nav-btn {
+            display: flex;
+            align-items: center;
+            width: 100%;
+            text-align: left;
+            padding: 0.75rem 1.25rem;
+            border-radius: 12px;
+            font-weight: 500;
+            font-family: 'Syne', sans-serif;
+            font-size: 0.9rem;
+            color: rgba(255,255,255,0.65) !important;
+            background: transparent !important;
+            border: 1px solid transparent;
+            transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+            box-shadow: none !important;
+            transform: none !important;
+            letter-spacing: 0.01em;
+        }
+        #main-nav .nav-btn:hover {
+            color: #fff !important;
+            background: rgba(255,255,255,0.12) !important;
+            border-color: rgba(255,255,255,0.15);
+            transform: translateX(4px) !important;
+            box-shadow: none !important;
+        }
+        #main-nav .nav-btn:active {
+            transform: translateX(2px) !important;
+        }
+        #main-nav .nav-btn.bg-indigo-600 {
+            background: rgba(255,255,255,0.2) !important;
+            color: #fff !important;
+            border-color: rgba(255,255,255,0.25);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.15) !important;
+            transform: none !important;
+        }
+        #main-nav .nav-btn.bg-indigo-600:hover {
+            background: rgba(255,255,255,0.25) !important;
+            transform: translateX(4px) !important;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.2) !important;
+        }
+
+        /* Nav icons */
+        #main-nav .nav-btn::before {
+            margin-right: 10px;
+            font-family: "Font Awesome 6 Free";
+            font-weight: 900;
+            font-size: 0.8rem;
+            opacity: 0.8;
+        }
+        [data-section="dashboard"]::before { content: "\f3fd"; }
+        [data-section="complaints"]::before { content: "\f0e0"; }
+        [data-section="commission"]::before { content: "\f0d6"; }
+        [data-section="calculator"]::before { content: "\f1ec"; }
+        [data-section="expenses"]::before { content: "\f3d1"; }
+        [data-section="profiles"]::before { content: "\f007"; }
+        [data-section="employees"]::before { content: "\f0c0"; }
+        [data-section="couriers"]::before { content: "\f4d8"; }
+
+        /* ─── Header ─────────────────────────────── */
+        header.bg-white {
+            background: rgba(255,255,255,0.92) !important;
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(99,102,241,0.1) !important;
+            box-shadow: 0 2px 12px rgba(79,70,229,0.06);
+        }
+        #header-title {
+            font-family: 'Syne', sans-serif;
+            font-weight: 700;
+            color: var(--brand-dark) !important;
+            font-size: 1.1rem;
+            letter-spacing: -0.3px;
+        }
+
+        /* ─── Auth section ───────────────────────── */
+        #auth-section {
+            background: linear-gradient(135deg, #1e1b4b 0%, #312e81 40%, #4338ca 100%);
+            min-height: 100vh;
+            position: relative;
+            overflow: hidden;
+        }
+        #auth-section::before {
+            content: '';
+            position: absolute;
+            width: 600px; height: 600px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(99,102,241,0.25) 0%, transparent 70%);
+            top: -200px; right: -200px;
+            animation: orb1 8s ease-in-out infinite alternate;
+        }
+        #auth-section::after {
+            content: '';
+            position: absolute;
+            width: 400px; height: 400px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(165,180,252,0.15) 0%, transparent 70%);
+            bottom: -100px; left: -100px;
+            animation: orb2 10s ease-in-out infinite alternate;
+        }
+        @keyframes orb1 {
+            from { transform: translate(0,0) scale(1); }
+            to   { transform: translate(40px, 30px) scale(1.1); }
+        }
+        @keyframes orb2 {
+            from { transform: translate(0,0) scale(1); }
+            to   { transform: translate(-30px, -20px) scale(1.15); }
+        }
+
+        #auth-section > .bg-white, #auth-section > div {
+            background: rgba(255,255,255,0.95) !important;
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255,255,255,0.5);
+            border-radius: 24px !important;
+            box-shadow: 0 24px 64px rgba(30,27,75,0.4), 0 0 0 1px rgba(255,255,255,0.2);
+            position: relative;
+            z-index: 1;
+            animation: authCardIn 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+        @keyframes authCardIn {
+            from { opacity:0; transform: translateY(40px) scale(0.95) rotateX(8deg); }
+            to   { opacity:1; transform: translateY(0) scale(1) rotateX(0deg); }
+        }
+        #auth-section h2 {
+            background: linear-gradient(135deg, var(--brand-primary), var(--brand-mid));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        /* ─── Modals ─────────────────────────────── */
         .modal-overlay {
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.5);
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background-color: rgba(15,23,42,0.65);
+            backdrop-filter: blur(6px);
             display: none;
             justify-content: center;
             align-items: center;
@@ -63,96 +345,196 @@
             padding: 20px 0;
         }
         .modal-content {
-            background-color: white;
-            padding: 24px;
-            border-radius: 12px;
+            background: var(--surface);
+            padding: 32px;
+            border-radius: 20px;
             max-width: 500px;
-            /* Using width: 90% makes the modal responsive on smaller screens */
             width: 90%;
             text-align: center;
-            animation: slideIn 0.3s ease-in-out;
+            animation: modalIn 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+            box-shadow: 0 32px 80px rgba(30,27,75,0.3), 0 0 0 1px rgba(99,102,241,0.1);
+            border: 1px solid rgba(255,255,255,0.8);
+        }
+        @keyframes modalIn {
+            from { transform: scale(0.85) translateY(-20px) rotateX(12deg); opacity: 0; }
+            to   { transform: scale(1) translateY(0) rotateX(0deg); opacity: 1; }
         }
         @keyframes slideIn {
             from { transform: translateY(-50px); opacity: 0; }
             to { transform: translateY(0); opacity: 1; }
         }
-        
+
+        /* ─── Slide-in Panel ─────────────────────── */
         .popup-window-overlay {
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.5);
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background-color: rgba(15,23,42,0.55);
+            backdrop-filter: blur(4px);
             display: none;
             z-index: 1000;
             opacity: 0;
             transition: opacity 0.3s ease-in-out;
         }
-        .popup-window-overlay.active {
-            display: block;
-            opacity: 1;
-        }
+        .popup-window-overlay.active { display: block; opacity: 1; }
         .popup-window-content {
             position: fixed;
-            top: 0;
-            right: -100%; 
-            width: 100%; /* Full width on mobile */
-            height: 100%;
-            /* UPDATED: Changed background to match body */
-            background-color: #f8fafc; /* slate-50 */
-            box-shadow: -4px 0 12px rgba(0,0,0,0.1);
+            top: 0; right: -100%;
+            width: 100%; height: 100%;
+            background-color: #f8fafc;
+            box-shadow: -8px 0 40px rgba(30,27,75,0.2);
             transition: right 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-            display: flex;
-            flex-direction: column;
+            display: flex; flex-direction: column;
         }
-        /* Media query for larger screens (tablets and desktops) */
-        @media (min-width: 768px) { 
-            .popup-window-content {
-                width: 80%;
-                max-width: 800px;
-            }
+        @media (min-width: 768px) {
+            .popup-window-content { width: 80%; max-width: 800px; }
         }
-        .popup-window-content.active {
-            right: 0;
-        }
+        .popup-window-content.active { right: 0; }
         .popup-window-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
             padding: 1rem 1.5rem;
-            background-color: white;
-            /* UPDATED: Consistent border */
-            border-bottom: 1px solid #e2e8f0; /* slate-200 */
+            background: linear-gradient(90deg, #1e1b4b, #312e81);
+            border-bottom: none;
             flex-shrink: 0;
+        }
+        .popup-window-header h2,
+        .popup-window-header h3 {
+            color: #fff !important;
+            font-family: 'Syne', sans-serif;
+        }
+        .popup-window-header button {
+            background: rgba(255,255,255,0.15) !important;
+            color: #fff !important;
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 8px;
+            padding: 6px 14px;
+            font-weight: 600;
+            box-shadow: none !important;
+        }
+        .popup-window-header button:hover {
+            background: rgba(255,255,255,0.25) !important;
+            transform: scale(1.05) !important;
+            box-shadow: none !important;
         }
         .popup-window-body {
             padding: 1.5rem;
             flex-grow: 1;
             overflow-y: auto;
         }
-        #password-verification-modal {
-            z-index: 2000;
+
+        /* ─── Loading Spinner ────────────────────── */
+        #loading {
+            background: rgba(15,23,42,0.6) !important;
+            backdrop-filter: blur(8px);
         }
-        /* Sidebar styles */
-        #main-nav .nav-btn {
-            display: flex;
-            align-items: center;
-            width: 100%;
-            text-align: left;
-            padding: 0.75rem 1.5rem;
-            border-radius: 8px;
-            font-weight: 500;
-            transition: background-color 0.2s, color 0.2s;
+
+        /* ─── Form Controls ──────────────────────── */
+        input[type="text"], input[type="email"], input[type="password"],
+        input[type="number"], input[type="date"], textarea, select {
+            transition: all 0.2s ease;
+        }
+        input:focus, textarea:focus, select:focus {
+            border-color: var(--brand-primary) !important;
+            box-shadow: 0 0 0 3px rgba(99,102,241,0.15), 0 2px 8px rgba(99,102,241,0.1);
+            outline: none;
+        }
+
+        /* ─── Section Headings ───────────────────── */
+        section > h2.text-3xl {
+            font-family: 'Syne', sans-serif;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--brand-dark) 0%, var(--brand-primary) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            letter-spacing: -0.5px;
+            margin-bottom: 1.5rem;
+        }
+
+        /* ─── Hamburger Button ───────────────────── */
+        #hamburger-btn {
+            background: rgba(99,102,241,0.08) !important;
+            border-radius: 10px;
+            padding: 8px;
+            color: var(--brand-primary) !important;
+            transition: all 0.2s ease;
+            box-shadow: none !important;
+            transform: none !important;
+        }
+        #hamburger-btn:hover {
+            background: rgba(99,102,241,0.15) !important;
+            transform: scale(1.05) !important;
+            box-shadow: none !important;
+        }
+
+        /* ─── Table Styling ──────────────────────── */
+        table thead tr { background: linear-gradient(90deg, #f0f4ff, #e8edff); }
+        table thead th { color: var(--brand-dark) !important; font-family: 'Syne', sans-serif; font-size: 0.75rem; }
+        table tbody tr { transition: background 0.15s ease; }
+        table tbody tr:hover { background: #f5f3ff; }
+
+        /* ─── Password verification modal ─────────── */
+        #password-verification-modal { z-index: 2000; }
+
+        /* ─── Scrollbar Styling ──────────────────── */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: rgba(99,102,241,0.3); border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: rgba(99,102,241,0.5); }
+
+        /* ─── Floating badge on sidebar ──────────── */
+        #sidebar nav::after {
+            content: 'Darson Brokerage';
+            display: block;
+            position: absolute;
+            bottom: 1.5rem;
+            left: 1.5rem;
+            font-family: 'Syne', sans-serif;
+            font-size: 0.65rem;
+            font-weight: 700;
+            letter-spacing: 0.1em;
+            color: rgba(255,255,255,0.25);
+            text-transform: uppercase;
+        }
+        #sidebar nav { position: relative; min-height: 400px; }
+
+        /* ─── Share / Copy button small ─────────── */
+        #copy-share-link-btn {
+            box-shadow: var(--shadow-3d-sm) !important;
+        }
+
+        /* ─── Border radius improvements ─────────── */
+        .rounded-full { border-radius: 9999px !important; }
+        .rounded-xl { border-radius: 16px !important; }
+
+        /* ─── Animating number cards on dashboard ─ */
+        @keyframes countUp {
+            from { transform: translateY(10px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        #total-complaints, #total-clients, #active-clients,
+        #monthly-revenue, #total-employees {
+            animation: countUp 0.6s cubic-bezier(0.22,1,0.36,1) both;
+        }
+
+        /* ─── Sidebar brand logo area ────────────── */
+        #sidebar .p-4.border-b {
+            background: rgba(0,0,0,0.15);
+            padding: 1.25rem 1.5rem;
+        }
+        #sidebar h1 {
+            font-size: 1.35rem;
+            letter-spacing: -0.5px;
         }
     </style>
 </head>
 <!-- UPDATED: Body background color -->
-<body class="bg-slate-50">
+<body>
 
-    <!-- UPDATED: Loading spinner color -->
-    <div id="loading" class="fixed inset-0 bg-slate-200 bg-opacity-75 flex items-center justify-center z-50 hidden">
-        <div class="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-indigo-600"></div>
+    <div id="loading" class="fixed inset-0 flex items-center justify-center z-50 hidden">
+        <div class="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-indigo-400" style="filter:drop-shadow(0 0 12px rgba(99,102,241,0.6));"></div>
     </div>
 
     <div id="messageModal" class="modal-overlay">
@@ -231,9 +613,8 @@
     <!-- REMOVED: Courier Edit Modal -->
 
     <main id="auth-section" class="flex-grow flex items-center justify-center p-4 min-h-screen">
-        <div class="bg-white p-6 sm:p-8 rounded-2xl shadow-xl w-full max-w-md">
-            <!-- UPDATED: Text color -->
-            <h2 class="text-2xl font-bold text-center text-slate-800 mb-6">Darson Sargodha</h2>
+        <div style="background:rgba(255,255,255,0.95);padding:2rem 2.5rem;border-radius:24px;width:100%;max-width:28rem;box-shadow:0 24px 64px rgba(30,27,75,0.4);border:1px solid rgba(255,255,255,0.5);">
+            <h2 class="text-2xl font-bold text-center mb-6" style="background:linear-gradient(135deg,#4f46e5,#6366f1);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">Darson Sargodha</h2>
             <div id="auth-forms">
                 <form id="login-form" class="space-y-4">
                     <h3 class="text-xl font-semibold mb-4 text-center">Login to your account</h3>
@@ -285,12 +666,9 @@
     </main>
 
     <div id="main-app" class="hidden min-h-screen">
-        <!-- Sidebar: Hidden on mobile (using -translate-x-full), visible from medium screens up (md:translate-x-0) -->
-        <!-- UPDATED: Removed shadow, added border for a cleaner look -->
-        <aside id="sidebar" class="bg-white w-64 min-h-full border-r border-slate-200 fixed top-0 left-0 z-50 transform -translate-x-full md:translate-x-0 transition-transform duration-300 ease-in-out">
-            <div class="p-4 border-b border-slate-200 h-16 flex items-center">
-                <!-- UPDATED: Text color -->
-                <h1 class="text-2xl font-bold text-slate-800">Darson Sargodha</h1>
+        <aside id="sidebar" class="w-64 min-h-full fixed top-0 left-0 z-50 transform -translate-x-full md:translate-x-0 transition-transform duration-300 ease-in-out" style="background:linear-gradient(160deg,#1e1b4b 0%,#312e81 60%,#4f46e5 100%);box-shadow:4px 0 24px rgba(30,27,75,0.25);">
+            <div class="p-4 h-16 flex items-center" style="border-bottom:1px solid rgba(255,255,255,0.1);background:rgba(0,0,0,0.15);">
+                <h1 class="text-2xl font-bold" style="color:#ffffff;letter-spacing:-0.5px;">Darson Sargodha</h1>
             </div>
             <nav class="p-4">
                 <ul id="main-nav" class="space-y-2">
@@ -309,18 +687,13 @@
 
         <!-- Main Content: Margin-left is applied on medium screens and up to make space for the sidebar -->
         <div id="main-content-wrapper" class="flex-1 flex flex-col md:ml-64">
-            <!-- UPDATED: Replaced shadow with a border for a cleaner look -->
-            <header class="bg-white border-b border-slate-200 p-4 sticky top-0 z-40 flex items-center justify-between h-16">
+            <header class="border-b sticky top-0 z-40 flex items-center justify-between h-16 px-4" style="background:rgba(255,255,255,0.92);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-color:rgba(99,102,241,0.1);box-shadow:0 2px 12px rgba(79,70,229,0.06);">
                 <div class="flex items-center">
-                    <!-- Hamburger menu button is only visible on mobile (hidden from medium screens up: md:hidden) -->
-                    <!-- UPDATED: Text color -->
-                    <button id="hamburger-btn" class="md:hidden text-slate-600 focus:outline-none mr-4">
+                    <button id="hamburger-btn" class="md:hidden focus:outline-none mr-4" style="background:rgba(99,102,241,0.08);border-radius:10px;padding:8px;color:#4f46e5;">
                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
                     </button>
-                    <!-- UPDATED: Text color -->
-                    <h2 id="header-title" class="text-xl font-semibold text-slate-700">Dashboard</h2>
+                    <h2 id="header-title" class="text-xl font-semibold" style="font-family:'Syne',sans-serif;font-weight:700;color:#1e1b4b;letter-spacing:-0.3px;">Dashboard</h2>
                 </div>
-                <!-- UPDATE: Added responsive spacing and padding to prevent overflow on small screens -->
                 <div class="flex items-center space-x-2 sm:space-x-4">
                     <!-- UPDATED: Button colors -->
                     <button id="share-dashboard-btn" class="px-2 sm:px-4 py-2 rounded-full text-sm font-medium bg-emerald-600 text-white hover:bg-emerald-700 animated-btn flex-shrink-0">Share Frontend</button>
@@ -342,33 +715,40 @@
                             and only goes to 5 columns on extra-large screens (xl).
                         -->
                         <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-5 gap-6 mb-8">
-                            <!-- 
-                              UPDATED: Dashboard Card Structure
-                              - Changed padding from p-6 to p-5
-                              - Removed text-center, added flex-col
-                              - Updated h3 styling (uppercase, tracking)
-                              - Updated p styling (responsive text-2xl xl:text-3xl, break-words)
-                            -->
-                            <div id="dashboard-complaints-card" class="card p-5 flex flex-col justify-between cursor-pointer">
-                                <h3 class="text-slate-500 text-sm font-medium uppercase tracking-wider">Complaints</h3>
-                                <p id="total-complaints" class="text-2xl xl:text-3xl font-bold text-slate-800 mt-2 break-words">0</p>
+                            <div id="dashboard-complaints-card" class="stat-card cursor-pointer">
+                                <div class="stat-icon" style="background:linear-gradient(135deg,#fde8e8,#fca5a5);">
+                                    <i class="fas fa-exclamation-circle" style="color:#e11d48;"></i>
+                                </div>
+                                <h3 style="color:#94a3b8;font-size:0.7rem;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:4px;">Complaints</h3>
+                                <p id="total-complaints" class="text-2xl xl:text-3xl font-bold" style="color:#0f172a;">0</p>
                             </div>
-                            <div id="total-clients-card" class="card p-5 flex flex-col justify-between cursor-pointer">
-                                <h3 class="text-slate-500 text-sm font-medium uppercase tracking-wider">Total Clients</h3>
-                                <p id="total-clients" class="text-2xl xl:text-3xl font-bold text-slate-800 mt-2 break-words">0</p>
+                            <div id="total-clients-card" class="stat-card cursor-pointer">
+                                <div class="stat-icon" style="background:linear-gradient(135deg,#e0e7ff,#a5b4fc);">
+                                    <i class="fas fa-users" style="color:#4f46e5;"></i>
+                                </div>
+                                <h3 style="color:#94a3b8;font-size:0.7rem;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:4px;">Total Clients</h3>
+                                <p id="total-clients" class="text-2xl xl:text-3xl font-bold" style="color:#0f172a;">0</p>
                             </div>
-                            <div id="active-clients-card" class="card p-5 flex flex-col justify-between cursor-pointer">
-                                <h3 class="text-slate-500 text-sm font-medium uppercase tracking-wider">Active Clients (Last 2 Mo)</h3>
-                                <p id="active-clients" class="text-2xl xl:text-3xl font-bold text-slate-800 mt-2 break-words">0</p>
+                            <div id="active-clients-card" class="stat-card cursor-pointer">
+                                <div class="stat-icon" style="background:linear-gradient(135deg,#d1fae5,#6ee7b7);">
+                                    <i class="fas fa-user-check" style="color:#059669;"></i>
+                                </div>
+                                <h3 style="color:#94a3b8;font-size:0.7rem;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:4px;">Active Clients (Last 2 Mo)</h3>
+                                <p id="active-clients" class="text-2xl xl:text-3xl font-bold" style="color:#0f172a;">0</p>
                             </div>
-                            <div id="dashboard-revenue-card" class="card p-5 flex flex-col justify-between cursor-pointer">
-                                <h3 class="text-slate-500 text-sm font-medium uppercase tracking-wider">Commission Balance</h3>
-                                <!-- UPDATED: Changed text color to new theme -->
-                                <p id="monthly-revenue" class="text-2xl xl:text-3xl font-bold text-emerald-600 mt-2 break-words">PKR 0</p>
+                            <div id="dashboard-revenue-card" class="stat-card cursor-pointer">
+                                <div class="stat-icon" style="background:linear-gradient(135deg,#d1fae5,#6ee7b7);">
+                                    <i class="fas fa-coins" style="color:#059669;"></i>
+                                </div>
+                                <h3 style="color:#94a3b8;font-size:0.7rem;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:4px;">Commission Balance</h3>
+                                <p id="monthly-revenue" class="text-2xl xl:text-3xl font-bold" style="color:#059669;">PKR 0</p>
                             </div>
-                            <div id="dashboard-employees-card" class="card p-5 flex flex-col justify-between cursor-pointer">
-                                <h3 class="text-slate-500 text-sm font-medium uppercase tracking-wider">Total Employees</h3>
-                                <p id="total-employees" class="text-2xl xl:text-3xl font-bold text-slate-800 mt-2 break-words">0</p>
+                            <div id="dashboard-employees-card" class="stat-card cursor-pointer">
+                                <div class="stat-icon" style="background:linear-gradient(135deg,#fef3c7,#fde68a);">
+                                    <i class="fas fa-id-badge" style="color:#d97706;"></i>
+                                </div>
+                                <h3 style="color:#94a3b8;font-size:0.7rem;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:4px;">Total Employees</h3>
+                                <p id="total-employees" class="text-2xl xl:text-3xl font-bold" style="color:#0f172a;">0</p>
                             </div>
                         </div>
                         
@@ -858,18 +1238,37 @@
                     <section id="couriers" class="section-container">
                         <h2 class="text-3xl font-bold text-slate-800 mb-6">Couriers</h2>
                         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+
                             <!-- Left: Add Courier Form (hidden in shared/frontend view) -->
                             <div id="add-courier-wrapper" class="card p-6">
                                 <h3 class="text-xl font-semibold mb-4">Add New Courier Record</h3>
                                 <form id="add-courier-form" class="space-y-4">
+                                    <!-- Direction: In / Out toggle -->
+                                    <div>
+                                        <label class="block text-sm font-medium text-slate-700 mb-2">Courier Direction</label>
+                                        <div class="flex rounded-full overflow-hidden border border-slate-300">
+                                            <label class="flex-1 text-center cursor-pointer">
+                                                <input type="radio" name="courier-direction" id="courier-dir-in" value="In" required class="sr-only peer">
+                                                <span class="block py-2 font-semibold text-sm transition-colors peer-checked:bg-emerald-600 peer-checked:text-white bg-white text-slate-600 hover:bg-slate-50">
+                                                    <i class="fas fa-arrow-down mr-1"></i> In (Received)
+                                                </span>
+                                            </label>
+                                            <label class="flex-1 text-center cursor-pointer border-l border-slate-300">
+                                                <input type="radio" name="courier-direction" id="courier-dir-out" value="Out" required class="sr-only peer">
+                                                <span class="block py-2 font-semibold text-sm transition-colors peer-checked:bg-indigo-600 peer-checked:text-white bg-white text-slate-600 hover:bg-slate-50">
+                                                    <i class="fas fa-arrow-up mr-1"></i> Out (Sent)
+                                                </span>
+                                            </label>
+                                        </div>
+                                    </div>
                                     <div>
                                         <label for="courier-date" class="block text-sm font-medium text-slate-700 mb-1">Date</label>
                                         <input type="date" id="courier-date" required
                                                class="w-full px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-indigo-500">
                                     </div>
                                     <div>
-                                        <label for="courier-destination" class="block text-sm font-medium text-slate-700 mb-1">Destination</label>
-                                        <input type="text" id="courier-destination" placeholder="Destination" required
+                                        <label for="courier-destination" class="block text-sm font-medium text-slate-700 mb-1">Destination / Origin</label>
+                                        <input type="text" id="courier-destination" placeholder="Destination or Origin" required
                                                class="w-full px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-indigo-500">
                                     </div>
                                     <div>
@@ -889,12 +1288,12 @@
                                     </div>
                                     <div>
                                         <label for="courier-reason-sending" class="block text-sm font-medium text-slate-700 mb-1">Reason for Sending</label>
-                                        <textarea id="courier-reason-sending" rows="3" placeholder="Reason for Sending" required
+                                        <textarea id="courier-reason-sending" rows="2" placeholder="Reason for Sending"
                                                   class="w-full px-4 py-2 border rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500"></textarea>
                                     </div>
                                     <div>
                                         <label for="courier-reason-receiving" class="block text-sm font-medium text-slate-700 mb-1">Reason for Receiving</label>
-                                        <textarea id="courier-reason-receiving" rows="3" placeholder="Reason for Receiving" required
+                                        <textarea id="courier-reason-receiving" rows="2" placeholder="Reason for Receiving"
                                                   class="w-full px-4 py-2 border rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500"></textarea>
                                     </div>
                                     <button type="submit" class="w-full bg-indigo-600 text-white py-2 rounded-full font-semibold hover:bg-indigo-700 animated-btn">
@@ -902,26 +1301,52 @@
                                     </button>
                                 </form>
                             </div>
-                            <!-- Right: Courier Records Table -->
-                            <div class="card p-6">
-                                <h3 class="text-xl font-semibold mb-4">Courier Records</h3>
-                                <div class="overflow-x-auto">
-                                    <table class="w-full text-left table-auto">
-                                        <thead class="border-b-2">
-                                            <tr class="text-slate-600 uppercase text-sm">
-                                                <th class="p-2">Date</th>
-                                                <th class="p-2">Destination</th>
-                                                <th class="p-2">Sender</th>
-                                                <th class="p-2">Receiver</th>
-                                                <th class="p-2">Doc Type</th>
-                                                <th class="p-2 actions-header">Actions</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody id="couriers-list">
-                                        </tbody>
-                                    </table>
+
+                            <!-- Right: Records Table + Print Report -->
+                            <div class="flex flex-col gap-6">
+                                <!-- Print Report Card -->
+                                <div class="card p-6">
+                                    <h3 class="text-xl font-semibold mb-4"><i class="fas fa-print mr-2 text-slate-500"></i>Print Courier Report</h3>
+                                    <div class="flex flex-col sm:flex-row gap-3 items-end">
+                                        <div class="flex-1">
+                                            <label for="courier-report-from" class="block text-sm font-medium text-slate-700 mb-1">From Date</label>
+                                            <input type="date" id="courier-report-from"
+                                                   class="w-full px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                                        </div>
+                                        <div class="flex-1">
+                                            <label for="courier-report-to" class="block text-sm font-medium text-slate-700 mb-1">To Date</label>
+                                            <input type="date" id="courier-report-to"
+                                                   class="w-full px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                                        </div>
+                                        <button id="print-courier-report-btn" class="bg-slate-700 text-white px-5 py-2 rounded-full font-semibold hover:bg-slate-800 animated-btn w-full sm:w-auto flex-shrink-0">
+                                            <i class="fas fa-print mr-1"></i> Print
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <!-- Records Table Card -->
+                                <div class="card p-6">
+                                    <h3 class="text-xl font-semibold mb-4">All Courier Records</h3>
+                                    <div class="overflow-x-auto">
+                                        <table class="w-full text-left table-auto">
+                                            <thead class="border-b-2">
+                                                <tr class="text-slate-600 uppercase text-sm">
+                                                    <th class="p-2">Direction</th>
+                                                    <th class="p-2">Date</th>
+                                                    <th class="p-2">Destination</th>
+                                                    <th class="p-2">Sender</th>
+                                                    <th class="p-2">Receiver</th>
+                                                    <th class="p-2">Doc Type</th>
+                                                    <th class="p-2 actions-header">Actions</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="couriers-list">
+                                            </tbody>
+                                        </table>
+                                    </div>
                                 </div>
                             </div>
+
                         </div>
                     </section>
 
@@ -3111,28 +3536,38 @@
             const list = document.getElementById('couriers-list');
             if (!list) return;
             if (allCouriers.length === 0) {
-                list.innerHTML = `<tr><td colspan="6" class="p-4 text-center text-slate-400">No courier records found.</td></tr>`;
+                list.innerHTML = `<tr><td colspan="7" class="p-4 text-center text-slate-400">No courier records found.</td></tr>`;
                 return;
             }
             const sorted = [...allCouriers].sort((a, b) => new Date(b.date) - new Date(a.date));
-            list.innerHTML = sorted.map(c => `
+            list.innerHTML = sorted.map(c => {
+                const isIn = c.direction === 'In';
+                const dirBadge = isIn
+                    ? `<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-semibold bg-emerald-100 text-emerald-700"><i class="fas fa-arrow-down"></i> In</span>`
+                    : `<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-semibold bg-indigo-100 text-indigo-700"><i class="fas fa-arrow-up"></i> Out</span>`;
+                return `
                 <tr class="border-b hover:bg-slate-50">
-                    <td class="p-2 text-sm">${c.date ? new Date(c.date).toLocaleDateString() : 'N/A'}</td>
+                    <td class="p-2">${dirBadge}</td>
+                    <td class="p-2 text-sm">${c.date ? new Date(c.date).toLocaleDateString('en-PK') : 'N/A'}</td>
                     <td class="p-2 text-sm">${c.destination || 'N/A'}</td>
                     <td class="p-2 text-sm">${c.senderName || 'N/A'}</td>
                     <td class="p-2 text-sm">${c.receiverName || 'N/A'}</td>
                     <td class="p-2 text-sm">${c.documentType || 'N/A'}</td>
-                    <td class="p-2 text-sm">
+                    <td class="p-2 text-sm actions-header">
                         <button class="text-rose-600 hover:underline text-sm" onclick="deleteItem('couriers', '${c.id}')">Delete</button>
                     </td>
-                </tr>
-            `).join('');
+                </tr>`;
+            }).join('');
         }
 
         document.getElementById('add-courier-form').addEventListener('submit', async (e) => {
             e.preventDefault();
             const form = e.target;
+            const directionEl = form.querySelector('input[name="courier-direction"]:checked');
+            if (!directionEl) return showMessage('Error', 'Please select courier direction (In or Out).');
+
             const courierData = {
+                direction: directionEl.value,
                 date: form['courier-date'].value,
                 destination: form['courier-destination'].value.trim(),
                 senderName: form['courier-sender-name'].value.trim(),
@@ -3154,6 +3589,110 @@
             } finally {
                 hideLoading();
             }
+        });
+
+        document.getElementById('print-courier-report-btn').addEventListener('click', () => {
+            const fromVal = document.getElementById('courier-report-from').value;
+            const toVal   = document.getElementById('courier-report-to').value;
+
+            if (!fromVal || !toVal) {
+                showMessage('Error', 'Please select both From and To dates for the report.');
+                return;
+            }
+
+            const fromDate = new Date(fromVal);
+            const toDate   = new Date(toVal);
+            toDate.setHours(23, 59, 59, 999);
+
+            if (fromDate > toDate) {
+                showMessage('Error', '"From" date cannot be later than "To" date.');
+                return;
+            }
+
+            const filtered = allCouriers
+                .filter(c => {
+                    const d = new Date(c.date);
+                    return d >= fromDate && d <= toDate;
+                })
+                .sort((a, b) => new Date(a.date) - new Date(b.date));
+
+            const fmt = (d) => new Date(d).toLocaleDateString('en-PK', { day: '2-digit', month: 'short', year: 'numeric' });
+
+            const rows = filtered.length === 0
+                ? `<tr><td colspan="7" style="text-align:center;padding:20px;color:#888;">No records found for this date range.</td></tr>`
+                : filtered.map((c, i) => {
+                    const isIn = c.direction === 'In';
+                    const dir = isIn
+                        ? `<span style="display:inline-block;padding:2px 8px;border-radius:20px;background:#d1fae5;color:#065f46;font-size:11px;font-weight:700;">▼ In</span>`
+                        : `<span style="display:inline-block;padding:2px 8px;border-radius:20px;background:#e0e7ff;color:#3730a3;font-size:11px;font-weight:700;">▲ Out</span>`;
+                    const bg = i % 2 === 0 ? '#ffffff' : '#f8fafc';
+                    return `<tr style="background:${bg};">
+                        <td style="padding:8px 10px;border-bottom:1px solid #e2e8f0;">${i+1}</td>
+                        <td style="padding:8px 10px;border-bottom:1px solid #e2e8f0;">${dir}</td>
+                        <td style="padding:8px 10px;border-bottom:1px solid #e2e8f0;">${c.date ? fmt(c.date) : 'N/A'}</td>
+                        <td style="padding:8px 10px;border-bottom:1px solid #e2e8f0;">${c.destination || 'N/A'}</td>
+                        <td style="padding:8px 10px;border-bottom:1px solid #e2e8f0;">${c.senderName || 'N/A'}</td>
+                        <td style="padding:8px 10px;border-bottom:1px solid #e2e8f0;">${c.receiverName || 'N/A'}</td>
+                        <td style="padding:8px 10px;border-bottom:1px solid #e2e8f0;">${c.documentType || 'N/A'}</td>
+                    </tr>`;
+                  }).join('');
+
+            const inCount  = filtered.filter(c => c.direction === 'In').length;
+            const outCount = filtered.filter(c => c.direction === 'Out').length;
+
+            const printWindow = window.open('', '_blank', 'width=900,height=650');
+            printWindow.document.write(`<!DOCTYPE html>
+<html><head><meta charset="UTF-8">
+<title>Courier Report — ${fmt(fromVal)} to ${fmt(toVal)}</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: Arial, sans-serif; font-size: 13px; color: #1e293b; background: #fff; padding: 30px; }
+  .header { display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 3px solid #4f46e5; padding-bottom: 14px; margin-bottom: 20px; }
+  .header h1 { font-size: 22px; font-weight: 700; color: #4f46e5; }
+  .header p { font-size: 12px; color: #64748b; margin-top: 3px; }
+  .meta { display: flex; gap: 30px; margin-bottom: 20px; }
+  .meta-box { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 10px 18px; }
+  .meta-box .label { font-size: 11px; color: #64748b; text-transform: uppercase; letter-spacing: .05em; }
+  .meta-box .val { font-size: 18px; font-weight: 700; color: #1e293b; }
+  table { width: 100%; border-collapse: collapse; }
+  thead { background: #4f46e5; }
+  thead th { color: #fff; padding: 9px 10px; text-align: left; font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: .05em; }
+  .footer { margin-top: 24px; text-align: center; font-size: 11px; color: #94a3b8; border-top: 1px solid #e2e8f0; padding-top: 12px; }
+  @media print { body { padding: 15px; } }
+</style>
+</head><body>
+<div class="header">
+  <div>
+    <h1>Darson Sargodha Brokerage</h1>
+    <p>Courier Activity Report</p>
+    <p style="margin-top:6px;font-size:13px;color:#1e293b;font-weight:600;">Period: ${fmt(fromVal)} &mdash; ${fmt(toVal)}</p>
+  </div>
+  <div style="text-align:right;font-size:11px;color:#64748b;">
+    <p>Printed: ${new Date().toLocaleString('en-PK')}</p>
+  </div>
+</div>
+<div class="meta">
+  <div class="meta-box"><div class="label">Total Records</div><div class="val">${filtered.length}</div></div>
+  <div class="meta-box" style="border-color:#6ee7b7;"><div class="label" style="color:#065f46;">Incoming (In)</div><div class="val" style="color:#065f46;">${inCount}</div></div>
+  <div class="meta-box" style="border-color:#a5b4fc;"><div class="label" style="color:#3730a3;">Outgoing (Out)</div><div class="val" style="color:#3730a3;">${outCount}</div></div>
+</div>
+<table>
+  <thead><tr>
+    <th style="width:40px;">#</th>
+    <th style="width:70px;">Direction</th>
+    <th style="width:100px;">Date</th>
+    <th>Destination / Origin</th>
+    <th>Sender</th>
+    <th>Receiver</th>
+    <th>Doc Type</th>
+  </tr></thead>
+  <tbody>${rows}</tbody>
+</table>
+<div class="footer">Darson Sargodha Brokerage &mdash; Courier Report &mdash; Generated by Next Gen Sites</div>
+</body></html>`);
+            printWindow.document.close();
+            printWindow.focus();
+            setTimeout(() => printWindow.print(), 400);
         });
         
         // --- Initialize App ---
