@@ -258,6 +258,7 @@
         [data-section="profiles"]::before { content: "\f007"; }
         [data-section="employees"]::before { content: "\f0c0"; }
         [data-section="couriers"]::before { content: "\f4d8"; }
+        [data-section="disclaimer"]::before { content: "\f05a"; }
 
         /* ─── Header ─────────────────────────────── */
         header.bg-white {
@@ -681,6 +682,7 @@
                     <li><button data-section="profiles" class="nav-btn text-slate-600 hover:bg-indigo-50 hover:text-indigo-600">Profiles</button></li>
                     <li><button data-section="employees" class="nav-btn text-slate-600 hover:bg-indigo-50 hover:text-indigo-600">Employees</button></li>
                     <li><button data-section="couriers" class="nav-btn text-slate-600 hover:bg-indigo-50 hover:text-indigo-600">Couriers</button></li>
+                    <li style="margin-top:1rem;border-top:1px solid rgba(255,255,255,0.1);padding-top:1rem;"><button data-section="disclaimer" class="nav-btn text-slate-600 hover:bg-indigo-50 hover:text-indigo-600">Disclaimer</button></li>
                 </ul>
             </nav>
         </aside>
@@ -714,7 +716,7 @@
                           - This provides a more balanced 3-column layout on standard desktops (md/lg)
                             and only goes to 5 columns on extra-large screens (xl).
                         -->
-                        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-5 gap-6 mb-8">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-6 mb-4">
                             <div id="dashboard-complaints-card" class="stat-card cursor-pointer">
                                 <div class="stat-icon" style="background:linear-gradient(135deg,#fde8e8,#fca5a5);">
                                     <i class="fas fa-exclamation-circle" style="color:#e11d48;"></i>
@@ -749,6 +751,27 @@
                                 </div>
                                 <h3 style="color:#94a3b8;font-size:0.7rem;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:4px;">Total Employees</h3>
                                 <p id="total-employees" class="text-2xl xl:text-3xl font-bold" style="color:#0f172a;">0</p>
+                            </div>
+                            <div id="dashboard-total-commission-card" class="stat-card">
+                                <div class="stat-icon" style="background:linear-gradient(135deg,#ede9fe,#c4b5fd);">
+                                    <i class="fas fa-chart-line" style="color:#7c3aed;"></i>
+                                </div>
+                                <h3 style="color:#94a3b8;font-size:0.7rem;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:4px;">Total Commission (This Month)</h3>
+                                <p id="dashboard-total-commission" class="text-2xl xl:text-3xl font-bold" style="color:#7c3aed;">PKR 0</p>
+                            </div>
+                            <div id="dashboard-ho-deduction-card" class="stat-card">
+                                <div class="stat-icon" style="background:linear-gradient(135deg,#fce7f3,#f9a8d4);">
+                                    <i class="fas fa-building" style="color:#be185d;"></i>
+                                </div>
+                                <h3 style="color:#94a3b8;font-size:0.7rem;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:4px;">Head Office Deduction (This Month)</h3>
+                                <p id="dashboard-ho-deduction" class="text-2xl xl:text-3xl font-bold" style="color:#be185d;">PKR 0</p>
+                            </div>
+                            <div id="dashboard-total-tax-card" class="stat-card">
+                                <div class="stat-icon" style="background:linear-gradient(135deg,#ffedd5,#fed7aa);">
+                                    <i class="fas fa-receipt" style="color:#c2410c;"></i>
+                                </div>
+                                <h3 style="color:#94a3b8;font-size:0.7rem;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:4px;">Total Tax (This Month)</h3>
+                                <p id="dashboard-total-tax" class="text-2xl xl:text-3xl font-bold" style="color:#c2410c;">PKR 0</p>
                             </div>
                         </div>
                         
@@ -924,6 +947,62 @@
                                         <span class="font-semibold">Closing Balance:</span>
                                         <!-- UPDATED: Text color -->
                                         <span id="commission-closing-balance" class="font-bold text-indigo-600">PKR 0</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- ALL-TIME DEDUCTION TOTALS PANEL -->
+                        <div class="card p-6 mt-6" id="deduction-totals-panel">
+                            <h3 class="text-xl font-semibold mb-1"><i class="fas fa-calculator mr-2 text-indigo-600"></i>All-Time Deduction Totals</h3>
+                            <p class="text-sm text-slate-500 mb-5">Cumulative Head Office deduction and Tax deduction across all months.</p>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                                <!-- Head Office Deduction Summary -->
+                                <div class="rounded-xl border border-pink-100 bg-pink-50 p-4">
+                                    <div class="flex items-center gap-3 mb-3">
+                                        <div class="w-9 h-9 rounded-lg flex items-center justify-center" style="background:linear-gradient(135deg,#fce7f3,#f9a8d4);">
+                                            <i class="fas fa-building" style="color:#be185d;font-size:0.85rem;"></i>
+                                        </div>
+                                        <div>
+                                            <p class="text-xs font-bold uppercase tracking-wide text-pink-400">Head Office Deduction</p>
+                                            <p id="alltime-ho-total" class="text-2xl font-bold" style="color:#be185d;">PKR 0</p>
+                                        </div>
+                                    </div>
+                                    <p class="text-xs text-slate-500 mb-2 font-semibold uppercase tracking-wide">Monthly Breakdown</p>
+                                    <div class="overflow-y-auto max-h-56">
+                                        <table class="w-full text-left text-sm">
+                                            <thead>
+                                                <tr class="text-slate-500 uppercase text-xs border-b border-pink-200">
+                                                    <th class="pb-1 pr-2">Month</th>
+                                                    <th class="pb-1 text-right">HO Deduction</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="alltime-ho-breakdown"></tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                                <!-- Tax Deduction Summary -->
+                                <div class="rounded-xl border border-orange-100 bg-orange-50 p-4">
+                                    <div class="flex items-center gap-3 mb-3">
+                                        <div class="w-9 h-9 rounded-lg flex items-center justify-center" style="background:linear-gradient(135deg,#ffedd5,#fed7aa);">
+                                            <i class="fas fa-receipt" style="color:#c2410c;font-size:0.85rem;"></i>
+                                        </div>
+                                        <div>
+                                            <p class="text-xs font-bold uppercase tracking-wide text-orange-400">Tax Deduction (12%)</p>
+                                            <p id="alltime-tax-total" class="text-2xl font-bold" style="color:#c2410c;">PKR 0</p>
+                                        </div>
+                                    </div>
+                                    <p class="text-xs text-slate-500 mb-2 font-semibold uppercase tracking-wide">Monthly Breakdown</p>
+                                    <div class="overflow-y-auto max-h-56">
+                                        <table class="w-full text-left text-sm">
+                                            <thead>
+                                                <tr class="text-slate-500 uppercase text-xs border-b border-orange-200">
+                                                    <th class="pb-1 pr-2">Month</th>
+                                                    <th class="pb-1 text-right">Tax Deduction</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="alltime-tax-breakdown"></tbody>
+                                        </table>
                                     </div>
                                 </div>
                             </div>
@@ -1229,6 +1308,31 @@
                                 </table>
                             </div>
                         </div>
+                        <div id="salary-slip-section-wrapper" class="card p-6 mt-6">
+                            <h3 class="text-xl font-semibold mb-4"><i class="fas fa-file-invoice-dollar mr-2 text-indigo-600"></i>Generate Salary Slip</h3>
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
+                                <div>
+                                    <label class="block text-sm font-medium text-slate-700 mb-1">Select Employee</label>
+                                    <select id="salary-slip-employee-select" class="w-full px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                                        <option value="">-- Select Employee --</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-slate-700 mb-1">Select Month</label>
+                                    <select id="salary-slip-section-month" class="w-full px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-indigo-500"></select>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-slate-700 mb-1">Year</label>
+                                    <input type="number" id="salary-slip-section-year" placeholder="Year" class="w-full px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                                </div>
+                            </div>
+                            <div class="mt-4 flex justify-end">
+                                <button type="button" id="print-salary-slip-section-btn"
+                                        class="bg-emerald-600 text-white px-6 py-2 rounded-full font-semibold hover:bg-emerald-700 animated-btn">
+                                    <i class="fas fa-print mr-2"></i>Print Salary Slip
+                                </button>
+                            </div>
+                        </div>
                     </section>
 
                     <!-- REMOVED: Courier Records Section -->
@@ -1350,6 +1454,73 @@
                         </div>
                     </section>
 
+                    <!-- DISCLAIMER SECTION -->
+                    <section id="disclaimer" class="section-container">
+                        <h2 class="text-3xl font-bold text-slate-800 mb-6">Disclaimer</h2>
+                        <div class="card p-8 max-w-4xl mx-auto">
+                            <!-- Icon header -->
+                            <div class="flex items-center gap-4 mb-8 pb-6" style="border-bottom:2px solid rgba(99,102,241,0.15);">
+                                <div class="w-14 h-14 rounded-2xl flex items-center justify-center flex-shrink-0" style="background:linear-gradient(135deg,#e0e7ff,#c7d2fe);">
+                                    <i class="fas fa-shield-alt text-2xl" style="color:#4f46e5;"></i>
+                                </div>
+                                <div>
+                                    <h3 class="text-xl font-bold" style="color:#1e1b4b;">Internal Use Only</h3>
+                                    <p class="text-sm text-slate-500 mt-0.5">Darson Securities (Pvt.) Limited — Sargodha Branch</p>
+                                </div>
+                            </div>
+
+                            <!-- Paragraph 1 -->
+                            <div class="flex gap-4 mb-6">
+                                <div class="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5" style="background:linear-gradient(135deg,#e0e7ff,#a5b4fc);">
+                                    <span class="text-xs font-bold" style="color:#4f46e5;">1</span>
+                                </div>
+                                <div>
+                                    <h4 class="font-semibold text-slate-800 mb-1">Purpose of This Software</h4>
+                                    <p class="text-slate-600 leading-relaxed">This software has been developed exclusively for internal use by the Sargodha Branch of Darson Securities (Pvt.) Limited. Its primary purpose is to facilitate smoother branch operations, improve efficiency, and assist in maintaining records such as employee performance, commissions, and related operational data.</p>
+                                </div>
+                            </div>
+
+                            <!-- Paragraph 2 -->
+                            <div class="flex gap-4 mb-6">
+                                <div class="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5" style="background:linear-gradient(135deg,#d1fae5,#6ee7b7);">
+                                    <span class="text-xs font-bold" style="color:#059669;">2</span>
+                                </div>
+                                <div>
+                                    <h4 class="font-semibold text-slate-800 mb-1">Nature of Data</h4>
+                                    <p class="text-slate-600 leading-relaxed">The information and data contained within this system are intended solely for internal tracking and management purposes. While efforts are made to maintain accuracy, the data should not be considered final, official, or legally binding.</p>
+                                </div>
+                            </div>
+
+                            <!-- Paragraph 3 -->
+                            <div class="flex gap-4 mb-6">
+                                <div class="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5" style="background:linear-gradient(135deg,#fef3c7,#fde68a);">
+                                    <span class="text-xs font-bold" style="color:#d97706;">3</span>
+                                </div>
+                                <div>
+                                    <h4 class="font-semibold text-slate-800 mb-1">Verification Requirement</h4>
+                                    <p class="text-slate-600 leading-relaxed">All figures, records, and reports generated through this software must be independently verified and cross-checked with the official records maintained by the Head Office of Darson Securities (Pvt.) Limited before making any financial, operational, or compliance-related decisions.</p>
+                                </div>
+                            </div>
+
+                            <!-- Paragraph 4 -->
+                            <div class="flex gap-4 mb-8">
+                                <div class="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5" style="background:linear-gradient(135deg,#fde8e8,#fca5a5);">
+                                    <span class="text-xs font-bold" style="color:#e11d48;">4</span>
+                                </div>
+                                <div>
+                                    <h4 class="font-semibold text-slate-800 mb-1">Limitation of Liability</h4>
+                                    <p class="text-slate-600 leading-relaxed">The developers and users of this software shall not be held responsible for any discrepancies, errors, or decisions made based on unverified data from this system.</p>
+                                </div>
+                            </div>
+
+                            <!-- Footer note -->
+                            <div class="rounded-xl p-4 text-center" style="background:linear-gradient(135deg,rgba(79,70,229,0.06),rgba(99,102,241,0.04));border:1px solid rgba(99,102,241,0.12);">
+                                <i class="fas fa-info-circle mr-2" style="color:#6366f1;"></i>
+                                <span class="text-sm text-slate-600">This disclaimer is displayed for informational purposes and applies to all data within this system.</span>
+                            </div>
+                        </div>
+                    </section>
+
                 </div>
             </main>
             
@@ -1461,11 +1632,58 @@
             </div>
             <div class="popup-window-body">
                 <div id="employee-detail-info-wrapper">
+                    <!-- Employee Photo Section -->
+                    <div class="bg-white p-4 rounded-lg shadow-sm mb-4 flex flex-col sm:flex-row items-center gap-4">
+                        <div class="flex-shrink-0">
+                            <img id="employee-profile-photo" src="" alt="Employee Photo"
+                                 class="w-24 h-24 rounded-full object-cover border-4 border-indigo-100 shadow"
+                                 style="display:none;">
+                            <div id="employee-photo-placeholder" class="w-24 h-24 rounded-full bg-indigo-100 flex items-center justify-center border-4 border-indigo-200">
+                                <i class="fas fa-user text-indigo-400 text-3xl"></i>
+                            </div>
+                        </div>
+                        <div id="employee-photo-upload-section" class="flex-grow space-y-2 w-full">
+                            <p class="text-sm font-semibold text-slate-700">Profile Photo</p>
+                            <div class="flex flex-col sm:flex-row gap-2">
+                                <label class="flex-1 cursor-pointer bg-indigo-50 border border-indigo-300 rounded-full px-3 py-2 text-sm text-indigo-700 font-medium text-center hover:bg-indigo-100 transition-colors">
+                                    <i class="fas fa-upload mr-1"></i> Upload from Device
+                                    <input type="file" id="employee-photo-file-input" accept="image/*" class="sr-only">
+                                </label>
+                            </div>
+                            <div class="flex gap-2 items-center">
+                                <input type="url" id="employee-photo-url-input" placeholder="Or paste image URL here..."
+                                       class="flex-grow px-3 py-2 border rounded-full text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                                <button type="button" id="employee-photo-url-btn"
+                                        class="bg-indigo-600 text-white px-4 py-2 rounded-full text-sm font-semibold hover:bg-indigo-700 animated-btn flex-shrink-0">
+                                    Set URL
+                                </button>
+                            </div>
+                        </div>
+                    </div>
                     <!-- UPDATED: Text color -->
                     <div id="employee-detail-info" class="text-slate-700 text-sm mb-6 bg-white p-6 rounded-lg shadow-sm grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4"></div>
                     <div id="edit-employee-btn-wrapper" class="mt-6 flex justify-center gap-4">
                         <!-- UPDATED: Button color -->
                         <button id="edit-employee-btn" class="bg-amber-500 text-white px-6 py-2 rounded-full font-semibold hover:bg-amber-600 animated-btn">Edit Employee</button>
+                        <button id="generate-salary-slip-btn" class="bg-indigo-600 text-white px-6 py-2 rounded-full font-semibold hover:bg-indigo-700 animated-btn"><i class="fas fa-file-invoice-dollar mr-1"></i> Salary Slip</button>
+                    </div>
+                    <!-- Salary Slip Generator -->
+                    <div id="salary-slip-generator" class="hidden mt-4 bg-white p-4 rounded-lg shadow-sm">
+                        <h4 class="font-semibold text-lg mb-3">Generate Salary Slip</h4>
+                        <div class="flex flex-col sm:flex-row gap-3 items-end">
+                            <div class="flex-1">
+                                <label class="block text-sm font-medium text-slate-700 mb-1">Month</label>
+                                <select id="salary-slip-month" class="w-full px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-indigo-500"></select>
+                            </div>
+                            <div class="flex-1">
+                                <label class="block text-sm font-medium text-slate-700 mb-1">Year</label>
+                                <input type="number" id="salary-slip-year" placeholder="Year" class="w-full px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                            </div>
+                            <button type="button" id="print-salary-slip-btn"
+                                    class="bg-emerald-600 text-white px-5 py-2 rounded-full font-semibold hover:bg-emerald-700 animated-btn flex-shrink-0">
+                                <i class="fas fa-print mr-1"></i> Print Slip
+                            </button>
+                        </div>
                     </div>
                 </div>
                 
@@ -1662,8 +1880,9 @@
                     headerTitle.textContent = 'Commission Generator System';
                 } else if (sectionId === 'courier-records') {
                     headerTitle.textContent = 'Courier Records';
-                }
-                else {
+                } else if (sectionId === 'disclaimer') {
+                    headerTitle.textContent = 'Disclaimer';
+                } else {
                     headerTitle.textContent = sectionId.charAt(0).toUpperCase() + sectionId.slice(1);
                 }
             }
@@ -1960,6 +2179,20 @@
             const totalCommissionReceived = allCommissionReceived.reduce((sum, r) => sum + (r.amount || 0), 0);
             const commissionClosingBalance = totalHouseCommission - totalCommissionReceived;
 
+            // Current-month totals for new stat cards
+            const currentMonthCommissions = allDailyCommissions.filter(c => {
+                const d = new Date(c.date);
+                return d.getMonth() === currentMonth && d.getFullYear() === currentYear;
+            });
+            // Gross commission this month = sum of totalCommission CR entries
+            const monthGrossCommission = currentMonthCommissions.reduce((sum, c) => sum + (c.totalCommission || 0), 0);
+
+            // HO deduction = 40% of gross (from stored headofficeCommission field)
+            const monthHODeduction = currentMonthCommissions.reduce((sum, c) => sum + (c.headofficeCommission || 0), 0);
+
+            // Tax deduction = 12% of Branch share (60% of gross), from stored tax field
+            const monthTaxDeduction = currentMonthCommissions.reduce((sum, c) => sum + (c.tax || 0), 0);
+
             const activeComplaints = allComplaints.filter(c => c.status !== 'Closed');
             document.getElementById('total-complaints').textContent = activeComplaints.length;
 
@@ -1970,6 +2203,11 @@
             document.getElementById('dashboard-revenue-card').querySelector('h3').textContent = 'Commission Balance';
             // UPDATED: Format number with commas
             document.getElementById('monthly-revenue').textContent = `PKR ${commissionClosingBalance.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`;
+
+            // New three stat cards
+            document.getElementById('dashboard-total-commission').textContent = `PKR ${monthGrossCommission.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`;
+            document.getElementById('dashboard-ho-deduction').textContent = `PKR ${monthHODeduction.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`;
+            document.getElementById('dashboard-total-tax').textContent = `PKR ${monthTaxDeduction.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`;
 
             const complaintStatusData = { Pending: 0, Done: 0 };
             activeComplaints.forEach(c => {
@@ -2342,11 +2580,58 @@
             }).join('');
             
             document.getElementById('commission-closing-balance').textContent = `PKR ${runningBalance.toLocaleString()}`;
+
+            // Render all-time deduction totals panel
+            renderDeductionTotalsPanel();
         }
 
         document.getElementById('commission-statement-month').addEventListener('change', renderCommissionSection);
         document.getElementById('commission-statement-year').addEventListener('input', renderCommissionSection);
         document.getElementById('print-commission-btn').addEventListener('click', printCommissionStatement);
+
+        function renderDeductionTotalsPanel() {
+            // Build a per-month breakdown of HO deduction and Tax deduction from all daily commission records
+            const byMonth = {};
+            allDailyCommissions.forEach(c => {
+                const d = new Date(c.date);
+                const key = `${d.getFullYear()}-${String(d.getMonth()).padStart(2, '0')}`;
+                if (!byMonth[key]) byMonth[key] = { ho: 0, tax: 0 };
+                byMonth[key].ho += c.headofficeCommission || 0;
+                byMonth[key].tax += c.tax || 0;
+            });
+
+            const sortedKeys = Object.keys(byMonth).sort();
+            let totalHO = 0, totalTax = 0;
+            sortedKeys.forEach(k => { totalHO += byMonth[k].ho; totalTax += byMonth[k].tax; });
+
+            document.getElementById('alltime-ho-total').textContent = `PKR ${totalHO.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`;
+            document.getElementById('alltime-tax-total').textContent = `PKR ${totalTax.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`;
+
+            const hoBreakdown = document.getElementById('alltime-ho-breakdown');
+            const taxBreakdown = document.getElementById('alltime-tax-breakdown');
+
+            if (sortedKeys.length === 0) {
+                hoBreakdown.innerHTML = `<tr><td colspan="2" class="py-2 text-slate-400 text-center">No data available.</td></tr>`;
+                taxBreakdown.innerHTML = `<tr><td colspan="2" class="py-2 text-slate-400 text-center">No data available.</td></tr>`;
+                return;
+            }
+
+            hoBreakdown.innerHTML = sortedKeys.map(k => {
+                const [yr, mo] = k.split('-');
+                return `<tr class="border-b border-pink-100">
+                    <td class="py-1 pr-2 text-slate-600">${months[parseInt(mo)]} ${yr}</td>
+                    <td class="py-1 text-right font-semibold" style="color:#be185d;">PKR ${byMonth[k].ho.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 })}</td>
+                </tr>`;
+            }).join('');
+
+            taxBreakdown.innerHTML = sortedKeys.map(k => {
+                const [yr, mo] = k.split('-');
+                return `<tr class="border-b border-orange-100">
+                    <td class="py-1 pr-2 text-slate-600">${months[parseInt(mo)]} ${yr}</td>
+                    <td class="py-1 text-right font-semibold" style="color:#c2410c;">PKR ${byMonth[k].tax.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 })}</td>
+                </tr>`;
+            }).join('');
+        }
 
         function printCommissionStatement() {
             const month = parseInt(document.getElementById('commission-statement-month').value);
@@ -2915,6 +3200,10 @@
                     </td>` : ''}
                 </tr>
             `).join('');
+
+            // Populate salary slip section dropdown and hide section in shared view
+            document.getElementById('salary-slip-section-wrapper').style.display = isSharedView ? 'none' : 'block';
+            populateSalarySlipEmployeeSelect();
         }
 
         // --- GENERAL DELETE FUNCTION ---
@@ -3257,16 +3546,34 @@
 
             document.getElementById('edit-employee-btn-wrapper').style.display = isSharedView ? 'none' : 'block';
             document.getElementById('employee-performance-wrapper').style.display = isSharedView ? 'none' : 'block';
+            document.getElementById('employee-photo-upload-section').style.display = isSharedView ? 'none' : 'block';
+            document.getElementById('salary-slip-generator').classList.add('hidden');
+
+            // Handle profile photo display
+            const photoImg = document.getElementById('employee-profile-photo');
+            const photoPlaceholder = document.getElementById('employee-photo-placeholder');
+            if (employee.photoUrl) {
+                photoImg.src = employee.photoUrl;
+                photoImg.style.display = 'block';
+                photoPlaceholder.style.display = 'none';
+            } else {
+                photoImg.style.display = 'none';
+                photoPlaceholder.style.display = 'flex';
+            }
+            // Clear the URL input
+            document.getElementById('employee-photo-url-input').value = '';
 
             document.getElementById('employee-detail-name').textContent = employee.name;
+            const totalComp = (employee.salary || 0) + (employee.incentives || 0) + (employee.allowance || 0);
             document.getElementById('employee-detail-info').innerHTML = `
                 <div><p class="font-semibold">CNIC:</p><p>${employee.cnic || 'N/A'}</p></div>
                 <div><p class="font-semibold">Contact:</p><p>${employee.contact || 'N/A'}</p></div>
                 <div><p class="font-semibold">Designation:</p><p>${employee.designation || 'N/A'}</p></div>
                 <div><p class="font-semibold">Joining Date:</p><p>${employee.joiningDate ? new Date(employee.joiningDate).toLocaleDateString() : 'N/A'}</p></div>
-                <div><p class="font-semibold">Salary:</p><p>PKR ${employee.salary ? employee.salary.toLocaleString() : 'N/A'}</p></div>
+                <div><p class="font-semibold">Basic Salary:</p><p>PKR ${employee.salary ? employee.salary.toLocaleString() : 'N/A'}</p></div>
                 <div><p class="font-semibold">Incentives:</p><p>PKR ${employee.incentives ? employee.incentives.toLocaleString() : '0'}</p></div>
                 <div><p class="font-semibold">Allowance:</p><p>PKR ${employee.allowance ? employee.allowance.toLocaleString() : '0'}</p></div>
+                <div><p class="font-semibold">Total Compensation:</p><p class="font-bold text-indigo-700">PKR ${totalComp.toLocaleString()}</p></div>
                 <div class="md:col-span-2"><p class="font-semibold">Address:</p><p>${employee.address || 'N/A'}</p></div>
             `;
             
@@ -3299,6 +3606,136 @@
             const content = overlay.querySelector('.popup-window-content');
             overlay.classList.remove('active');
             content.classList.remove('active');
+        });
+
+        // --- EMPLOYEE PHOTO UPLOAD ---
+        document.getElementById('employee-photo-file-input').addEventListener('change', async (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+            const employeeId = editEmployeeForm.dataset.id;
+            if (!employeeId) return;
+            const reader = new FileReader();
+            reader.onload = async (evt) => {
+                const dataUrl = evt.target.result;
+                showLoading();
+                try {
+                    await db.collection(`users/${currentUserId}/employees`).doc(employeeId).update({ photoUrl: dataUrl });
+                    showEmployeeProfile(employeeId);
+                } catch (error) {
+                    showMessage('Error', 'Failed to save photo: ' + error.message);
+                } finally {
+                    hideLoading();
+                }
+            };
+            reader.readAsDataURL(file);
+            e.target.value = '';
+        });
+
+        document.getElementById('employee-photo-url-btn').addEventListener('click', async () => {
+            const url = document.getElementById('employee-photo-url-input').value.trim();
+            if (!url) return showMessage('Error', 'Please enter a valid image URL.');
+            const employeeId = editEmployeeForm.dataset.id;
+            if (!employeeId) return;
+            showLoading();
+            try {
+                await db.collection(`users/${currentUserId}/employees`).doc(employeeId).update({ photoUrl: url });
+                showEmployeeProfile(employeeId);
+            } catch (error) {
+                showMessage('Error', 'Failed to save photo URL: ' + error.message);
+            } finally {
+                hideLoading();
+            }
+        });
+
+        // --- SALARY SLIP GENERATOR ---
+        document.getElementById('generate-salary-slip-btn').addEventListener('click', () => {
+            const slipDiv = document.getElementById('salary-slip-generator');
+            slipDiv.classList.toggle('hidden');
+            if (!slipDiv.classList.contains('hidden')) {
+                populateMonthDropdown(document.getElementById('salary-slip-month'));
+                document.getElementById('salary-slip-year').value = new Date().getFullYear();
+            }
+        });
+
+        document.getElementById('print-salary-slip-btn').addEventListener('click', () => {
+            const employeeId = editEmployeeForm.dataset.id;
+            const employee = allEmployees.find(e => e.id === employeeId);
+            if (!employee) return;
+
+            const monthIdx = parseInt(document.getElementById('salary-slip-month').value);
+            const year = parseInt(document.getElementById('salary-slip-year').value);
+            if (isNaN(monthIdx) || isNaN(year) || year < 2000) {
+                return showMessage('Error', 'Please select a valid month and year.');
+            }
+            const monthName = months[monthIdx];
+            const basicSalary = employee.salary || 0;
+            const incentives = employee.incentives || 0;
+            const allowance = employee.allowance || 0;
+            const grossSalary = basicSalary + incentives + allowance;
+
+            const printWindow = window.open('', '_blank', 'width=750,height=600');
+            printWindow.document.write(`<!DOCTYPE html>
+<html><head><meta charset="UTF-8">
+<title>Salary Slip — ${employee.name} — ${monthName} ${year}</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: Arial, sans-serif; font-size: 13px; color: #1e293b; background: #fff; padding: 30px; }
+  .header { display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 3px solid #4f46e5; padding-bottom: 14px; margin-bottom: 20px; }
+  .header h1 { font-size: 20px; font-weight: 700; color: #4f46e5; }
+  .header p { font-size: 12px; color: #64748b; margin-top: 3px; }
+  .slip-title { text-align: center; font-size: 16px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: #1e293b; margin-bottom: 18px; padding: 8px; background: #eef2ff; border-radius: 6px; }
+  .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px 24px; margin-bottom: 20px; padding: 14px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; }
+  .info-grid .label { font-size: 11px; color: #64748b; text-transform: uppercase; letter-spacing: .05em; }
+  .info-grid .val { font-size: 14px; font-weight: 600; color: #1e293b; margin-bottom: 6px; }
+  table { width: 100%; border-collapse: collapse; margin-bottom: 16px; }
+  thead { background: #4f46e5; }
+  thead th { color: #fff; padding: 9px 12px; text-align: left; font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: .05em; }
+  tbody tr:nth-child(even) { background: #f8fafc; }
+  tbody td { padding: 9px 12px; border-bottom: 1px solid #e2e8f0; }
+  .total-row { background: #eef2ff !important; font-weight: 700; color: #4f46e5; }
+  .total-row td { border-top: 2px solid #4f46e5; padding: 10px 12px; font-size: 14px; }
+  .footer { margin-top: 36px; display: flex; justify-content: space-between; align-items: flex-end; }
+  .sig-line { border-top: 1px solid #94a3b8; padding-top: 6px; font-size: 11px; color: #64748b; min-width: 160px; text-align: center; }
+  .print-footer { margin-top: 20px; text-align: center; font-size: 11px; color: #94a3b8; border-top: 1px solid #e2e8f0; padding-top: 12px; }
+  @media print { body { padding: 15px; } }
+</style>
+</head><body>
+<div class="header">
+  <div>
+    <h1>Darson Securities Pvt Limited SGD BR</h1>
+    <p>Official Salary Slip</p>
+  </div>
+  <div style="text-align:right;font-size:11px;color:#64748b;">
+    <p>Printed: ${new Date().toLocaleString('en-PK')}</p>
+  </div>
+</div>
+<div class="slip-title">Salary Slip — ${monthName} ${year}</div>
+<div class="info-grid">
+  <div><div class="label">Employee Name</div><div class="val">${employee.name}</div></div>
+  <div><div class="label">CNIC</div><div class="val">${employee.cnic || 'N/A'}</div></div>
+  <div><div class="label">Designation</div><div class="val">${employee.designation || 'N/A'}</div></div>
+  <div><div class="label">Contact</div><div class="val">${employee.contact || 'N/A'}</div></div>
+  <div><div class="label">Joining Date</div><div class="val">${employee.joiningDate ? new Date(employee.joiningDate).toLocaleDateString('en-PK') : 'N/A'}</div></div>
+  <div><div class="label">Pay Period</div><div class="val">${monthName} ${year}</div></div>
+</div>
+<table>
+  <thead><tr><th>Earnings</th><th style="text-align:right;">Amount (PKR)</th></tr></thead>
+  <tbody>
+    <tr><td>Basic Salary</td><td style="text-align:right;">${basicSalary.toLocaleString()}</td></tr>
+    <tr><td>Incentives</td><td style="text-align:right;">${incentives.toLocaleString()}</td></tr>
+    <tr><td>Allowance</td><td style="text-align:right;">${allowance.toLocaleString()}</td></tr>
+    <tr class="total-row"><td>Gross Salary</td><td style="text-align:right;">PKR ${grossSalary.toLocaleString()}</td></tr>
+  </tbody>
+</table>
+<div class="footer">
+  <div class="sig-line">Employee Signature</div>
+  <div class="sig-line">Authorized Signatory</div>
+</div>
+<div class="print-footer">Darson Securities Pvt Limited SGD BR &mdash; Salary Slip &mdash; ${monthName} ${year}</div>
+</body></html>`);
+            printWindow.document.close();
+            printWindow.focus();
+            setTimeout(() => printWindow.print(), 400);
         });
 
         document.getElementById('edit-employee-btn').addEventListener('click', (e) => {
@@ -3663,7 +4100,7 @@
 </head><body>
 <div class="header">
   <div>
-    <h1>Darson Sargodha Brokerage</h1>
+    <h1>Darson Securities Pvt Limited SGD BR</h1>
     <p>Courier Activity Report</p>
     <p style="margin-top:6px;font-size:13px;color:#1e293b;font-weight:600;">Period: ${fmt(fromVal)} &mdash; ${fmt(toVal)}</p>
   </div>
@@ -3695,6 +4132,94 @@
             setTimeout(() => printWindow.print(), 400);
         });
         
+        // --- SALARY SLIP SECTION (standalone in employees page) ---
+        function populateSalarySlipEmployeeSelect() {
+            const sel = document.getElementById('salary-slip-employee-select');
+            if (!sel) return;
+            const currentVal = sel.value;
+            sel.innerHTML = '<option value="">-- Select Employee --</option>';
+            allEmployees.forEach(emp => {
+                const opt = document.createElement('option');
+                opt.value = emp.id;
+                opt.textContent = emp.name + (emp.designation ? ` (${emp.designation})` : '');
+                sel.appendChild(opt);
+            });
+            if (currentVal) sel.value = currentVal;
+        }
+
+        document.getElementById('print-salary-slip-section-btn').addEventListener('click', () => {
+            const employeeId = document.getElementById('salary-slip-employee-select').value;
+            if (!employeeId) return showMessage('Error', 'Please select an employee.');
+            const employee = allEmployees.find(e => e.id === employeeId);
+            if (!employee) return;
+            const monthIdx = parseInt(document.getElementById('salary-slip-section-month').value);
+            const year = parseInt(document.getElementById('salary-slip-section-year').value);
+            if (isNaN(monthIdx) || isNaN(year) || year < 2000) return showMessage('Error', 'Please select a valid month and year.');
+            const monthName = months[monthIdx];
+            const basicSalary = employee.salary || 0;
+            const incentives = employee.incentives || 0;
+            const allowance = employee.allowance || 0;
+            const grossSalary = basicSalary + incentives + allowance;
+            const printWindow = window.open('', '_blank', 'width=750,height=600');
+            printWindow.document.write(`<!DOCTYPE html>
+<html><head><meta charset="UTF-8">
+<title>Salary Slip - ${employee.name} - ${monthName} ${year}</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: Arial, sans-serif; font-size: 13px; color: #1e293b; background: #fff; padding: 30px; }
+  .header { display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 3px solid #4f46e5; padding-bottom: 14px; margin-bottom: 20px; }
+  .header h1 { font-size: 20px; font-weight: 700; color: #4f46e5; }
+  .header p { font-size: 12px; color: #64748b; margin-top: 3px; }
+  .slip-title { text-align: center; font-size: 16px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: #1e293b; margin-bottom: 18px; padding: 8px; background: #eef2ff; border-radius: 6px; }
+  .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px 24px; margin-bottom: 20px; padding: 14px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; }
+  .info-grid .label { font-size: 11px; color: #64748b; text-transform: uppercase; letter-spacing: .05em; }
+  .info-grid .val { font-size: 14px; font-weight: 600; color: #1e293b; margin-bottom: 6px; }
+  table { width: 100%; border-collapse: collapse; margin-bottom: 16px; }
+  thead { background: #4f46e5; }
+  thead th { color: #fff; padding: 9px 12px; text-align: left; font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: .05em; }
+  tbody tr:nth-child(even) { background: #f8fafc; }
+  tbody td { padding: 9px 12px; border-bottom: 1px solid #e2e8f0; }
+  .total-row { background: #eef2ff !important; font-weight: 700; color: #4f46e5; }
+  .total-row td { border-top: 2px solid #4f46e5; padding: 10px 12px; font-size: 14px; }
+  .footer { margin-top: 36px; display: flex; justify-content: space-between; align-items: flex-end; }
+  .sig-line { border-top: 1px solid #94a3b8; padding-top: 6px; font-size: 11px; color: #64748b; min-width: 160px; text-align: center; }
+  .print-footer { margin-top: 20px; text-align: center; font-size: 11px; color: #94a3b8; border-top: 1px solid #e2e8f0; padding-top: 12px; }
+  @media print { body { padding: 15px; } }
+</style>
+</head><body>
+<div class="header">
+  <div><h1>Darson Securities Pvt Limited SGD BR</h1><p>Official Salary Slip</p></div>
+  <div style="text-align:right;font-size:11px;color:#64748b;"><p>Printed: ${new Date().toLocaleString('en-PK')}</p></div>
+</div>
+<div class="slip-title">Salary Slip - ${monthName} ${year}</div>
+<div class="info-grid">
+  <div><div class="label">Employee Name</div><div class="val">${employee.name}</div></div>
+  <div><div class="label">CNIC</div><div class="val">${employee.cnic || 'N/A'}</div></div>
+  <div><div class="label">Designation</div><div class="val">${employee.designation || 'N/A'}</div></div>
+  <div><div class="label">Contact</div><div class="val">${employee.contact || 'N/A'}</div></div>
+  <div><div class="label">Joining Date</div><div class="val">${employee.joiningDate ? new Date(employee.joiningDate).toLocaleDateString('en-PK') : 'N/A'}</div></div>
+  <div><div class="label">Pay Period</div><div class="val">${monthName} ${year}</div></div>
+</div>
+<table>
+  <thead><tr><th>Earnings</th><th style="text-align:right;">Amount (PKR)</th></tr></thead>
+  <tbody>
+    <tr><td>Basic Salary</td><td style="text-align:right;">${basicSalary.toLocaleString()}</td></tr>
+    <tr><td>Incentives</td><td style="text-align:right;">${incentives.toLocaleString()}</td></tr>
+    <tr><td>Allowance</td><td style="text-align:right;">${allowance.toLocaleString()}</td></tr>
+    <tr class="total-row"><td>Gross Salary</td><td style="text-align:right;">PKR ${grossSalary.toLocaleString()}</td></tr>
+  </tbody>
+</table>
+<div class="footer">
+  <div class="sig-line">Employee Signature</div>
+  <div class="sig-line">Authorized Signatory</div>
+</div>
+<div class="print-footer">Darson Sargodha Brokerage - Salary Slip - ${monthName} ${year}</div>
+</body></html>`);
+            printWindow.document.close();
+            printWindow.focus();
+            setTimeout(() => printWindow.print(), 400);
+        });
+
         // --- Initialize App ---
         document.addEventListener('DOMContentLoaded', () => {
             const urlParams = new URLSearchParams(window.location.search);
@@ -3722,6 +4247,8 @@
             populateMonthDropdown(document.getElementById('expense-report-month'));
             populateMonthDropdown(document.getElementById('performance-month'));
             populateMonthDropdown(document.getElementById('commission-statement-month'));
+            populateMonthDropdown(document.getElementById('salary-slip-month'));
+            populateMonthDropdown(document.getElementById('salary-slip-section-month'));
             
             initializeCalculator();
         });
