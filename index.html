@@ -578,6 +578,41 @@
         </div>
     </div>
     
+    <!-- Expense Import Preview Modal -->
+    <div id="expense-import-preview-modal" class="modal-overlay">
+        <div class="modal-content card" style="max-width:640px;width:95%;">
+            <h3 class="text-xl font-bold mb-2">Fetched Expenses — Review Before Adding</h3>
+            <p class="text-slate-500 text-sm mb-4">The following expenses were detected in the uploaded file. Confirm to add them to the selected month.</p>
+            <div class="overflow-y-auto mb-4" style="max-height:340px;">
+                <table class="w-full text-left text-sm">
+                    <thead class="sticky top-0 bg-white">
+                        <tr class="text-slate-600 uppercase text-xs border-b-2">
+                            <th class="p-2">#</th>
+                            <th class="p-2">Category</th>
+                            <th class="p-2">Description</th>
+                            <th class="p-2 text-right">Amount (PKR)</th>
+                            <th class="p-2 text-center" title="Tick to mark as Home Expense — will appear in statement but excluded from office total">🏠 Home</th>
+                        </tr>
+                    </thead>
+                    <tbody id="expense-import-preview-list"></tbody>
+                </table>
+            </div>
+            <div class="flex justify-between items-center mb-2 p-3 bg-indigo-50 rounded-xl">
+                <span class="font-semibold text-indigo-800">Office Total (added to balance):</span>
+                <span id="expense-import-office-total" class="font-bold text-indigo-700 text-lg">PKR 0</span>
+            </div>
+            <div class="flex justify-between items-center mb-4 p-3 bg-amber-50 rounded-xl">
+                <span class="font-semibold text-amber-800">🏠 Home Total (shown only, not counted):</span>
+                <span id="expense-import-home-total" class="font-bold text-amber-600 text-lg">PKR 0</span>
+            </div>
+            <div id="expense-import-debt-warning" class="hidden mb-4 p-3 bg-rose-50 border border-rose-200 rounded-xl text-rose-700 text-sm"></div>
+            <div class="flex gap-3 justify-end">
+                <button type="button" id="expense-import-cancel-btn" class="bg-slate-300 text-slate-800 px-6 py-2 rounded-full font-semibold hover:bg-slate-400">Cancel</button>
+                <button type="button" id="expense-import-confirm-btn" class="bg-emerald-600 text-white px-6 py-2 rounded-full font-semibold hover:bg-emerald-700">Add All Expenses</button>
+            </div>
+        </div>
+    </div>
+
     <div id="active-clients-modal" class="modal-overlay">
         <div class="modal-content card">
             <h3 class="text-xl font-bold mb-4">Active Clients (Last Two Months)</h3>
@@ -1213,6 +1248,19 @@
                                             Save Expense
                                         </button>
                                     </form>
+                                </div>
+                                <div class="card p-6 mb-6">
+                                    <h3 class="text-xl font-semibold mb-4">Import Expenses from File</h3>
+                                    <p class="text-slate-500 text-sm mb-4">Upload a <code>.txt</code> or <code>.csv</code> file with expense data. All expenses will be previewed before being added.</p>
+                                    <div class="space-y-4">
+                                        <input type="file" id="expense-file-upload" accept=".txt,.csv"
+                                               class="w-full px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm text-slate-600 file:mr-4 file:py-1 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100 cursor-pointer">
+                                        <input type="date" id="expense-import-date"
+                                               class="w-full px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                                        <button type="button" id="fetch-expenses-btn" class="w-full bg-indigo-600 text-white py-2 rounded-full font-semibold hover:bg-indigo-700 animated-btn">
+                                            <i class="fas fa-file-import mr-2"></i>Fetch &amp; Preview Expenses
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
                             <div class="card p-6">
@@ -2327,7 +2375,7 @@
             });
 
             const expensesByMonth = {};
-            allExpenses.forEach(e => {
+            allExpenses.filter(e => !e.isHome).forEach(e => {
                 const date = new Date(e.date);
                 const key = `${date.getFullYear()}-${String(date.getMonth()).padStart(2, '0')}`;
                 if (!expensesByMonth[key]) expensesByMonth[key] = 0;
@@ -2343,7 +2391,7 @@
                         return `${months[parseInt(month)]} '${year.slice(2)}`;
                     }),
                     // UPDATED: Theme color
-                    datasets: [{ label: 'Total Expenses', data: sortedExpenses.map(([, value]) => value), backgroundColor: '#a855f7' }] // purple-500
+                    datasets: [{ label: 'Office Expenses', data: sortedExpenses.map(([, value]) => value), backgroundColor: '#a855f7' }] // purple-500
                 },
                 options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true } } }
             });
@@ -3081,8 +3129,6 @@
             const balance = totalIn - totalOut;
             const expenseAmount = parseFloat(form['expense-amount'].value);
 
-            if(expenseAmount > balance) return showMessage('Error', `Expense amount (PKR ${expenseAmount.toLocaleString()}) exceeds remaining petty cash (PKR ${balance.toLocaleString()}).`);
-
             showLoading();
             const expenseData = {
                 name: form['expense-name'].value,
@@ -3101,6 +3147,168 @@
             }
         });
 
+        // ─── Expense File Import Logic ───────────────────────────────────────
+        let _pendingImportedExpenses = [];
+
+        function parseExpenseFile(text) {
+            const expenses = [];
+            const lines = text.split(/\r?\n/);
+            // Detect pipe-delimited table (markdown table format from .txt)
+            const isPipeTable = lines.some(l => l.includes('|'));
+
+            if (isPipeTable) {
+                for (const line of lines) {
+                    const trimmed = line.trim();
+                    if (!trimmed.startsWith('|')) continue;
+                    // Skip header/separator rows
+                    if (/^\|\s*[-:]+\s*\|/.test(trimmed)) continue;
+                    if (/category/i.test(trimmed) && /description/i.test(trimmed)) continue;
+                    const cols = trimmed.split('|').map(c => c.trim()).filter(c => c !== '');
+                    if (cols.length < 3) continue;
+                    const category = cols[0] || '';
+                    const description = cols[1] || '';
+                    const rawAmount = cols[2] || '';
+                    // Extract numeric value — strip Rs, PKR, commas
+                    const numMatch = rawAmount.replace(/[,\s]/g, '').match(/[\d.]+/);
+                    if (!numMatch) continue;
+                    const amount = parseFloat(numMatch[0]);
+                    if (isNaN(amount) || amount <= 0) continue;
+                    const name = description && description !== category ? `${category} — ${description}` : (category || description);
+                    expenses.push({ name: name.trim(), amount });
+                }
+            } else {
+                // CSV / plain text fallback: try to find name,amount pairs
+                for (const line of lines) {
+                    const trimmed = line.trim();
+                    if (!trimmed || /^(category|name|description)/i.test(trimmed)) continue;
+                    // Try comma-separated
+                    const parts = trimmed.split(',');
+                    if (parts.length >= 2) {
+                        const name = parts.slice(0, parts.length - 1).join(',').trim();
+                        const rawAmount = parts[parts.length - 1].replace(/[,\s]/g, '');
+                        const numMatch = rawAmount.match(/[\d.]+/);
+                        if (!numMatch || !name) continue;
+                        const amount = parseFloat(numMatch[0]);
+                        if (isNaN(amount) || amount <= 0) continue;
+                        expenses.push({ name, amount });
+                    }
+                }
+            }
+            return expenses;
+        }
+
+        document.getElementById('fetch-expenses-btn').addEventListener('click', () => {
+            const fileInput = document.getElementById('expense-file-upload');
+            const dateInput = document.getElementById('expense-import-date');
+            if (!fileInput.files || !fileInput.files[0]) {
+                return showMessage('Error', 'Please select a file to import.');
+            }
+            if (!dateInput.value) {
+                return showMessage('Error', 'Please select a date for the imported expenses.');
+            }
+            const file = fileInput.files[0];
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const text = e.target.result;
+                const expenses = parseExpenseFile(text);
+                if (!expenses.length) {
+                    return showMessage('Error', 'No expenses could be detected in the uploaded file. Please check the format.');
+                }
+                _pendingImportedExpenses = expenses;
+                // Build preview rows with Home flag checkboxes
+                const tbody = document.getElementById('expense-import-preview-list');
+                tbody.innerHTML = expenses.map((exp, i) => `
+                    <tr class="border-b" id="imp-row-${i}">
+                        <td class="p-2 text-slate-400">${i + 1}</td>
+                        <td class="p-2 font-medium">${exp.name.split('—')[0]?.trim() || exp.name}</td>
+                        <td class="p-2 text-slate-500 text-xs">${exp.name.includes('—') ? exp.name.split('—')[1]?.trim() : ''}</td>
+                        <td class="p-2 text-right text-rose-600 font-semibold">PKR ${exp.amount.toLocaleString()}</td>
+                        <td class="p-2 text-center">
+                            <input type="checkbox" class="imp-home-chk w-4 h-4 accent-amber-500 cursor-pointer" data-idx="${i}"
+                                title="Mark as Home Expense (shown in statement but not counted in office total)">
+                        </td>
+                    </tr>
+                `).join('');
+
+                function updateImportTotals() {
+                    const checkboxes = document.querySelectorAll('.imp-home-chk');
+                    let officeTotal = 0, homeTotal = 0;
+                    checkboxes.forEach((chk, i) => {
+                        const amt = _pendingImportedExpenses[i].amount;
+                        if (chk.checked) {
+                            homeTotal += amt;
+                            // dim the row
+                            document.getElementById(`imp-row-${i}`).style.opacity = '0.55';
+                        } else {
+                            officeTotal += amt;
+                            document.getElementById(`imp-row-${i}`).style.opacity = '1';
+                        }
+                    });
+                    document.getElementById('expense-import-office-total').textContent = `PKR ${officeTotal.toLocaleString()}`;
+                    document.getElementById('expense-import-home-total').textContent = `PKR ${homeTotal.toLocaleString()}`;
+                    // Debt warning uses office total only
+                    const totalIn = allPettyCashEntries.reduce((sum, entry) => sum + entry.amount, 0);
+                    const totalOut = allExpenses.reduce((sum, entry) => sum + entry.amount, 0);
+                    const currentBalance = totalIn - totalOut;                    const debtWarning = document.getElementById('expense-import-debt-warning');
+                    if (officeTotal > currentBalance) {
+                        const debt = officeTotal - currentBalance;
+                        debtWarning.textContent = `Warning: Office expenses (PKR ${officeTotal.toLocaleString()}) exceed the current balance (PKR ${currentBalance.toLocaleString()}). A debt of PKR ${debt.toLocaleString()} will be recorded. You can recover it by adding Cash In.`;
+                        debtWarning.classList.remove('hidden');
+                    } else {
+                        debtWarning.classList.add('hidden');
+                    }
+                }
+
+                // Attach live listeners
+                document.querySelectorAll('.imp-home-chk').forEach(chk => {
+                    chk.addEventListener('change', updateImportTotals);
+                });
+                updateImportTotals();
+                document.getElementById('expense-import-preview-modal').style.display = 'flex';
+            };
+            reader.onerror = () => showMessage('Error', 'Could not read the file.');
+            reader.readAsText(file);
+        });
+
+        document.getElementById('expense-import-cancel-btn').addEventListener('click', () => {
+            document.getElementById('expense-import-preview-modal').style.display = 'none';
+            _pendingImportedExpenses = [];
+        });
+
+        document.getElementById('expense-import-confirm-btn').addEventListener('click', async () => {
+            if (!_pendingImportedExpenses.length) return;
+            const dateValue = document.getElementById('expense-import-date').value;
+            // Collect home flags from checkboxes before closing modal
+            const checkboxes = document.querySelectorAll('.imp-home-chk');
+            const homeFlags = Array.from(checkboxes).map(chk => chk.checked);
+            const count = _pendingImportedExpenses.length;
+            showLoading();
+            document.getElementById('expense-import-preview-modal').style.display = 'none';
+            try {
+                const batch = db.batch();
+                for (let i = 0; i < _pendingImportedExpenses.length; i++) {
+                    const exp = _pendingImportedExpenses[i];
+                    const ref = db.collection(`users/${currentUserId}/expenses`).doc();
+                    batch.set(ref, {
+                        name: exp.name,
+                        amount: exp.amount,
+                        date: dateValue,
+                        isHome: homeFlags[i] || false,
+                        timestamp: firebase.firestore.FieldValue.serverTimestamp()
+                    });
+                }
+                await batch.commit();
+                _pendingImportedExpenses = [];
+                document.getElementById('expense-file-upload').value = '';
+                showMessage('Success', `${count} expenses have been added successfully.`);
+            } catch (error) {
+                showMessage('Error', error.message);
+            } finally {
+                hideLoading();
+            }
+        });
+        // ─── End Expense File Import Logic ──────────────────────────────────
+
         function renderExpenses() {
             document.getElementById('add-expense-forms-wrapper').style.display = isSharedView ? 'none' : 'block';
             document.querySelectorAll('#expenses .actions-header').forEach(el => el.style.display = isSharedView ? 'none' : 'table-cell');
@@ -3109,7 +3317,14 @@
             const totalIn = allPettyCashEntries.reduce((sum, entry) => sum + entry.amount, 0);
             const totalOut = allExpenses.reduce((sum, entry) => sum + entry.amount, 0);
             const balance = totalIn - totalOut;
-            document.getElementById('petty-cash-balance').textContent = `PKR ${balance.toLocaleString()}`;
+            const balanceEl = document.getElementById('petty-cash-balance');
+            if (balance < 0) {
+                balanceEl.textContent = `PKR ${balance.toLocaleString()} (Debt)`;
+                balanceEl.style.color = '#e11d48';
+            } else {
+                balanceEl.textContent = `PKR ${balance.toLocaleString()}`;
+                balanceEl.style.color = '';
+            }
 
             const selectedMonth = parseInt(document.getElementById('expense-report-month').value);
             const selectedYear = parseInt(document.getElementById('expense-report-year').value);
@@ -3121,26 +3336,47 @@
             const openingBalance = previousCashIn - previousExpenses;
             document.getElementById('opening-balance-display').textContent = `PKR ${openingBalance.toLocaleString()}`;
 
-            const cashInThisMonth = allPettyCashEntries.filter(e => { const date = new Date(e.date); return date.getMonth() === selectedMonth && date.getFullYear() === selectedYear; }).map(e => ({ id: e.id, date: e.date, description: 'Petty Cash In', cr: e.amount, dr: 0, type: 'petty_cash' }));
-            const expensesThisMonth = allExpenses.filter(e => { const date = new Date(e.date); return date.getMonth() === selectedMonth && date.getFullYear() === selectedYear; }).map(e => ({ id: e.id, date: e.date, description: e.name, cr: 0, dr: e.amount, type: 'expenses' }));
+            const cashInThisMonth = allPettyCashEntries.filter(e => { const date = new Date(e.date); return date.getMonth() === selectedMonth && date.getFullYear() === selectedYear; }).map(e => ({ id: e.id, date: e.date, description: 'Petty Cash In', cr: e.amount, dr: 0, type: 'petty_cash', isHome: false }));
+            const expensesThisMonth = allExpenses.filter(e => { const date = new Date(e.date); return date.getMonth() === selectedMonth && date.getFullYear() === selectedYear; }).map(e => ({ id: e.id, date: e.date, description: e.name, cr: 0, dr: e.amount, type: 'expenses', isHome: !!e.isHome }));
             const transactions = [...cashInThisMonth, ...expensesThisMonth].sort((a, b) => new Date(a.date) - new Date(b.date));
 
             const statementList = document.getElementById('expense-statement-list');
             let runningBalance = openingBalance;
+            let hasHomeExpenses = false;
             statementList.innerHTML = transactions.map(t => {
+                const home = t.isHome;
+                if (home) hasHomeExpenses = true;
+                // ALL expenses (home + office) deduct from running balance
                 runningBalance += t.cr - t.dr;
+                const rowStyle = home ? 'background:#fffbeb;font-style:italic;' : '';
+                const homeTag = home ? ' <span style="font-size:0.7rem;background:#fde68a;color:#92400e;border-radius:4px;padding:1px 5px;margin-left:4px;font-style:normal;">🏠 Home</span>' : '';
                 return `
-                    <tr class="border-b">
+                    <tr class="border-b" style="${rowStyle}">
                         <td class="p-2">${new Date(t.date).toLocaleDateString()}</td>
-                        <td class="p-2">${t.description}</td>
-                        <!-- UPDATED: Text colors -->
+                        <td class="p-2">${t.description}${homeTag}</td>
                         <td class="p-2 text-right text-rose-600">${t.dr > 0 ? `PKR ${t.dr.toLocaleString()}` : '-'}</td>
                         <td class="p-2 text-right text-emerald-600">${t.cr > 0 ? `PKR ${t.cr.toLocaleString()}` : '-'}</td>
-                        <td class="p-2 text-right font-semibold">${`PKR ${runningBalance.toLocaleString()}`}</td>
+                        <td class="p-2 text-right font-semibold">PKR ${runningBalance.toLocaleString()}</td>
                         ${!isSharedView ? `<td class="p-2"><button class="text-rose-600 hover:underline" onclick="deleteItem('${t.type}', '${t.id}')">Delete</button></td>` : ''}
                     </tr>
                 `;
             }).join('');
+
+            // Home expense disclaimer note under table
+            let noteEl = document.getElementById('home-expense-ledger-note');
+            if (!noteEl) {
+                noteEl = document.createElement('div');
+                noteEl.id = 'home-expense-ledger-note';
+                noteEl.style.cssText = 'margin-top:8px;padding:8px 12px;background:#fffbeb;border:1px solid #fde68a;border-radius:8px;font-size:0.78rem;color:#92400e;';
+                document.getElementById('expenses-report-container').appendChild(noteEl);
+            }
+            if (hasHomeExpenses) {
+                const monthName = typeof months !== 'undefined' ? months[selectedMonth] : '';
+                noteEl.style.display = 'block';
+                noteEl.innerHTML = `🏠 <strong>Note:</strong> Home expenses for ${monthName} ${selectedYear} are included in the balance. They are marked separately for reference but <strong>excluded only from the dashboard graph</strong> (office totals only).`;
+            } else {
+                noteEl.style.display = 'none';
+            }
             
             document.getElementById('closing-balance-display').textContent = `PKR ${runningBalance.toLocaleString()}`;
         }
@@ -3159,17 +3395,23 @@
             const previousExpenses = allExpenses.filter(e => new Date(e.date) < firstDayOfSelectedMonth).reduce((sum, e) => sum + e.amount, 0);
             const openingBalance = previousCashIn - previousExpenses;
 
-            const cashInThisMonth = allPettyCashEntries.filter(e => { const date = new Date(e.date); return date.getMonth() === month && date.getFullYear() === year; }).map(e => ({ date: e.date, description: 'Petty Cash In', cr: e.amount, dr: 0 }));
-            const expensesThisMonth = allExpenses.filter(e => { const date = new Date(e.date); return date.getMonth() === month && date.getFullYear() === year; }).map(e => ({ date: e.date, description: e.name, cr: 0, dr: e.amount }));
+            const cashInThisMonth = allPettyCashEntries.filter(e => { const date = new Date(e.date); return date.getMonth() === month && date.getFullYear() === year; }).map(e => ({ date: e.date, description: 'Petty Cash In', cr: e.amount, dr: 0, isHome: false }));
+            const expensesThisMonth = allExpenses.filter(e => { const date = new Date(e.date); return date.getMonth() === month && date.getFullYear() === year; }).map(e => ({ date: e.date, description: e.name, cr: 0, dr: e.amount, isHome: !!e.isHome }));
             const transactions = [...cashInThisMonth, ...expensesThisMonth].sort((a, b) => new Date(a.date) - new Date(b.date));
 
             let runningBalance = openingBalance;
+            let hasHomePrint = false;
             const transactionRows = transactions.map(t => {
+                const home = t.isHome;
+                if (home) hasHomePrint = true;
+                // ALL expenses deduct from balance in statement
                 runningBalance += t.cr - t.dr;
+                const rowBg = home ? 'background:#fffbeb;font-style:italic;color:#92400e;' : '';
+                const homeTag = home ? ' <span style="font-size:0.68rem;background:#fde68a;color:#92400e;border-radius:3px;padding:1px 4px;font-style:normal;">🏠 Home</span>' : '';
                 return `
-                    <tr>
+                    <tr style="${rowBg}">
                         <td>${new Date(t.date).toLocaleDateString()}</td>
-                        <td>${t.description}</td>
+                        <td>${t.description}${homeTag}</td>
                         <td class="text-right">${t.dr > 0 ? `(PKR ${t.dr.toLocaleString()})` : '-'}</td>
                         <td class="text-right">${t.cr > 0 ? `PKR ${t.cr.toLocaleString()}` : '-'}</td>
                         <td class="text-right">PKR ${runningBalance.toLocaleString()}</td>
@@ -3195,6 +3437,7 @@
                         </tbody>
                     </table>
                     <table class="summary-table"><tr><td><strong>Closing Balance</strong></td><td class="text-right"><strong>PKR ${closingBalance.toLocaleString()}</strong></td></tr></table>
+                    ${hasHomePrint ? `<div style="margin-top:16px;padding:10px 14px;background:#fffbeb;border:1px solid #fde68a;border-radius:6px;font-size:0.82rem;color:#92400e;">&#127968; <strong>Note:</strong> Home expenses for ${monthName} ${year} are included in the balance above. They are marked separately for reference and excluded only from the dashboard graph (office totals only).</div>` : ''}
                 </body>
                 </html>
             `;
