@@ -646,6 +646,81 @@
         </div>
     </div>
 
+    <!-- ADDED: Download Client Report Modal -->
+    <div id="download-report-modal" class="modal-overlay">
+        <div class="modal-content card" style="max-width:520px;width:95%;">
+            <h3 class="text-xl font-bold mb-1">Download Client Report</h3>
+            <p class="text-slate-500 text-sm mb-5">Select client list and preferred format to download.</p>
+
+            <!-- Step 1: Client List Selection -->
+            <div class="mb-5">
+                <label class="block text-sm font-semibold text-slate-700 mb-2">
+                    <span class="inline-flex items-center justify-center w-5 h-5 rounded-full bg-indigo-600 text-white text-xs mr-2">1</span>
+                    Select Client List
+                </label>
+                <div class="grid grid-cols-1 gap-2" id="report-filter-options">
+                    <label class="flex items-center gap-3 p-3 border-2 border-indigo-200 rounded-xl cursor-pointer hover:border-indigo-500 transition-colors has-[:checked]:border-indigo-600 has-[:checked]:bg-indigo-50">
+                        <input type="radio" name="report-client-filter" value="all" checked class="accent-indigo-600">
+                        <div>
+                            <p class="font-semibold text-slate-800">All Clients</p>
+                            <p class="text-xs text-slate-500">Download the complete list of all registered clients</p>
+                        </div>
+                    </label>
+                    <label class="flex items-center gap-3 p-3 border-2 border-emerald-200 rounded-xl cursor-pointer hover:border-emerald-500 transition-colors has-[:checked]:border-emerald-600 has-[:checked]:bg-emerald-50">
+                        <input type="radio" name="report-client-filter" value="active" class="accent-emerald-600">
+                        <div>
+                            <p class="font-semibold text-slate-800">Active Clients Only</p>
+                            <p class="text-xs text-slate-500">Clients who appear in Active Clients (Last Two Months) — current or previous month</p>
+                        </div>
+                    </label>
+                    <label class="flex items-center gap-3 p-3 border-2 border-rose-200 rounded-xl cursor-pointer hover:border-rose-500 transition-colors has-[:checked]:border-rose-600 has-[:checked]:bg-rose-50">
+                        <input type="radio" name="report-client-filter" value="inactive" class="accent-rose-600">
+                        <div>
+                            <p class="font-semibold text-slate-800">Inactive Clients Only</p>
+                            <p class="text-xs text-slate-500">Clients not in the Last Two Months active list</p>
+                        </div>
+                    </label>
+                </div>
+            </div>
+
+            <!-- Step 2: Format Selection -->
+            <div class="mb-6">
+                <label class="block text-sm font-semibold text-slate-700 mb-2">
+                    <span class="inline-flex items-center justify-center w-5 h-5 rounded-full bg-indigo-600 text-white text-xs mr-2">2</span>
+                    Select Download Format
+                </label>
+                <div class="grid grid-cols-3 gap-3" id="report-format-options">
+                    <label class="flex flex-col items-center gap-2 p-3 border-2 border-slate-200 rounded-xl cursor-pointer hover:border-indigo-400 transition-colors has-[:checked]:border-indigo-600 has-[:checked]:bg-indigo-50 text-center">
+                        <input type="radio" name="report-format" value="pdf" checked class="accent-indigo-600">
+                        <i class="fas fa-file-pdf text-2xl text-rose-500"></i>
+                        <span class="text-sm font-semibold text-slate-700">PDF</span>
+                    </label>
+                    <label class="flex flex-col items-center gap-2 p-3 border-2 border-slate-200 rounded-xl cursor-pointer hover:border-emerald-400 transition-colors has-[:checked]:border-emerald-600 has-[:checked]:bg-emerald-50 text-center">
+                        <input type="radio" name="report-format" value="excel" class="accent-emerald-600">
+                        <i class="fas fa-file-excel text-2xl text-emerald-600"></i>
+                        <span class="text-sm font-semibold text-slate-700">Excel</span>
+                    </label>
+                    <label class="flex flex-col items-center gap-2 p-3 border-2 border-slate-200 rounded-xl cursor-pointer hover:border-slate-400 transition-colors has-[:checked]:border-slate-600 has-[:checked]:bg-slate-50 text-center">
+                        <input type="radio" name="report-format" value="txt" class="accent-slate-600">
+                        <i class="fas fa-file-alt text-2xl text-slate-500"></i>
+                        <span class="text-sm font-semibold text-slate-700">Notepad</span>
+                    </label>
+                </div>
+            </div>
+
+            <!-- Record count preview -->
+            <div id="report-count-preview" class="mb-5 p-3 bg-indigo-50 border border-indigo-200 rounded-xl text-sm text-indigo-800 font-medium text-center"></div>
+
+            <!-- Actions -->
+            <div class="flex gap-3 justify-end">
+                <button type="button" id="download-report-cancel-btn" class="bg-slate-300 text-slate-800 px-6 py-2 rounded-full font-semibold hover:bg-slate-400">Cancel</button>
+                <button type="button" id="download-report-confirm-btn" class="bg-indigo-600 text-white px-6 py-2 rounded-full font-semibold hover:bg-indigo-700 animated-btn">
+                    <i class="fas fa-download mr-2"></i>Download
+                </button>
+            </div>
+        </div>
+    </div>
+
     <!-- REMOVED: Courier Edit Modal -->
 
     <main id="auth-section" class="flex-grow flex items-center justify-center p-4 min-h-screen">
@@ -3591,67 +3666,272 @@
             profilesList.querySelectorAll('.card').forEach(card => card.addEventListener('click', (e) => showClientProfile(e.currentTarget.dataset.id)));
         }
 
-        // ADDED: Function to download client report as CSV
+        // ─── ENHANCED DOWNLOAD CLIENT REPORT MODULE ──────────────────────────────
+
+        // Helper: get the set of clientIds that have commission added this current month
+        // Helper: get active client IDs — same logic as "Active Clients (Last Two Months)" modal
+        function getActiveClientIdsLastTwoMonths() {
+            const now = new Date();
+            const currentMonth = now.getMonth();
+            const currentYear = now.getFullYear();
+            const prevDate = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+            const previousMonth = prevDate.getMonth();
+            const previousYear = prevDate.getFullYear();
+            return new Set(
+                allClientPayments
+                    .filter(p =>
+                        (p.month === currentMonth && p.year === currentYear) ||
+                        (p.month === previousMonth && p.year === previousYear)
+                    )
+                    .map(p => p.clientId)
+            );
+        }
+
+        // Helper: filter allClients based on chosen filter option
+        function getFilteredClientsForReport(filterValue) {
+            const activeIds = getActiveClientIdsLastTwoMonths();
+            if (filterValue === 'active') {
+                // Active = has payment in current or previous month (matches Active Clients modal)
+                return allClients.filter(c => activeIds.has(c.id));
+            } else if (filterValue === 'inactive') {
+                // Inactive = not in the active set
+                return allClients.filter(c => !activeIds.has(c.id));
+            }
+            // 'all'
+            return [...allClients];
+        }
+
+        // Opens the modal and wires up count preview
         function downloadClientReport() {
             if (allClients.length === 0) {
                 showMessage('Info', 'No client data to download.');
                 return;
             }
+            updateDownloadReportCountPreview();
+            document.getElementById('download-report-modal').style.display = 'flex';
+        }
 
-            // Define CSV headers
-            const headers = [
-                "Name", 
-                "Contact", 
-                "Trading Account", 
-                "CNIC", 
-                "CDC Account", 
-                "Email", 
-                "Address", 
-                "Status"
-            ];
-            
-            let csvContent = headers.join(",") + "\n";
+        function updateDownloadReportCountPreview() {
+            const filterVal = document.querySelector('input[name="report-client-filter"]:checked')?.value || 'all';
+            const clients = getFilteredClientsForReport(filterVal);
+            const labels = { all: 'All Clients', active: 'Active Clients', inactive: 'Inactive Clients' };
+            document.getElementById('report-count-preview').textContent =
+                `${labels[filterVal]}: ${clients.length} record(s) will be included in the report.`;
+        }
 
-            // Iterate over allClients array
-            allClients.forEach(client => {
-                const status = client.isClosed ? "Inactive" : "Active";
-                
-                // Function to escape commas and quotes in a field
-                const escapeField = (field) => {
-                    const strField = String(field || ''); // Handle null/undefined
-                    if (strField.includes(',') || strField.includes('"') || strField.includes('\n')) {
-                        return `"${strField.replace(/"/g, '""')}"`; // Escape quotes by doubling them
-                    }
-                    return strField;
-                };
+        // Wire up live count preview on filter/format change
+        document.querySelectorAll('input[name="report-client-filter"]').forEach(r =>
+            r.addEventListener('change', updateDownloadReportCountPreview));
 
-                const row = [
-                    escapeField(client.name),
-                    escapeField(client.contact),
-                    escapeField(client.tradingAccount),
-                    escapeField(client.cnic),
-                    escapeField(client.cdcAccount),
-                    escapeField(client.email),
-                    escapeField(client.address),
-                    escapeField(status)
-                ];
-                
-                csvContent += row.join(",") + "\n";
+        document.getElementById('download-report-cancel-btn').addEventListener('click', () => {
+            document.getElementById('download-report-modal').style.display = 'none';
+        });
+
+        document.getElementById('download-report-confirm-btn').addEventListener('click', () => {
+            const filterVal = document.querySelector('input[name="report-client-filter"]:checked')?.value || 'all';
+            const formatVal = document.querySelector('input[name="report-format"]:checked')?.value || 'pdf';
+            const clients = getFilteredClientsForReport(filterVal);
+
+            if (clients.length === 0) {
+                showMessage('Info', 'No clients match the selected filter.');
+                return;
+            }
+
+            const filterLabel = { all: 'All Clients', active: 'Active Clients', inactive: 'Inactive Clients' }[filterVal];
+            const now = new Date();
+            const dateStr = now.toLocaleDateString('en-PK', { day: '2-digit', month: 'long', year: 'numeric' });
+            const fileDate = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')}`;
+
+            if (formatVal === 'pdf') {
+                _downloadReportPDF(clients, filterLabel, dateStr);
+            } else if (formatVal === 'excel') {
+                _downloadReportExcel(clients, filterLabel, fileDate);
+            } else if (formatVal === 'txt') {
+                _downloadReportNotepad(clients, filterLabel, dateStr, fileDate);
+            }
+
+            document.getElementById('download-report-modal').style.display = 'none';
+        });
+
+        // ── PDF Download ──────────────────────────────────────────────────────────
+        function _downloadReportPDF(clients, filterLabel, dateStr) {
+            const rows = clients.map((c, i) => {
+                const status = c.isClosed
+                    ? `<span style="color:#e11d48;font-weight:600;">Inactive</span>`
+                    : `<span style="color:#059669;font-weight:600;">Active</span>`;
+                const bg = i % 2 === 0 ? '#ffffff' : '#f8fafc';
+                return `<tr style="background:${bg};">
+                    <td style="padding:8px 10px;border-bottom:1px solid #e2e8f0;">${i + 1}</td>
+                    <td style="padding:8px 10px;border-bottom:1px solid #e2e8f0;font-weight:600;">${c.name || 'N/A'}</td>
+                    <td style="padding:8px 10px;border-bottom:1px solid #e2e8f0;">${c.tradingAccount || 'N/A'}</td>
+                    <td style="padding:8px 10px;border-bottom:1px solid #e2e8f0;">${c.cnic || 'N/A'}</td>
+                    <td style="padding:8px 10px;border-bottom:1px solid #e2e8f0;">${c.cdcAccount || 'N/A'}</td>
+                    <td style="padding:8px 10px;border-bottom:1px solid #e2e8f0;">${c.contact || 'N/A'}</td>
+                    <td style="padding:8px 10px;border-bottom:1px solid #e2e8f0;">${c.email || 'N/A'}</td>
+                    <td style="padding:8px 10px;border-bottom:1px solid #e2e8f0;">${c.address || 'N/A'}</td>
+                    <td style="padding:8px 10px;border-bottom:1px solid #e2e8f0;">${status}</td>
+                </tr>`;
+            }).join('');
+
+            const html = `<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Client Report — ${filterLabel} — ${dateStr}</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: Arial, sans-serif; font-size: 12px; color: #1e293b; background: #fff; padding: 28px; }
+  .letterhead { display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 3px solid #4f46e5; padding-bottom: 14px; margin-bottom: 6px; }
+  .letterhead h1 { font-size: 20px; font-weight: 700; color: #4f46e5; }
+  .letterhead p { font-size: 11px; color: #64748b; margin-top: 2px; }
+  .report-title { text-align: center; font-size: 14px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.07em; color: #1e293b; margin: 10px 0; padding: 7px; background: #eef2ff; border-radius: 6px; }
+  .meta-bar { display: flex; gap: 20px; margin-bottom: 14px; font-size: 11px; color: #475569; }
+  .meta-bar span { background: #f1f5f9; padding: 3px 10px; border-radius: 20px; }
+  table { width: 100%; border-collapse: collapse; font-size: 11px; }
+  thead { background: #4f46e5; }
+  thead th { color: #fff; padding: 9px 10px; text-align: left; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; }
+  tbody tr:hover { background: #f0f4ff !important; }
+  .footer { margin-top: 22px; text-align: center; font-size: 10px; color: #94a3b8; border-top: 1px solid #e2e8f0; padding-top: 10px; }
+  @media print {
+    body { padding: 14px; }
+    thead { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  }
+</style>
+</head>
+<body>
+<div class="letterhead">
+  <div>
+    <h1>Darson Securities Pvt Limited</h1>
+    <p>Sargodha Branch &mdash; Client Report</p>
+  </div>
+  <div style="text-align:right;">
+    <p style="font-size:11px;color:#64748b;">Date: ${dateStr}</p>
+    <p style="font-size:11px;color:#64748b;">Printed: ${new Date().toLocaleString('en-PK')}</p>
+  </div>
+</div>
+<div class="report-title">Client Report &mdash; ${filterLabel}</div>
+<div class="meta-bar">
+  <span>Total Records: <strong>${clients.length}</strong></span>
+  <span>Filter: <strong>${filterLabel}</strong></span>
+  <span>Generated By: <strong>Darson Brokerage System</strong></span>
+</div>
+<table>
+  <thead>
+    <tr>
+      <th style="width:32px;">#</th>
+      <th>Client Name</th>
+      <th>Trading Acc.</th>
+      <th>CNIC</th>
+      <th>CDC Account</th>
+      <th>Contact</th>
+      <th>Email</th>
+      <th>Address</th>
+      <th style="width:65px;">Status</th>
+    </tr>
+  </thead>
+  <tbody>${rows}</tbody>
+</table>
+<div class="footer">Darson Securities Pvt Limited, Sargodha Branch &mdash; Confidential Client Report &mdash; Generated by Darson Brokerage System</div>
+</body>
+</html>`;
+
+            const win = window.open('', '_blank', 'width=1100,height=750');
+            win.document.write(html);
+            win.document.close();
+            win.focus();
+            setTimeout(() => win.print(), 500);
+        }
+
+        // ── Excel (CSV) Download ──────────────────────────────────────────────────
+        function _downloadReportExcel(clients, filterLabel, fileDate) {
+            const escapeCSV = (val) => {
+                const s = String(val || '');
+                return (s.includes(',') || s.includes('"') || s.includes('\n'))
+                    ? `"${s.replace(/"/g, '""')}"` : s;
+            };
+            const headers = ['#', 'Client Name', 'Trading Account', 'CNIC', 'CDC Account', 'Contact', 'Email', 'Address', 'Status'];
+            let csv = headers.join(',') + '\n';
+            clients.forEach((c, i) => {
+                const status = c.isClosed ? 'Inactive' : 'Active';
+                csv += [
+                    i + 1,
+                    escapeCSV(c.name),
+                    escapeCSV(c.tradingAccount),
+                    escapeCSV(c.cnic),
+                    escapeCSV(c.cdcAccount),
+                    escapeCSV(c.contact),
+                    escapeCSV(c.email),
+                    escapeCSV(c.address),
+                    status
+                ].join(',') + '\n';
+            });
+            // Add summary footer
+            csv += `\n"Report: ${filterLabel}","Total Records: ${clients.length}","Generated: ${new Date().toLocaleString('en-PK')}"`;
+
+            const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `darson_client_report_${filterLabel.replace(/\s+/g,'_').toLowerCase()}_${fileDate}.csv`;
+            a.style.display = 'none';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+
+        // ── Notepad (TXT) Download ────────────────────────────────────────────────
+        function _downloadReportNotepad(clients, filterLabel, dateStr, fileDate) {
+            const pad = (str, len) => String(str || 'N/A').substring(0, len).padEnd(len);
+            const divider = '='.repeat(110);
+            const thinDiv = '-'.repeat(110);
+
+            let txt = '';
+            txt += divider + '\n';
+            txt += '  DARSON SECURITIES PVT LIMITED — SARGODHA BRANCH\n';
+            txt += `  CLIENT REPORT — ${filterLabel.toUpperCase()}\n`;
+            txt += `  Date: ${dateStr}   |   Total Records: ${clients.length}   |   Generated: ${new Date().toLocaleString('en-PK')}\n`;
+            txt += divider + '\n\n';
+
+            // Column widths
+            const col = [4, 28, 16, 16, 14, 14, 28, 28, 10];
+            const hdrs = ['#', 'Client Name', 'Trading Acc.', 'CNIC', 'CDC Account', 'Contact', 'Email', 'Address', 'Status'];
+            txt += hdrs.map((h, i) => pad(h, col[i])).join('  ') + '\n';
+            txt += thinDiv + '\n';
+
+            clients.forEach((c, i) => {
+                const status = c.isClosed ? 'Inactive' : 'Active';
+                txt += [
+                    pad(i + 1, col[0]),
+                    pad(c.name, col[1]),
+                    pad(c.tradingAccount, col[2]),
+                    pad(c.cnic, col[3]),
+                    pad(c.cdcAccount, col[4]),
+                    pad(c.contact, col[5]),
+                    pad(c.email, col[6]),
+                    pad(c.address, col[7]),
+                    pad(status, col[8])
+                ].join('  ') + '\n';
             });
 
-            // Create a blob and trigger download
-            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-            const link = document.createElement("a");
-            if (link.download !== undefined) { 
-                const url = URL.createObjectURL(blob);
-                link.setAttribute("href", url);
-                link.setAttribute("download", "darson_client_report.csv");
-                link.style.visibility = 'hidden';
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
-            }
+            txt += '\n' + divider + '\n';
+            txt += `  END OF REPORT — ${filterLabel} — Total: ${clients.length} clients\n`;
+            txt += '  Darson Securities Pvt Limited — Darson Brokerage System\n';
+            txt += divider + '\n';
+
+            const blob = new Blob([txt], { type: 'text/plain;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `darson_client_report_${filterLabel.replace(/\s+/g,'_').toLowerCase()}_${fileDate}.txt`;
+            a.style.display = 'none';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
         }
+
+        // ─── END ENHANCED DOWNLOAD CLIENT REPORT MODULE ───────────────────────────
         
         async function showClientProfile(clientId) {
             const client = allClients.find(c => c.id === clientId);
