@@ -529,6 +529,13 @@
             font-size: 1.35rem;
             letter-spacing: -0.5px;
         }
+
+        /* ─── HR Module Tabs ─────────────────────── */
+        #hr-tabs { flex-wrap: wrap; }
+        .hr-tab-btn { cursor: pointer; }
+        #employee-doc-grid a { display: inline-flex; align-items: center; text-decoration: none; }
+        .doc-alert-badge { animation: pulse 2s cubic-bezier(0.4,0,0.6,1) infinite; }
+        @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.6} }
     </style>
 </head>
 <!-- UPDATED: Body background color -->
@@ -790,7 +797,7 @@
                     <li><button data-section="calculator" class="nav-btn text-slate-600 hover:bg-indigo-50 hover:text-indigo-600">CGS</button></li>
                     <li><button data-section="expenses" class="nav-btn text-slate-600 hover:bg-indigo-50 hover:text-indigo-600">Expenses</button></li>
                     <li><button data-section="profiles" class="nav-btn text-slate-600 hover:bg-indigo-50 hover:text-indigo-600">Profiles</button></li>
-                    <li><button data-section="employees" class="nav-btn text-slate-600 hover:bg-indigo-50 hover:text-indigo-600">Employees</button></li>
+                    <li><button data-section="employees" class="nav-btn text-slate-600 hover:bg-indigo-50 hover:text-indigo-600">HR</button></li>
                     <li><button data-section="couriers" class="nav-btn text-slate-600 hover:bg-indigo-50 hover:text-indigo-600">Couriers</button></li>
                     <li style="margin-top:1rem;border-top:1px solid rgba(255,255,255,0.1);padding-top:1rem;"><button data-section="disclaimer" class="nav-btn text-slate-600 hover:bg-indigo-50 hover:text-indigo-600">Disclaimer</button></li>
                 </ul>
@@ -1440,34 +1447,94 @@
                     </section>
     
                     <section id="employees" class="section-container">
-                        <!-- UPDATED: Text color -->
-                        <h2 class="text-3xl font-bold text-slate-800 mb-6">Employees</h2>
+                        <h2 class="text-3xl font-bold text-slate-800 mb-6">HR Module</h2>
+                        
+                        <!-- HR Sub-Navigation Tabs -->
+                        <div class="flex gap-2 mb-6 border-b border-slate-200 pb-0" id="hr-tabs">
+                            <button class="hr-tab-btn px-5 py-2 rounded-t-xl font-semibold text-sm transition-colors bg-indigo-600 text-white" data-tab="hr-employees-tab">
+                                <i class="fas fa-users mr-1"></i> Employees
+                            </button>
+                            <button class="hr-tab-btn px-5 py-2 rounded-t-xl font-semibold text-sm transition-colors bg-white text-slate-600 border border-b-0 border-slate-200 hover:bg-indigo-50" data-tab="hr-payroll-tab">
+                                <i class="fas fa-money-check-alt mr-1"></i> Payroll & Salary
+                            </button>
+                        </div>
+
+                        <!-- TAB: Employees -->
+                        <div id="hr-employees-tab" class="hr-tab-content">
                         <div id="add-employee-wrapper" class="card p-6 mb-6">
                             <h3 class="text-xl font-semibold mb-4">Add New Employee</h3>
                             <form id="add-employee-form" class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <!-- UPDATED: Focus ring color -->
-                                <input type="text" id="employee-name" placeholder="Name" required
+                                <!-- Basic Profile Fields -->
+                                <div class="md:col-span-2"><p class="text-xs font-bold text-indigo-600 uppercase tracking-wider mb-2"><i class="fas fa-user mr-1"></i> Basic Information</p></div>
+                                <input type="text" id="employee-name" placeholder="Full Name" required
+                                       class="w-full px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                                <input type="text" id="employee-father-name" placeholder="Father Name"
                                        class="w-full px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-indigo-500">
                                 <input type="text" id="employee-cnic" placeholder="CNIC" required
                                        class="w-full px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                                <input type="text" id="employee-contact" placeholder="Contact Number" required
+                                <input type="text" id="employee-contact" placeholder="Phone Number" required
                                        class="w-full px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                                <input type="text" id="employee-designation" placeholder="Designation" required
+                                <input type="email" id="employee-email" placeholder="Email Address"
                                        class="w-full px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                                <div>
+                                    <label for="employee-dob" class="text-sm text-slate-600 ml-2">Date of Birth</label>
+                                    <input type="date" id="employee-dob" class="w-full px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                                </div>
                                 <input type="text" id="employee-address" placeholder="Address" required
                                        class="w-full px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-indigo-500 md:col-span-2">
+                                <!-- Job Info Fields -->
+                                <div class="md:col-span-2"><p class="text-xs font-bold text-indigo-600 uppercase tracking-wider mb-2 mt-2"><i class="fas fa-briefcase mr-1"></i> Job Information</p></div>
                                 <div>
-                                    <!-- UPDATED: Text color -->
                                     <label for="employee-joining-date" class="text-sm text-slate-600 ml-2">Joining Date</label>
                                     <input type="date" id="employee-joining-date" required class="w-full px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-indigo-500">
                                 </div>
-                                <input type="number" id="employee-salary" placeholder="Salary (PKR)" required
+                                <input type="text" id="employee-designation" placeholder="Designation" required
+                                       class="w-full px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                                <div>
+                                    <label class="text-sm text-slate-600 ml-2">Department</label>
+                                    <select id="employee-department" class="w-full px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                                        <option value="">-- Select Department --</option>
+                                        <option value="Trader">Trader</option>
+                                        <option value="Sales">Sales</option>
+                                        <option value="Compliance">Compliance</option>
+                                        <option value="HR">HR</option>
+                                        <option value="Accounts">Accounts</option>
+                                    </select>
+                                </div>
+                                <input type="text" id="employee-reporting-manager" placeholder="Reporting Manager"
+                                       class="w-full px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                                <div>
+                                    <label class="text-sm text-slate-600 ml-2">Employment Type</label>
+                                    <select id="employee-employment-type" class="w-full px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                                        <option value="">-- Select Type --</option>
+                                        <option value="Full-time">Full-time</option>
+                                        <option value="Part-time">Part-time</option>
+                                        <option value="Contract">Contract</option>
+                                    </select>
+                                </div>
+                                <!-- Brokerage-Specific Fields -->
+                                <div class="md:col-span-2"><p class="text-xs font-bold text-indigo-600 uppercase tracking-wider mb-2 mt-2"><i class="fas fa-chart-line mr-1"></i> Brokerage-Specific</p></div>
+                                <input type="text" id="employee-trading-id" placeholder="Trading ID / Dealer ID"
+                                       class="w-full px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                                <input type="text" id="employee-branch" placeholder="Assigned Branch"
+                                       class="w-full px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                                <div>
+                                    <label class="text-sm text-slate-600 ml-2">Sales Type</label>
+                                    <select id="employee-sales-type" class="w-full px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                                        <option value="">-- Sales Type (if applicable) --</option>
+                                        <option value="Telemarketing">Telemarketing</option>
+                                        <option value="Field Sales">Field Sales</option>
+                                        <option value="Trader">Trader</option>
+                                    </select>
+                                </div>
+                                <!-- Salary Fields -->
+                                <div class="md:col-span-2"><p class="text-xs font-bold text-indigo-600 uppercase tracking-wider mb-2 mt-2"><i class="fas fa-money-bill-wave mr-1"></i> Compensation</p></div>
+                                <input type="number" id="employee-salary" placeholder="Basic Salary (PKR)" required
                                        class="w-full px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-indigo-500">
                                 <input type="number" id="employee-incentives" placeholder="Incentives (PKR)" value="0" required
                                        class="w-full px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-indigo-500">
                                 <input type="number" id="employee-allowance" placeholder="Allowance (PKR)" value="0" required
                                        class="w-full px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                                <!-- UPDATED: Button color -->
                                 <button type="submit" class="w-full bg-indigo-600 text-white py-2 rounded-full font-semibold hover:bg-indigo-700 animated-btn md:col-span-2">
                                     Save Employee
                                 </button>
@@ -1478,10 +1545,10 @@
                             <div class="overflow-x-auto">
                                 <table class="w-full text-left table-auto">
                                     <thead class="border-b-2">
-                                        <!-- UPDATED: Text color -->
                                         <tr class="text-slate-600 uppercase text-sm">
                                             <th class="p-2">Name</th>
                                             <th class="p-2">Designation</th>
+                                            <th class="p-2">Department</th>
                                             <th class="p-2">Contact</th>
                                             <th class="p-2">Joining Date</th>
                                             <th class="p-2">Status</th>
@@ -1493,8 +1560,134 @@
                                 </table>
                             </div>
                         </div>
+                        </div><!-- end hr-employees-tab -->
+
+                        <!-- TAB: Payroll & Salary -->
+                        <div id="hr-payroll-tab" class="hr-tab-content hidden">
+                        <div class="card p-6 mb-6">
+                            <h3 class="text-xl font-semibold mb-4"><i class="fas fa-money-check-alt mr-2 text-indigo-600"></i>Generate Payroll Salary Slip</h3>
+                            <p class="text-sm text-slate-500 mb-4">Select an employee and configure salary components to generate an itemized salary slip with commission details and deductions.</p>
+                            <!-- Employee & Period Selection -->
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                                <div>
+                                    <label class="block text-sm font-medium text-slate-700 mb-1">Select Employee</label>
+                                    <select id="payroll-employee-select" class="w-full px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                                        <option value="">-- Select Employee --</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-slate-700 mb-1">Month</label>
+                                    <select id="payroll-month" class="w-full px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-indigo-500"></select>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-slate-700 mb-1">Year</label>
+                                    <input type="number" id="payroll-year" placeholder="Year" class="w-full px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                                </div>
+                            </div>
+                            <!-- Salary Structure -->
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-4">
+                                <!-- Earnings -->
+                                <div class="bg-emerald-50 border border-emerald-200 rounded-xl p-4">
+                                    <h4 class="font-semibold text-emerald-800 mb-3"><i class="fas fa-plus-circle mr-1 text-emerald-600"></i> Earnings</h4>
+                                    <div class="space-y-2">
+                                        <div>
+                                            <label class="text-xs font-semibold text-slate-600 uppercase tracking-wider">Basic Salary (PKR)</label>
+                                            <input type="number" id="payroll-basic" placeholder="0" value="0" class="w-full px-3 py-2 border rounded-full text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 mt-1">
+                                        </div>
+                                        <div>
+                                            <label class="text-xs font-semibold text-slate-600 uppercase tracking-wider">Transport Allowance (PKR)</label>
+                                            <input type="number" id="payroll-transport" placeholder="0" value="0" class="w-full px-3 py-2 border rounded-full text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 mt-1">
+                                        </div>
+                                        <div>
+                                            <label class="text-xs font-semibold text-slate-600 uppercase tracking-wider">Medical Allowance (PKR)</label>
+                                            <input type="number" id="payroll-medical" placeholder="0" value="0" class="w-full px-3 py-2 border rounded-full text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 mt-1">
+                                        </div>
+                                        <div>
+                                            <label class="text-xs font-semibold text-slate-600 uppercase tracking-wider">Other Allowances (PKR)</label>
+                                            <input type="number" id="payroll-other-allowance" placeholder="0" value="0" class="w-full px-3 py-2 border rounded-full text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 mt-1">
+                                        </div>
+                                        <div>
+                                            <label class="text-xs font-semibold text-slate-600 uppercase tracking-wider">Bonus (PKR)</label>
+                                            <input type="number" id="payroll-bonus" placeholder="0" value="0" class="w-full px-3 py-2 border rounded-full text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 mt-1">
+                                        </div>
+                                        <div>
+                                            <label class="text-xs font-semibold text-slate-600 uppercase tracking-wider">Overtime (PKR, optional)</label>
+                                            <input type="number" id="payroll-overtime" placeholder="0" value="0" class="w-full px-3 py-2 border rounded-full text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 mt-1">
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- Commission -->
+                                <div class="bg-indigo-50 border border-indigo-200 rounded-xl p-4">
+                                    <h4 class="font-semibold text-indigo-800 mb-3"><i class="fas fa-chart-line mr-1 text-indigo-600"></i> Commission (Dynamic)</h4>
+                                    <div class="space-y-2">
+                                        <div>
+                                            <label class="text-xs font-semibold text-slate-600 uppercase tracking-wider">Trading Volume Commission (PKR)</label>
+                                            <input type="number" id="payroll-comm-trading" placeholder="0" value="0" class="w-full px-3 py-2 border rounded-full text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 mt-1">
+                                        </div>
+                                        <div>
+                                            <label class="text-xs font-semibold text-slate-600 uppercase tracking-wider">Leads Generated / CPL (PKR)</label>
+                                            <input type="number" id="payroll-comm-leads" placeholder="0" value="0" class="w-full px-3 py-2 border rounded-full text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 mt-1">
+                                        </div>
+                                        <div>
+                                            <label class="text-xs font-semibold text-slate-600 uppercase tracking-wider">Accounts Opened Commission (PKR)</label>
+                                            <input type="number" id="payroll-comm-accounts" placeholder="0" value="0" class="w-full px-3 py-2 border rounded-full text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 mt-1">
+                                        </div>
+                                        <div>
+                                            <label class="text-xs font-semibold text-slate-600 uppercase tracking-wider">Revenue Generated Commission (PKR)</label>
+                                            <input type="number" id="payroll-comm-revenue" placeholder="0" value="0" class="w-full px-3 py-2 border rounded-full text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 mt-1">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Deductions -->
+                            <div class="bg-rose-50 border border-rose-200 rounded-xl p-4 mb-4">
+                                <h4 class="font-semibold text-rose-800 mb-3"><i class="fas fa-minus-circle mr-1 text-rose-600"></i> Deductions</h4>
+                                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
+                                    <div>
+                                        <label class="text-xs font-semibold text-slate-600 uppercase tracking-wider">Late Attendance (PKR)</label>
+                                        <input type="number" id="payroll-ded-late" placeholder="0" value="0" class="w-full px-3 py-2 border rounded-full text-sm focus:outline-none focus:ring-2 focus:ring-rose-400 mt-1">
+                                    </div>
+                                    <div>
+                                        <label class="text-xs font-semibold text-slate-600 uppercase tracking-wider">Absents Deduction (PKR)</label>
+                                        <input type="number" id="payroll-ded-absent" placeholder="0" value="0" class="w-full px-3 py-2 border rounded-full text-sm focus:outline-none focus:ring-2 focus:ring-rose-400 mt-1">
+                                    </div>
+                                    <div>
+                                        <label class="text-xs font-semibold text-slate-600 uppercase tracking-wider">Leaves Deduction (PKR)</label>
+                                        <input type="number" id="payroll-ded-leaves" placeholder="0" value="0" class="w-full px-3 py-2 border rounded-full text-sm focus:outline-none focus:ring-2 focus:ring-rose-400 mt-1">
+                                    </div>
+                                    <div>
+                                        <label class="text-xs font-semibold text-slate-600 uppercase tracking-wider">Tax Deduction</label>
+                                        <div class="flex gap-1 mt-1 items-center">
+                                            <input type="number" id="payroll-tax-amount" placeholder="PKR amount" value="0" class="w-full px-3 py-2 border rounded-full text-sm focus:outline-none focus:ring-2 focus:ring-rose-400">
+                                        </div>
+                                        <div class="flex gap-1 mt-1 items-center">
+                                            <input type="number" id="payroll-tax-pct" placeholder="OR % of gross" min="0" max="100" value="0" class="w-full px-3 py-2 border rounded-full text-sm focus:outline-none focus:ring-2 focus:ring-rose-400">
+                                            <span class="text-xs text-slate-500 flex-shrink-0">%</span>
+                                        </div>
+                                        <p class="text-xs text-slate-400 mt-1">Amount takes priority over %</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Action Buttons -->
+                            <div class="flex flex-wrap gap-3 justify-end">
+                                <button type="button" id="payroll-autofill-btn" class="bg-slate-500 text-white px-5 py-2 rounded-full font-semibold hover:bg-slate-600 animated-btn text-sm">
+                                    <i class="fas fa-magic mr-1"></i> Auto-fill from Profile
+                                </button>
+                                <button type="button" id="payroll-preview-btn" class="bg-emerald-600 text-white px-5 py-2 rounded-full font-semibold hover:bg-emerald-700 animated-btn text-sm">
+                                    <i class="fas fa-eye mr-1"></i> Preview Slip
+                                </button>
+                                <button type="button" id="payroll-print-btn" class="bg-indigo-600 text-white px-6 py-2 rounded-full font-semibold hover:bg-indigo-700 animated-btn">
+                                    <i class="fas fa-print mr-2"></i>Generate & Print
+                                </button>
+                            </div>
+                            <!-- Live Preview Panel -->
+                            <div id="payroll-preview-panel" class="hidden mt-6 bg-white border border-indigo-200 rounded-xl p-5">
+                                <h4 class="font-bold text-indigo-700 mb-3 text-center text-lg"><i class="fas fa-file-invoice-dollar mr-1"></i> Salary Slip Preview</h4>
+                                <div id="payroll-preview-content"></div>
+                            </div>
+                        </div>
                         <div id="salary-slip-section-wrapper" class="card p-6 mt-6">
-                            <h3 class="text-xl font-semibold mb-4"><i class="fas fa-file-invoice-dollar mr-2 text-indigo-600"></i>Generate Salary Slip</h3>
+                            <h3 class="text-xl font-semibold mb-4"><i class="fas fa-file-invoice-dollar mr-2 text-indigo-600"></i>Quick Salary Slip (Legacy)</h3>
                             <div class="grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
                                 <div>
                                     <label class="block text-sm font-medium text-slate-700 mb-1">Select Employee</label>
@@ -1514,10 +1707,11 @@
                             <div class="mt-4 flex justify-end">
                                 <button type="button" id="print-salary-slip-section-btn"
                                         class="bg-emerald-600 text-white px-6 py-2 rounded-full font-semibold hover:bg-emerald-700 animated-btn">
-                                    <i class="fas fa-print mr-2"></i>Print Salary Slip
+                                    <i class="fas fa-print mr-2"></i>Print Quick Slip
                                 </button>
                             </div>
                         </div>
+                        </div><!-- end hr-payroll-tab -->
                     </section>
 
                     <!-- REMOVED: Courier Records Section -->
@@ -1835,8 +2029,21 @@
                         </div>
                     </div>
                     <!-- UPDATED: Text color -->
-                    <div id="employee-detail-info" class="text-slate-700 text-sm mb-6 bg-white p-6 rounded-lg shadow-sm grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4"></div>
-                    <div id="edit-employee-btn-wrapper" class="mt-6 flex justify-center gap-4">
+                    <div id="employee-detail-info" class="text-slate-700 text-sm mb-4 bg-white p-6 rounded-lg shadow-sm grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4"></div>
+
+                    <!-- Document Upload Section -->
+                    <div id="employee-documents-section" class="bg-white p-4 rounded-lg shadow-sm mb-4">
+                        <div class="flex items-center justify-between mb-3">
+                            <h4 class="font-semibold text-lg"><i class="fas fa-folder-open mr-2 text-indigo-500"></i>Documents</h4>
+                            <div id="doc-missing-alert" class="hidden text-xs font-semibold text-rose-600 bg-rose-50 border border-rose-200 px-3 py-1 rounded-full">
+                                <i class="fas fa-exclamation-triangle mr-1"></i><span id="doc-missing-text"></span>
+                            </div>
+                        </div>
+                        <div id="doc-expiry-alerts" class="mb-3"></div>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3" id="employee-doc-grid"></div>
+                    </div>
+
+                    <div id="edit-employee-btn-wrapper" class="mt-4 flex justify-center gap-4">
                         <!-- UPDATED: Button color -->
                         <button id="edit-employee-btn" class="bg-amber-500 text-white px-6 py-2 rounded-full font-semibold hover:bg-amber-600 animated-btn">Edit Employee</button>
                         <button id="generate-salary-slip-btn" class="bg-indigo-600 text-white px-6 py-2 rounded-full font-semibold hover:bg-indigo-700 animated-btn"><i class="fas fa-file-invoice-dollar mr-1"></i> Salary Slip</button>
@@ -1864,17 +2071,58 @@
                 <form id="edit-employee-form" class="hidden space-y-4 bg-white p-6 rounded-lg shadow-sm">
                     <h3 class="text-xl font-semibold mb-2">Edit Employee Details</h3>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <input type="text" id="edit-employee-name" placeholder="Name" required class="w-full px-4 py-2 border rounded-full">
+                        <p class="md:col-span-2 text-xs font-bold text-indigo-600 uppercase tracking-wider"><i class="fas fa-user mr-1"></i> Basic Information</p>
+                        <input type="text" id="edit-employee-name" placeholder="Full Name" required class="w-full px-4 py-2 border rounded-full">
+                        <input type="text" id="edit-employee-father-name" placeholder="Father Name" class="w-full px-4 py-2 border rounded-full">
                         <input type="text" id="edit-employee-cnic" placeholder="CNIC" required class="w-full px-4 py-2 border rounded-full">
-                        <input type="text" id="edit-employee-contact" placeholder="Contact" required class="w-full px-4 py-2 border rounded-full">
+                        <input type="text" id="edit-employee-contact" placeholder="Phone Number" required class="w-full px-4 py-2 border rounded-full">
+                        <input type="email" id="edit-employee-email" placeholder="Email Address" class="w-full px-4 py-2 border rounded-full">
+                        <div>
+                            <label class="text-xs text-slate-500 ml-2">Date of Birth</label>
+                            <input type="date" id="edit-employee-dob" class="w-full px-4 py-2 border rounded-full">
+                        </div>
+                        <input type="text" id="edit-employee-address" placeholder="Address" required class="w-full px-4 py-2 border rounded-full md:col-span-2">
+                        <p class="md:col-span-2 text-xs font-bold text-indigo-600 uppercase tracking-wider mt-2"><i class="fas fa-briefcase mr-1"></i> Job Information</p>
                         <input type="text" id="edit-employee-designation" placeholder="Designation" required class="w-full px-4 py-2 border rounded-full">
-                        <input type="number" id="edit-employee-salary" placeholder="Salary (PKR)" required class="w-full px-4 py-2 border rounded-full">
+                        <div>
+                            <label class="text-xs text-slate-500 ml-2">Department</label>
+                            <select id="edit-employee-department" class="w-full px-4 py-2 border rounded-full">
+                                <option value="">-- Department --</option>
+                                <option value="Trader">Trader</option>
+                                <option value="Sales">Sales</option>
+                                <option value="Compliance">Compliance</option>
+                                <option value="HR">HR</option>
+                                <option value="Accounts">Accounts</option>
+                            </select>
+                        </div>
+                        <input type="text" id="edit-employee-reporting-manager" placeholder="Reporting Manager" class="w-full px-4 py-2 border rounded-full">
+                        <div>
+                            <label class="text-xs text-slate-500 ml-2">Employment Type</label>
+                            <select id="edit-employee-employment-type" class="w-full px-4 py-2 border rounded-full">
+                                <option value="">-- Employment Type --</option>
+                                <option value="Full-time">Full-time</option>
+                                <option value="Part-time">Part-time</option>
+                                <option value="Contract">Contract</option>
+                            </select>
+                        </div>
+                        <p class="md:col-span-2 text-xs font-bold text-indigo-600 uppercase tracking-wider mt-2"><i class="fas fa-chart-line mr-1"></i> Brokerage-Specific</p>
+                        <input type="text" id="edit-employee-trading-id" placeholder="Trading ID / Dealer ID" class="w-full px-4 py-2 border rounded-full">
+                        <input type="text" id="edit-employee-branch" placeholder="Assigned Branch" class="w-full px-4 py-2 border rounded-full">
+                        <div>
+                            <label class="text-xs text-slate-500 ml-2">Sales Type</label>
+                            <select id="edit-employee-sales-type" class="w-full px-4 py-2 border rounded-full">
+                                <option value="">-- Sales Type --</option>
+                                <option value="Telemarketing">Telemarketing</option>
+                                <option value="Field Sales">Field Sales</option>
+                                <option value="Trader">Trader</option>
+                            </select>
+                        </div>
+                        <p class="md:col-span-2 text-xs font-bold text-indigo-600 uppercase tracking-wider mt-2"><i class="fas fa-money-bill-wave mr-1"></i> Compensation</p>
+                        <input type="number" id="edit-employee-salary" placeholder="Basic Salary (PKR)" required class="w-full px-4 py-2 border rounded-full">
                         <input type="number" id="edit-employee-incentives" placeholder="Incentives (PKR)" required class="w-full px-4 py-2 border rounded-full">
                         <input type="number" id="edit-employee-allowance" placeholder="Allowance (PKR)" required class="w-full px-4 py-2 border rounded-full">
-                        <input type="text" id="edit-employee-address" placeholder="Address" required class="w-full px-4 py-2 border rounded-full md:col-span-2">
                     </div>
                     <div class="flex justify-end gap-4 mt-4">
-                        <!-- UPDATED: Button colors -->
                         <button type="button" id="cancel-edit-employee-btn" class="bg-slate-300 text-slate-800 px-6 py-2 rounded-full font-semibold">Cancel</button>
                         <button type="submit" class="bg-indigo-600 text-white px-6 py-2 rounded-full font-semibold">Save Changes</button>
                     </div>
@@ -2056,6 +2304,8 @@
                     headerTitle.textContent = 'Courier Records';
                 } else if (sectionId === 'disclaimer') {
                     headerTitle.textContent = 'Disclaimer';
+                } else if (sectionId === 'employees') {
+                    headerTitle.textContent = 'HR Module';
                 } else {
                     headerTitle.textContent = sectionId.charAt(0).toUpperCase() + sectionId.slice(1);
                 }
@@ -3530,14 +3780,24 @@
             showLoading();
             const employeeData = {
                 name: form['employee-name'].value,
+                fatherName: form['employee-father-name'].value || '',
                 cnic: form['employee-cnic'].value,
                 contact: form['employee-contact'].value,
+                email: form['employee-email'].value || '',
+                dob: form['employee-dob'].value || '',
                 address: form['employee-address'].value,
                 joiningDate: form['employee-joining-date'].value,
                 designation: form['employee-designation'].value,
+                department: form['employee-department'].value || '',
+                reportingManager: form['employee-reporting-manager'].value || '',
+                employmentType: form['employee-employment-type'].value || '',
+                tradingId: form['employee-trading-id'].value || '',
+                branch: form['employee-branch'].value || '',
+                salesType: form['employee-sales-type'].value || '',
                 salary: parseFloat(form['employee-salary'].value),
                 incentives: parseFloat(form['employee-incentives'].value) || 0,
                 allowance: parseFloat(form['employee-allowance'].value) || 0,
+                documents: {},
             };
             try {
                 await db.collection(`users/${currentUserId}/employees`).add(employeeData);
@@ -3555,17 +3815,17 @@
             document.querySelectorAll('#employees .actions-header').forEach(el => el.style.display = isSharedView ? 'none' : 'table-cell');
 
             document.getElementById('employees-list').innerHTML = allEmployees.map(e => `
-                <tr class="border-b">
-                    <td class="p-2">${e.name}</td>
-                    <td class="p-2">${e.designation}</td>
+                <tr class="border-b hover:bg-slate-50">
+                    <td class="p-2 font-medium">${e.name}</td>
+                    <td class="p-2">${e.designation || 'N/A'}</td>
+                    <td class="p-2"><span class="px-2 py-0.5 rounded-full text-xs font-semibold bg-indigo-100 text-indigo-700">${e.department || '—'}</span></td>
                     <td class="p-2">${e.contact || 'N/A'}</td>
-                    <td class="p-2">${new Date(e.joiningDate).toLocaleDateString()}</td>
-                    <td class="p-2">Active</td>
+                    <td class="p-2">${e.joiningDate ? new Date(e.joiningDate).toLocaleDateString() : 'N/A'}</td>
+                    <td class="p-2"><span class="px-2 py-0.5 rounded-full text-xs font-semibold bg-emerald-100 text-emerald-700">Active</span></td>
                     ${!isSharedView ? `
-                    <td class="p-2 space-x-2">
-                        <!-- UPDATED: Text colors -->
-                        <button class="text-indigo-600 hover:underline" onclick="showEmployeeProfile('${e.id}')">View</button>
-                        <button class="text-rose-600 hover:underline" onclick="deleteItem('employees', '${e.id}')">Delete</button>
+                    <td class="p-2 space-x-2 actions-header">
+                        <button class="text-indigo-600 hover:underline text-sm" onclick="showEmployeeProfile('${e.id}')">View</button>
+                        <button class="text-rose-600 hover:underline text-sm" onclick="deleteItem('employees', '${e.id}')">Delete</button>
                     </td>` : ''}
                 </tr>
             `).join('');
@@ -3573,6 +3833,8 @@
             // Populate salary slip section dropdown and hide section in shared view
             document.getElementById('salary-slip-section-wrapper').style.display = isSharedView ? 'none' : 'block';
             populateSalarySlipEmployeeSelect();
+            populatePayrollEmployeeSelect();
+            checkDocumentExpiryAlerts();
         }
 
         // --- GENERAL DELETE FUNCTION ---
@@ -4336,22 +4598,34 @@
                 photoImg.style.display = 'none';
                 photoPlaceholder.style.display = 'flex';
             }
-            // Clear the URL input
             document.getElementById('employee-photo-url-input').value = '';
 
             document.getElementById('employee-detail-name').textContent = employee.name;
             const totalComp = (employee.salary || 0) + (employee.incentives || 0) + (employee.allowance || 0);
             document.getElementById('employee-detail-info').innerHTML = `
-                <div><p class="font-semibold">CNIC:</p><p>${employee.cnic || 'N/A'}</p></div>
-                <div><p class="font-semibold">Contact:</p><p>${employee.contact || 'N/A'}</p></div>
-                <div><p class="font-semibold">Designation:</p><p>${employee.designation || 'N/A'}</p></div>
-                <div><p class="font-semibold">Joining Date:</p><p>${employee.joiningDate ? new Date(employee.joiningDate).toLocaleDateString() : 'N/A'}</p></div>
-                <div><p class="font-semibold">Basic Salary:</p><p>PKR ${employee.salary ? employee.salary.toLocaleString() : 'N/A'}</p></div>
-                <div><p class="font-semibold">Incentives:</p><p>PKR ${employee.incentives ? employee.incentives.toLocaleString() : '0'}</p></div>
-                <div><p class="font-semibold">Allowance:</p><p>PKR ${employee.allowance ? employee.allowance.toLocaleString() : '0'}</p></div>
-                <div><p class="font-semibold">Total Compensation:</p><p class="font-bold text-indigo-700">PKR ${totalComp.toLocaleString()}</p></div>
-                <div class="md:col-span-2"><p class="font-semibold">Address:</p><p>${employee.address || 'N/A'}</p></div>
+                <div><p class="font-semibold text-slate-500 text-xs uppercase tracking-wider mb-1">Full Name</p><p class="font-medium">${employee.name || 'N/A'}</p></div>
+                <div><p class="font-semibold text-slate-500 text-xs uppercase tracking-wider mb-1">Father Name</p><p class="font-medium">${employee.fatherName || 'N/A'}</p></div>
+                <div><p class="font-semibold text-slate-500 text-xs uppercase tracking-wider mb-1">CNIC</p><p class="font-medium">${employee.cnic || 'N/A'}</p></div>
+                <div><p class="font-semibold text-slate-500 text-xs uppercase tracking-wider mb-1">Phone Number</p><p class="font-medium">${employee.contact || 'N/A'}</p></div>
+                <div><p class="font-semibold text-slate-500 text-xs uppercase tracking-wider mb-1">Email</p><p class="font-medium">${employee.email || 'N/A'}</p></div>
+                <div><p class="font-semibold text-slate-500 text-xs uppercase tracking-wider mb-1">Date of Birth</p><p class="font-medium">${employee.dob ? new Date(employee.dob).toLocaleDateString('en-PK') : 'N/A'}</p></div>
+                <div class="md:col-span-2"><p class="font-semibold text-slate-500 text-xs uppercase tracking-wider mb-1">Address</p><p class="font-medium">${employee.address || 'N/A'}</p></div>
+                <div><p class="font-semibold text-slate-500 text-xs uppercase tracking-wider mb-1">Designation</p><p class="font-medium">${employee.designation || 'N/A'}</p></div>
+                <div><p class="font-semibold text-slate-500 text-xs uppercase tracking-wider mb-1">Department</p><p class="font-medium"><span class="px-2 py-0.5 rounded-full text-xs font-semibold bg-indigo-100 text-indigo-700">${employee.department || 'N/A'}</span></p></div>
+                <div><p class="font-semibold text-slate-500 text-xs uppercase tracking-wider mb-1">Joining Date</p><p class="font-medium">${employee.joiningDate ? new Date(employee.joiningDate).toLocaleDateString('en-PK') : 'N/A'}</p></div>
+                <div><p class="font-semibold text-slate-500 text-xs uppercase tracking-wider mb-1">Reporting Manager</p><p class="font-medium">${employee.reportingManager || 'N/A'}</p></div>
+                <div><p class="font-semibold text-slate-500 text-xs uppercase tracking-wider mb-1">Employment Type</p><p class="font-medium">${employee.employmentType || 'N/A'}</p></div>
+                <div><p class="font-semibold text-slate-500 text-xs uppercase tracking-wider mb-1">Trading ID / Dealer ID</p><p class="font-medium">${employee.tradingId || 'N/A'}</p></div>
+                <div><p class="font-semibold text-slate-500 text-xs uppercase tracking-wider mb-1">Assigned Branch</p><p class="font-medium">${employee.branch || 'N/A'}</p></div>
+                <div><p class="font-semibold text-slate-500 text-xs uppercase tracking-wider mb-1">Sales Type</p><p class="font-medium">${employee.salesType || 'N/A'}</p></div>
+                <div><p class="font-semibold text-slate-500 text-xs uppercase tracking-wider mb-1">Basic Salary</p><p class="font-medium text-emerald-700">PKR ${(employee.salary || 0).toLocaleString()}</p></div>
+                <div><p class="font-semibold text-slate-500 text-xs uppercase tracking-wider mb-1">Incentives</p><p class="font-medium">PKR ${(employee.incentives || 0).toLocaleString()}</p></div>
+                <div><p class="font-semibold text-slate-500 text-xs uppercase tracking-wider mb-1">Allowance</p><p class="font-medium">PKR ${(employee.allowance || 0).toLocaleString()}</p></div>
+                <div><p class="font-semibold text-slate-500 text-xs uppercase tracking-wider mb-1">Total Compensation</p><p class="font-bold text-indigo-700">PKR ${totalComp.toLocaleString()}</p></div>
             `;
+
+            // Render Documents section
+            renderEmployeeDocuments(employee);
             
             document.getElementById('edit-employee-btn').dataset.id = employee.id;
             editEmployeeForm.dataset.id = employee.id;
@@ -4520,9 +4794,18 @@
             if (!employee) return;
 
             document.getElementById('edit-employee-name').value = employee.name || '';
+            document.getElementById('edit-employee-father-name').value = employee.fatherName || '';
             document.getElementById('edit-employee-cnic').value = employee.cnic || '';
             document.getElementById('edit-employee-contact').value = employee.contact || '';
+            document.getElementById('edit-employee-email').value = employee.email || '';
+            document.getElementById('edit-employee-dob').value = employee.dob || '';
             document.getElementById('edit-employee-designation').value = employee.designation || '';
+            document.getElementById('edit-employee-department').value = employee.department || '';
+            document.getElementById('edit-employee-reporting-manager').value = employee.reportingManager || '';
+            document.getElementById('edit-employee-employment-type').value = employee.employmentType || '';
+            document.getElementById('edit-employee-trading-id').value = employee.tradingId || '';
+            document.getElementById('edit-employee-branch').value = employee.branch || '';
+            document.getElementById('edit-employee-sales-type').value = employee.salesType || '';
             document.getElementById('edit-employee-salary').value = employee.salary || '';
             document.getElementById('edit-employee-incentives').value = employee.incentives || 0;
             document.getElementById('edit-employee-allowance').value = employee.allowance || 0;
@@ -4546,9 +4829,18 @@
 
             const updatedData = {
                 name: document.getElementById('edit-employee-name').value,
+                fatherName: document.getElementById('edit-employee-father-name').value || '',
                 cnic: document.getElementById('edit-employee-cnic').value,
                 contact: document.getElementById('edit-employee-contact').value,
+                email: document.getElementById('edit-employee-email').value || '',
+                dob: document.getElementById('edit-employee-dob').value || '',
                 designation: document.getElementById('edit-employee-designation').value,
+                department: document.getElementById('edit-employee-department').value || '',
+                reportingManager: document.getElementById('edit-employee-reporting-manager').value || '',
+                employmentType: document.getElementById('edit-employee-employment-type').value || '',
+                tradingId: document.getElementById('edit-employee-trading-id').value || '',
+                branch: document.getElementById('edit-employee-branch').value || '',
+                salesType: document.getElementById('edit-employee-sales-type').value || '',
                 salary: parseFloat(document.getElementById('edit-employee-salary').value),
                 incentives: parseFloat(document.getElementById('edit-employee-incentives').value) || 0,
                 allowance: parseFloat(document.getElementById('edit-employee-allowance').value) || 0,
@@ -4996,6 +5288,456 @@
             setTimeout(() => printWindow.print(), 400);
         });
 
+        // ─── PAYROLL EMPLOYEE SELECT POPULATE ───────────────────────────────────
+        function populatePayrollEmployeeSelect() {
+            const sel = document.getElementById('payroll-employee-select');
+            if (!sel) return;
+            const currentVal = sel.value;
+            sel.innerHTML = '<option value="">-- Select Employee --</option>';
+            allEmployees.forEach(emp => {
+                const opt = document.createElement('option');
+                opt.value = emp.id;
+                opt.textContent = emp.name + (emp.designation ? ` (${emp.designation})` : '');
+                sel.appendChild(opt);
+            });
+            if (currentVal) sel.value = currentVal;
+        }
+
+        // ─── HR TAB SWITCHING ─────────────────────────────────────────────────────
+        document.querySelectorAll('.hr-tab-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const target = btn.dataset.tab;
+                document.querySelectorAll('.hr-tab-btn').forEach(b => {
+                    b.classList.remove('bg-indigo-600', 'text-white');
+                    b.classList.add('bg-white', 'text-slate-600', 'border', 'border-b-0', 'border-slate-200', 'hover:bg-indigo-50');
+                });
+                btn.classList.add('bg-indigo-600', 'text-white');
+                btn.classList.remove('bg-white', 'text-slate-600', 'border', 'border-b-0', 'border-slate-200', 'hover:bg-indigo-50');
+                document.querySelectorAll('.hr-tab-content').forEach(tab => tab.classList.add('hidden'));
+                const targetEl = document.getElementById(target);
+                if (targetEl) targetEl.classList.remove('hidden');
+                // populate payroll select when switching to payroll tab
+                if (target === 'hr-payroll-tab') {
+                    populatePayrollEmployeeSelect();
+                    populateMonthDropdown(document.getElementById('payroll-month'));
+                    if (!document.getElementById('payroll-year').value) {
+                        document.getElementById('payroll-year').value = new Date().getFullYear();
+                    }
+                }
+            });
+        });
+
+        // ─── PAYROLL AUTO-FILL FROM PROFILE ──────────────────────────────────────
+        document.getElementById('payroll-autofill-btn').addEventListener('click', () => {
+            const empId = document.getElementById('payroll-employee-select').value;
+            if (!empId) return showMessage('Info', 'Please select an employee first.');
+            const emp = allEmployees.find(e => e.id === empId);
+            if (!emp) return;
+            document.getElementById('payroll-basic').value = emp.salary || 0;
+            document.getElementById('payroll-transport').value = 0;
+            document.getElementById('payroll-medical').value = emp.allowance || 0;
+            document.getElementById('payroll-other-allowance').value = 0;
+            document.getElementById('payroll-bonus').value = emp.incentives || 0;
+            document.getElementById('payroll-overtime').value = 0;
+            document.getElementById('payroll-comm-trading').value = 0;
+            document.getElementById('payroll-comm-leads').value = 0;
+            document.getElementById('payroll-comm-accounts').value = 0;
+            document.getElementById('payroll-comm-revenue').value = 0;
+            document.getElementById('payroll-ded-late').value = 0;
+            document.getElementById('payroll-ded-absent').value = 0;
+            document.getElementById('payroll-ded-leaves').value = 0;
+            document.getElementById('payroll-tax-amount').value = 0;
+            document.getElementById('payroll-tax-pct').value = 0;
+            showMessage('Success', `Profile data loaded for ${emp.name}. Adjust values as needed.`);
+        });
+
+        function buildPayrollData() {
+            const basic       = parseFloat(document.getElementById('payroll-basic').value) || 0;
+            const transport   = parseFloat(document.getElementById('payroll-transport').value) || 0;
+            const medical     = parseFloat(document.getElementById('payroll-medical').value) || 0;
+            const otherAllow  = parseFloat(document.getElementById('payroll-other-allowance').value) || 0;
+            const bonus       = parseFloat(document.getElementById('payroll-bonus').value) || 0;
+            const overtime    = parseFloat(document.getElementById('payroll-overtime').value) || 0;
+            const commTrading = parseFloat(document.getElementById('payroll-comm-trading').value) || 0;
+            const commLeads   = parseFloat(document.getElementById('payroll-comm-leads').value) || 0;
+            const commAccounts= parseFloat(document.getElementById('payroll-comm-accounts').value) || 0;
+            const commRevenue = parseFloat(document.getElementById('payroll-comm-revenue').value) || 0;
+            const dedLate     = parseFloat(document.getElementById('payroll-ded-late').value) || 0;
+            const dedAbsent   = parseFloat(document.getElementById('payroll-ded-absent').value) || 0;
+            const dedLeaves   = parseFloat(document.getElementById('payroll-ded-leaves').value) || 0;
+            const taxAmtInput = parseFloat(document.getElementById('payroll-tax-amount').value) || 0;
+            const taxPct      = parseFloat(document.getElementById('payroll-tax-pct').value) || 0;
+
+            const totalEarnings = basic + transport + medical + otherAllow + bonus + overtime;
+            const totalCommission = commTrading + commLeads + commAccounts + commRevenue;
+            const grossSalary = totalEarnings + totalCommission;
+
+            const taxDeduction = taxAmtInput > 0 ? taxAmtInput : (grossSalary * taxPct / 100);
+            const totalDeductions = dedLate + dedAbsent + dedLeaves + taxDeduction;
+            const netSalary = grossSalary - totalDeductions;
+
+            return { basic, transport, medical, otherAllow, bonus, overtime,
+                     commTrading, commLeads, commAccounts, commRevenue,
+                     dedLate, dedAbsent, dedLeaves, taxDeduction, taxPct,
+                     totalEarnings, totalCommission, grossSalary, totalDeductions, netSalary };
+        }
+
+        // ─── PAYROLL PREVIEW ──────────────────────────────────────────────────────
+        document.getElementById('payroll-preview-btn').addEventListener('click', () => {
+            const empId = document.getElementById('payroll-employee-select').value;
+            if (!empId) return showMessage('Error', 'Please select an employee.');
+            const emp = allEmployees.find(e => e.id === empId);
+            if (!emp) return;
+            const monthIdx = parseInt(document.getElementById('payroll-month').value);
+            const year = parseInt(document.getElementById('payroll-year').value);
+            if (isNaN(monthIdx) || isNaN(year) || year < 2000) return showMessage('Error', 'Please select a valid month and year.');
+            const d = buildPayrollData();
+            const panel = document.getElementById('payroll-preview-panel');
+            const content = document.getElementById('payroll-preview-content');
+            content.innerHTML = `
+            <div class="grid grid-cols-2 gap-2 text-sm mb-4 bg-slate-50 p-3 rounded-xl">
+                <div><span class="text-slate-500">Employee:</span> <strong>${emp.name}</strong></div>
+                <div><span class="text-slate-500">Dept:</span> <strong>${emp.department || 'N/A'}</strong></div>
+                <div><span class="text-slate-500">Designation:</span> <strong>${emp.designation || 'N/A'}</strong></div>
+                <div><span class="text-slate-500">Period:</span> <strong>${months[monthIdx]} ${year}</strong></div>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-3 text-sm">
+                <div class="bg-emerald-50 border border-emerald-200 rounded-xl p-3">
+                    <p class="font-bold text-emerald-700 mb-2">Earnings</p>
+                    ${d.basic?`<div class="flex justify-between"><span>Basic Salary</span><span>PKR ${d.basic.toLocaleString()}</span></div>`:''}
+                    ${d.transport?`<div class="flex justify-between"><span>Transport</span><span>PKR ${d.transport.toLocaleString()}</span></div>`:''}
+                    ${d.medical?`<div class="flex justify-between"><span>Medical</span><span>PKR ${d.medical.toLocaleString()}</span></div>`:''}
+                    ${d.otherAllow?`<div class="flex justify-between"><span>Other Allowances</span><span>PKR ${d.otherAllow.toLocaleString()}</span></div>`:''}
+                    ${d.bonus?`<div class="flex justify-between"><span>Bonus</span><span>PKR ${d.bonus.toLocaleString()}</span></div>`:''}
+                    ${d.overtime?`<div class="flex justify-between"><span>Overtime</span><span>PKR ${d.overtime.toLocaleString()}</span></div>`:''}
+                    <div class="flex justify-between font-bold border-t border-emerald-300 mt-2 pt-2 text-emerald-800"><span>Subtotal</span><span>PKR ${d.totalEarnings.toLocaleString()}</span></div>
+                </div>
+                <div class="bg-indigo-50 border border-indigo-200 rounded-xl p-3">
+                    <p class="font-bold text-indigo-700 mb-2">Commission</p>
+                    ${d.commTrading?`<div class="flex justify-between"><span>Trading Volume</span><span>PKR ${d.commTrading.toLocaleString()}</span></div>`:''}
+                    ${d.commLeads?`<div class="flex justify-between"><span>Leads / CPL</span><span>PKR ${d.commLeads.toLocaleString()}</span></div>`:''}
+                    ${d.commAccounts?`<div class="flex justify-between"><span>Accounts Opened</span><span>PKR ${d.commAccounts.toLocaleString()}</span></div>`:''}
+                    ${d.commRevenue?`<div class="flex justify-between"><span>Revenue Generated</span><span>PKR ${d.commRevenue.toLocaleString()}</span></div>`:''}
+                    <div class="flex justify-between font-bold border-t border-indigo-300 mt-2 pt-2 text-indigo-800"><span>Subtotal</span><span>PKR ${d.totalCommission.toLocaleString()}</span></div>
+                </div>
+                <div class="bg-rose-50 border border-rose-200 rounded-xl p-3">
+                    <p class="font-bold text-rose-700 mb-2">Deductions</p>
+                    ${d.dedLate?`<div class="flex justify-between"><span>Late Attendance</span><span>- PKR ${d.dedLate.toLocaleString()}</span></div>`:''}
+                    ${d.dedAbsent?`<div class="flex justify-between"><span>Absents</span><span>- PKR ${d.dedAbsent.toLocaleString()}</span></div>`:''}
+                    ${d.dedLeaves?`<div class="flex justify-between"><span>Leaves</span><span>- PKR ${d.dedLeaves.toLocaleString()}</span></div>`:''}
+                    ${d.taxDeduction?`<div class="flex justify-between"><span>Tax${d.taxPct?` (${d.taxPct}%)`:''}</span><span>- PKR ${d.taxDeduction.toLocaleString()}</span></div>`:''}
+                    <div class="flex justify-between font-bold border-t border-rose-300 mt-2 pt-2 text-rose-800"><span>Subtotal</span><span>- PKR ${d.totalDeductions.toLocaleString()}</span></div>
+                </div>
+            </div>
+            <div class="mt-4 p-4 bg-indigo-700 text-white rounded-xl flex justify-between items-center">
+                <span class="font-bold text-lg">NET SALARY</span>
+                <span class="font-bold text-2xl">PKR ${d.netSalary.toLocaleString()}</span>
+            </div>`;
+            panel.classList.remove('hidden');
+        });
+
+        // ─── PAYROLL PRINT ────────────────────────────────────────────────────────
+        document.getElementById('payroll-print-btn').addEventListener('click', () => {
+            const empId = document.getElementById('payroll-employee-select').value;
+            if (!empId) return showMessage('Error', 'Please select an employee.');
+            const emp = allEmployees.find(e => e.id === empId);
+            if (!emp) return;
+            const monthIdx = parseInt(document.getElementById('payroll-month').value);
+            const year = parseInt(document.getElementById('payroll-year').value);
+            if (isNaN(monthIdx) || isNaN(year) || year < 2000) return showMessage('Error', 'Please select a valid month and year.');
+            const monthName = months[monthIdx];
+            const d = buildPayrollData();
+            const printWindow = window.open('', '_blank', 'width=800,height=700');
+            printWindow.document.write(`<!DOCTYPE html>
+<html><head><meta charset="UTF-8">
+<title>Salary Slip - ${emp.name} - ${monthName} ${year}</title>
+<style>
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body { font-family:Arial,sans-serif; font-size:13px; color:#1e293b; background:#fff; padding:30px; }
+  .header { display:flex; justify-content:space-between; align-items:flex-start; border-bottom:3px solid #4f46e5; padding-bottom:14px; margin-bottom:16px; }
+  .header h1 { font-size:20px; font-weight:700; color:#4f46e5; }
+  .header p { font-size:12px; color:#64748b; margin-top:3px; }
+  .slip-title { text-align:center; font-size:16px; font-weight:700; text-transform:uppercase; letter-spacing:.08em; color:#1e293b; margin-bottom:16px; padding:8px; background:#eef2ff; border-radius:6px; }
+  .info-grid { display:grid; grid-template-columns:1fr 1fr 1fr; gap:6px 20px; margin-bottom:16px; padding:12px; background:#f8fafc; border:1px solid #e2e8f0; border-radius:8px; }
+  .info-grid .lbl { font-size:10px; color:#64748b; text-transform:uppercase; letter-spacing:.05em; }
+  .info-grid .val { font-size:13px; font-weight:600; color:#1e293b; margin-bottom:4px; }
+  .section-title { font-size:12px; font-weight:700; text-transform:uppercase; letter-spacing:.06em; padding:6px 10px; margin-bottom:0; }
+  .earnings-title { background:#059669; color:#fff; border-radius:6px 6px 0 0; }
+  .commission-title { background:#4f46e5; color:#fff; border-radius:6px 6px 0 0; }
+  .deduction-title { background:#e11d48; color:#fff; border-radius:6px 6px 0 0; }
+  table { width:100%; border-collapse:collapse; margin-bottom:14px; font-size:12px; }
+  table.block-table { border:1px solid #e2e8f0; border-top:none; }
+  table.block-table td { padding:7px 10px; border-bottom:1px solid #f1f5f9; }
+  table.block-table td:last-child { text-align:right; font-weight:600; }
+  .gross-row td { background:#d1fae5; font-weight:700; color:#065f46; padding:8px 10px; }
+  .comm-row td { background:#e0e7ff; font-weight:700; color:#3730a3; padding:8px 10px; }
+  .ded-row td { background:#fde8e8; font-weight:700; color:#be123c; padding:8px 10px; }
+  .net-box { background:#4f46e5; color:#fff; padding:14px 16px; border-radius:8px; display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; }
+  .net-box .label { font-size:14px; font-weight:700; }
+  .net-box .amount { font-size:22px; font-weight:800; }
+  .footer { margin-top:30px; display:flex; justify-content:space-between; align-items:flex-end; }
+  .sig-line { border-top:1px solid #94a3b8; padding-top:6px; font-size:11px; color:#64748b; min-width:160px; text-align:center; }
+  .print-footer { margin-top:16px; text-align:center; font-size:10px; color:#94a3b8; border-top:1px solid #e2e8f0; padding-top:10px; }
+  @media print { body { padding:15px; } .net-box { -webkit-print-color-adjust:exact; print-color-adjust:exact; } }
+</style>
+</head><body>
+<div class="header">
+  <div><h1>Darson Securities Pvt Limited SGD BR</h1><p>Official Salary Slip</p></div>
+  <div style="text-align:right;font-size:11px;color:#64748b;"><p>Printed: ${new Date().toLocaleString('en-PK')}</p></div>
+</div>
+<div class="slip-title">Salary Slip &mdash; ${monthName} ${year}</div>
+<div class="info-grid">
+  <div><div class="lbl">Employee Name</div><div class="val">${emp.name}</div></div>
+  <div><div class="lbl">CNIC</div><div class="val">${emp.cnic || 'N/A'}</div></div>
+  <div><div class="lbl">Designation</div><div class="val">${emp.designation || 'N/A'}</div></div>
+  <div><div class="lbl">Department</div><div class="val">${emp.department || 'N/A'}</div></div>
+  <div><div class="lbl">Employment Type</div><div class="val">${emp.employmentType || 'N/A'}</div></div>
+  <div><div class="lbl">Pay Period</div><div class="val">${monthName} ${year}</div></div>
+  <div><div class="lbl">Joining Date</div><div class="val">${emp.joiningDate ? new Date(emp.joiningDate).toLocaleDateString('en-PK') : 'N/A'}</div></div>
+  <div><div class="lbl">Contact</div><div class="val">${emp.contact || 'N/A'}</div></div>
+  <div><div class="lbl">Branch</div><div class="val">${emp.branch || 'N/A'}</div></div>
+</div>
+${(d.totalEarnings > 0) ? `
+<div class="section-title earnings-title">Earnings</div>
+<table class="block-table">
+  ${d.basic ? `<tr><td>Basic Salary</td><td>PKR ${d.basic.toLocaleString()}</td></tr>` : ''}
+  ${d.transport ? `<tr><td>Transport Allowance</td><td>PKR ${d.transport.toLocaleString()}</td></tr>` : ''}
+  ${d.medical ? `<tr><td>Medical Allowance</td><td>PKR ${d.medical.toLocaleString()}</td></tr>` : ''}
+  ${d.otherAllow ? `<tr><td>Other Allowances</td><td>PKR ${d.otherAllow.toLocaleString()}</td></tr>` : ''}
+  ${d.bonus ? `<tr><td>Bonus</td><td>PKR ${d.bonus.toLocaleString()}</td></tr>` : ''}
+  ${d.overtime ? `<tr><td>Overtime</td><td>PKR ${d.overtime.toLocaleString()}</td></tr>` : ''}
+  <tr class="gross-row"><td>Total Earnings</td><td>PKR ${d.totalEarnings.toLocaleString()}</td></tr>
+</table>` : ''}
+${(d.totalCommission > 0) ? `
+<div class="section-title commission-title">Commission Details</div>
+<table class="block-table">
+  ${d.commTrading ? `<tr><td>Trading Volume Commission</td><td>PKR ${d.commTrading.toLocaleString()}</td></tr>` : ''}
+  ${d.commLeads ? `<tr><td>Leads Generated (CPL)</td><td>PKR ${d.commLeads.toLocaleString()}</td></tr>` : ''}
+  ${d.commAccounts ? `<tr><td>Accounts Opened Commission</td><td>PKR ${d.commAccounts.toLocaleString()}</td></tr>` : ''}
+  ${d.commRevenue ? `<tr><td>Revenue Generated Commission</td><td>PKR ${d.commRevenue.toLocaleString()}</td></tr>` : ''}
+  <tr class="comm-row"><td>Total Commission</td><td>PKR ${d.totalCommission.toLocaleString()}</td></tr>
+</table>` : ''}
+${(d.totalDeductions > 0) ? `
+<div class="section-title deduction-title">Deductions</div>
+<table class="block-table">
+  ${d.dedLate ? `<tr><td>Late Attendance</td><td>- PKR ${d.dedLate.toLocaleString()}</td></tr>` : ''}
+  ${d.dedAbsent ? `<tr><td>Absents Deduction</td><td>- PKR ${d.dedAbsent.toLocaleString()}</td></tr>` : ''}
+  ${d.dedLeaves ? `<tr><td>Leaves Deduction</td><td>- PKR ${d.dedLeaves.toLocaleString()}</td></tr>` : ''}
+  ${d.taxDeduction ? `<tr><td>Tax Deduction${d.taxPct ? ` (${d.taxPct}%)` : ''}</td><td>- PKR ${Math.round(d.taxDeduction).toLocaleString()}</td></tr>` : ''}
+  <tr class="ded-row"><td>Total Deductions</td><td>- PKR ${d.totalDeductions.toLocaleString()}</td></tr>
+</table>` : ''}
+<div class="net-box">
+  <span class="label">NET SALARY (Take-Home)</span>
+  <span class="amount">PKR ${d.netSalary.toLocaleString()}</span>
+</div>
+<div class="footer">
+  <div class="sig-line">Employee Signature</div>
+  <div class="sig-line">Accounts Officer</div>
+  <div class="sig-line">Authorized Signatory</div>
+</div>
+<div class="print-footer">Darson Securities Pvt Limited, Sargodha Branch &mdash; Salary Slip &mdash; ${monthName} ${year} &mdash; Confidential</div>
+</body></html>`);
+            printWindow.document.close();
+            printWindow.focus();
+            setTimeout(() => printWindow.print(), 400);
+        });
+
+        // ─── DOCUMENT UPLOAD SYSTEM ───────────────────────────────────────────────
+        const DOC_TYPES = [
+            { key: 'cv',         label: 'CV / Resume',           required: true  },
+            { key: 'cnic_front', label: 'CNIC Front',            required: true  },
+            { key: 'cnic_back',  label: 'CNIC Back',             required: true  },
+            { key: 'offer_letter',label: 'Offer Letter',         required: true  },
+            { key: 'contract',   label: 'Employment Contract',   required: true, hasExpiry: true },
+            { key: 'nda',        label: 'NDA Agreement',         required: false, hasExpiry: true },
+            { key: 'exp_cert',   label: 'Experience Certificate',required: false },
+            { key: 'other',      label: 'Other Documents',       required: false },
+        ];
+
+        function renderEmployeeDocuments(employee) {
+            const docs = employee.documents || {};
+            const grid = document.getElementById('employee-doc-grid');
+            const missingAlert = document.getElementById('doc-missing-alert');
+            const missingText = document.getElementById('doc-missing-text');
+            const expiryDiv = document.getElementById('doc-expiry-alerts');
+
+            const missingRequired = DOC_TYPES.filter(dt => dt.required && !docs[dt.key]?.dataUrl);
+            if (missingRequired.length > 0 && !isSharedView) {
+                missingAlert.classList.remove('hidden');
+                missingText.textContent = `${missingRequired.length} required doc(s) missing`;
+            } else {
+                missingAlert.classList.add('hidden');
+            }
+
+            // Expiry alerts
+            const today = new Date();
+            const expiryWarnings = DOC_TYPES.filter(dt => dt.hasExpiry && docs[dt.key]?.expiry).map(dt => {
+                const expDate = new Date(docs[dt.key].expiry);
+                const daysLeft = Math.ceil((expDate - today) / (1000 * 60 * 60 * 24));
+                if (daysLeft <= 30) return { label: dt.label, daysLeft, expired: daysLeft < 0 };
+                return null;
+            }).filter(Boolean);
+
+            expiryDiv.innerHTML = expiryWarnings.map(w => `
+                <div class="text-xs font-semibold ${w.expired ? 'text-rose-700 bg-rose-50 border-rose-200' : 'text-amber-700 bg-amber-50 border-amber-200'} border px-3 py-1.5 rounded-lg mb-2">
+                    <i class="fas fa-clock mr-1"></i>
+                    <strong>${w.label}</strong>: ${w.expired ? 'EXPIRED' : `expires in ${w.daysLeft} day(s)`}
+                </div>`).join('');
+
+            grid.innerHTML = DOC_TYPES.map(dt => {
+                const doc = docs[dt.key];
+                const uploaded = doc && doc.dataUrl;
+                const bgClass = uploaded ? 'bg-emerald-50 border-emerald-300' : (dt.required ? 'bg-rose-50 border-rose-200' : 'bg-slate-50 border-slate-200');
+                const iconColor = uploaded ? 'text-emerald-600' : (dt.required ? 'text-rose-400' : 'text-slate-400');
+                const statusBadge = uploaded
+                    ? `<span class="text-xs font-semibold text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded-full">Uploaded</span>`
+                    : (dt.required ? `<span class="text-xs font-semibold text-rose-600 bg-rose-100 px-2 py-0.5 rounded-full">Required</span>`
+                                   : `<span class="text-xs text-slate-400">Optional</span>`);
+                const expiryField = dt.hasExpiry && !isSharedView ? `
+                    <div class="mt-1">
+                        <label class="text-xs text-slate-500">Expiry Date:</label>
+                        <input type="date" class="doc-expiry-input w-full px-2 py-1 border rounded-full text-xs mt-0.5 focus:outline-none focus:ring-1 focus:ring-indigo-400"
+                            data-doctype="${dt.key}" data-empid="${employee.id}"
+                            value="${doc?.expiry || ''}" placeholder="Expiry date (optional)">
+                    </div>` : (dt.hasExpiry && doc?.expiry ? `<p class="text-xs text-slate-500 mt-1">Expires: ${new Date(doc.expiry).toLocaleDateString('en-PK')}</p>` : '');
+                const actionBtns = !isSharedView ? `
+                    <div class="flex gap-1 mt-2 flex-wrap">
+                        <label class="cursor-pointer bg-indigo-600 text-white px-2 py-1 rounded-full text-xs font-semibold hover:bg-indigo-700 transition-colors">
+                            <i class="fas fa-upload mr-1"></i>${uploaded ? 'Replace' : 'Upload'}
+                            <input type="file" accept=".pdf,.jpg,.jpeg,.png" class="sr-only doc-file-input" data-doctype="${dt.key}" data-empid="${employee.id}">
+                        </label>
+                        ${uploaded ? `
+                        <button class="doc-preview-btn bg-slate-600 text-white px-2 py-1 rounded-full text-xs font-semibold hover:bg-slate-700"
+                            data-doctype="${dt.key}" data-empid="${employee.id}">
+                            <i class="fas fa-eye mr-1"></i>Preview
+                        </button>
+                        <a class="bg-emerald-600 text-white px-2 py-1 rounded-full text-xs font-semibold hover:bg-emerald-700 no-underline"
+                            href="${doc.dataUrl}" download="${dt.label.replace(/\//g,'_')}_${employee.name}.${doc.ext||'pdf'}">
+                            <i class="fas fa-download mr-1"></i>Download
+                        </a>` : ''}
+                    </div>` : (uploaded ? `
+                    <div class="mt-2">
+                        <a class="bg-emerald-600 text-white px-2 py-1 rounded-full text-xs font-semibold hover:bg-emerald-700 no-underline"
+                            href="${doc.dataUrl}" download="${dt.label.replace(/\//g,'_')}_${employee.name}.${doc.ext||'pdf'}">
+                            <i class="fas fa-download mr-1"></i>Download
+                        </a>
+                    </div>` : '');
+
+                return `
+                <div class="border rounded-xl p-3 ${bgClass}">
+                    <div class="flex items-start justify-between mb-1">
+                        <div class="flex items-center gap-2">
+                            <i class="fas fa-file-alt ${iconColor}"></i>
+                            <span class="text-sm font-semibold text-slate-700">${dt.label}</span>
+                        </div>
+                        ${statusBadge}
+                    </div>
+                    ${expiryField}
+                    ${actionBtns}
+                </div>`;
+            }).join('');
+
+            // Wire up file inputs
+            grid.querySelectorAll('.doc-file-input').forEach(input => {
+                input.addEventListener('change', async (ev) => {
+                    const file = ev.target.files[0];
+                    if (!file) return;
+                    const docType = ev.target.dataset.doctype;
+                    const empId = ev.target.dataset.empid;
+                    const allowedTypes = ['application/pdf', 'image/jpeg', 'image/png', 'image/jpg'];
+                    if (!allowedTypes.includes(file.type)) {
+                        return showMessage('Error', 'Only PDF, JPG, and PNG files are allowed.');
+                    }
+                    const reader = new FileReader();
+                    reader.onload = async (re) => {
+                        const dataUrl = re.target.result;
+                        const ext = file.name.split('.').pop().toLowerCase();
+                        showLoading();
+                        try {
+                            const existingDoc = allEmployees.find(e => e.id === empId)?.documents || {};
+                            const updatedDocs = { ...existingDoc, [docType]: { dataUrl, ext, uploadedAt: new Date().toISOString(), expiry: existingDoc[docType]?.expiry || '' } };
+                            await db.collection(`users/${currentUserId}/employees`).doc(empId).update({ documents: updatedDocs });
+                            showMessage('Success', `${DOC_TYPES.find(d=>d.key===docType)?.label || 'Document'} uploaded successfully!`);
+                        } catch (err) {
+                            showMessage('Error', 'Upload failed: ' + err.message);
+                        } finally {
+                            hideLoading();
+                        }
+                    };
+                    reader.readAsDataURL(file);
+                    ev.target.value = '';
+                });
+            });
+
+            // Wire up expiry date inputs
+            grid.querySelectorAll('.doc-expiry-input').forEach(input => {
+                input.addEventListener('change', async (ev) => {
+                    const docType = ev.target.dataset.doctype;
+                    const empId = ev.target.dataset.empid;
+                    const expiry = ev.target.value;
+                    const emp = allEmployees.find(e => e.id === empId);
+                    if (!emp) return;
+                    const updatedDocs = { ...(emp.documents || {}), [docType]: { ...(emp.documents?.[docType] || {}), expiry } };
+                    showLoading();
+                    try {
+                        await db.collection(`users/${currentUserId}/employees`).doc(empId).update({ documents: updatedDocs });
+                    } catch (err) {
+                        showMessage('Error', 'Failed to save expiry: ' + err.message);
+                    } finally {
+                        hideLoading();
+                    }
+                });
+            });
+
+            // Wire up preview buttons
+            grid.querySelectorAll('.doc-preview-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const docType = btn.dataset.doctype;
+                    const empId = btn.dataset.empid;
+                    const emp = allEmployees.find(e => e.id === empId);
+                    if (!emp) return;
+                    const doc = emp.documents?.[docType];
+                    if (!doc?.dataUrl) return;
+                    const win = window.open('', '_blank');
+                    if (doc.ext === 'pdf' || doc.dataUrl.startsWith('data:application/pdf')) {
+                        win.document.write(`<html><body style="margin:0"><embed src="${doc.dataUrl}" width="100%" height="100%" type="application/pdf"></body></html>`);
+                    } else {
+                        win.document.write(`<html><body style="margin:0;background:#000;display:flex;justify-content:center;align-items:center;min-height:100vh"><img src="${doc.dataUrl}" style="max-width:100%;max-height:100vh;object-fit:contain"></body></html>`);
+                    }
+                    win.document.close();
+                });
+            });
+        }
+
+        // ─── DOCUMENT EXPIRY GLOBAL CHECK ─────────────────────────────────────────
+        function checkDocumentExpiryAlerts() {
+            if (isSharedView) return;
+            const today = new Date();
+            let alertCount = 0;
+            allEmployees.forEach(emp => {
+                const docs = emp.documents || {};
+                DOC_TYPES.forEach(dt => {
+                    if (dt.hasExpiry && docs[dt.key]?.expiry) {
+                        const expDate = new Date(docs[dt.key].expiry);
+                        const daysLeft = Math.ceil((expDate - today) / (1000 * 60 * 60 * 24));
+                        if (daysLeft <= 30) alertCount++;
+                    }
+                });
+            });
+            // Update dashboard employees card with alert badge if needed
+            const empCard = document.getElementById('dashboard-employees-card');
+            if (empCard && alertCount > 0) {
+                let badge = empCard.querySelector('.doc-alert-badge');
+                if (!badge) {
+                    badge = document.createElement('span');
+                    badge.className = 'doc-alert-badge absolute top-2 right-2 bg-rose-500 text-white text-xs font-bold px-2 py-0.5 rounded-full';
+                    empCard.style.position = 'relative';
+                    empCard.appendChild(badge);
+                }
+                badge.textContent = `${alertCount} doc alert${alertCount > 1 ? 's' : ''}`;
+            }
+        }
+
         // --- Initialize App ---
         document.addEventListener('DOMContentLoaded', () => {
             const urlParams = new URLSearchParams(window.location.search);
@@ -5026,6 +5768,7 @@
             populateMonthDropdown(document.getElementById('salary-slip-month'));
             populateMonthDropdown(document.getElementById('salary-slip-section-month'));
             populateMonthDropdown(document.getElementById('bulk-commission-month'));
+            populateMonthDropdown(document.getElementById('payroll-month'));
             
             initializeCalculator();
         });
