@@ -193,54 +193,104 @@
         aside#sidebar {
             background: linear-gradient(160deg, #1e1b4b 0%, #312e81 60%, #4f46e5 100%) !important;
             border-right: none !important;
-            box-shadow: 4px 0 24px rgba(30,27,75,0.25);
+            box-shadow: 4px 0 32px rgba(30,27,75,0.35);
+            display: flex !important;
+            flex-direction: column !important;
+            height: 100vh !important;
         }
         #sidebar .p-4.border-b {
             border-bottom-color: rgba(255,255,255,0.1) !important;
+            flex-shrink: 0;
         }
         #sidebar h1 {
             color: #ffffff !important;
             letter-spacing: -0.5px;
         }
+
+        /* Sidebar nav scrollable area */
+        #sidebar nav {
+            flex: 1 !important;
+            overflow-y: auto !important;
+            overflow-x: hidden !important;
+            padding-bottom: 1rem !important;
+            /* Custom scrollbar inside sidebar */
+            scrollbar-width: thin;
+            scrollbar-color: rgba(255,255,255,0.2) transparent;
+        }
+        #sidebar nav::-webkit-scrollbar { width: 4px; }
+        #sidebar nav::-webkit-scrollbar-track { background: transparent; }
+        #sidebar nav::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 2px; }
+        #sidebar nav::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.35); }
+
+        /* Sidebar hover scroll activation */
+        #sidebar nav:hover {
+            scrollbar-color: rgba(255,255,255,0.3) transparent;
+        }
+
         #main-nav .nav-btn {
             display: flex;
             align-items: center;
             width: 100%;
             text-align: left;
-            padding: 0.75rem 1.25rem;
-            border-radius: 12px;
+            padding: 0.7rem 1.1rem;
+            border-radius: 10px;
             font-weight: 500;
             font-family: 'Syne', sans-serif;
-            font-size: 0.9rem;
+            font-size: 0.875rem;
             color: rgba(255,255,255,0.65) !important;
             background: transparent !important;
             border: 1px solid transparent;
-            transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+            transition: all 0.18s cubic-bezier(0.34, 1.4, 0.64, 1);
             box-shadow: none !important;
             transform: none !important;
             letter-spacing: 0.01em;
+            cursor: pointer;
+            position: relative;
         }
         #main-nav .nav-btn:hover {
             color: #fff !important;
-            background: rgba(255,255,255,0.12) !important;
-            border-color: rgba(255,255,255,0.15);
-            transform: translateX(4px) !important;
+            background: rgba(255,255,255,0.1) !important;
+            border-color: rgba(255,255,255,0.12);
+            transform: translateX(5px) !important;
             box-shadow: none !important;
         }
         #main-nav .nav-btn:active {
-            transform: translateX(2px) !important;
+            transform: translateX(2px) scale(0.98) !important;
         }
         #main-nav .nav-btn.bg-indigo-600 {
-            background: rgba(255,255,255,0.2) !important;
+            background: rgba(255,255,255,0.18) !important;
             color: #fff !important;
-            border-color: rgba(255,255,255,0.25);
-            box-shadow: 0 2px 8px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.15) !important;
+            border-color: rgba(255,255,255,0.22);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.15) !important;
             transform: none !important;
         }
+        #main-nav .nav-btn.bg-indigo-600::after {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 3px;
+            height: 60%;
+            background: rgba(255,255,255,0.8);
+            border-radius: 0 3px 3px 0;
+        }
         #main-nav .nav-btn.bg-indigo-600:hover {
-            background: rgba(255,255,255,0.25) !important;
-            transform: translateX(4px) !important;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.2) !important;
+            background: rgba(255,255,255,0.24) !important;
+            transform: translateX(5px) !important;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.2) !important;
+        }
+
+        /* Nav section divider label */
+        .nav-section-label {
+            font-family: 'DM Sans', sans-serif;
+            font-size: 0.62rem;
+            font-weight: 600;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: rgba(255,255,255,0.3);
+            padding: 0.6rem 1.1rem 0.3rem;
+            margin-top: 0.25rem;
         }
 
         /* Nav icons */
@@ -248,8 +298,11 @@
             margin-right: 10px;
             font-family: "Font Awesome 6 Free";
             font-weight: 900;
-            font-size: 0.8rem;
-            opacity: 0.8;
+            font-size: 0.78rem;
+            opacity: 0.75;
+            flex-shrink: 0;
+            width: 16px;
+            text-align: center;
         }
         [data-section="dashboard"]::before { content: "\f3fd"; }
         [data-section="complaints"]::before { content: "\f0e0"; }
@@ -489,18 +542,17 @@
         ::-webkit-scrollbar-thumb:hover { background: rgba(99,102,241,0.5); }
 
         /* ─── Floating badge on sidebar ──────────── */
-        #sidebar nav::after {
-            content: 'Darson Brokerage';
-            display: block;
-            position: absolute;
-            bottom: 1.5rem;
-            left: 1.5rem;
+        #sidebar-footer-badge {
+            flex-shrink: 0;
+            padding: 0.75rem 1.5rem;
+            border-top: 1px solid rgba(255,255,255,0.08);
             font-family: 'Syne', sans-serif;
-            font-size: 0.65rem;
+            font-size: 0.62rem;
             font-weight: 700;
             letter-spacing: 0.1em;
-            color: rgba(255,255,255,0.25);
+            color: rgba(255,255,255,0.22);
             text-transform: uppercase;
+            background: rgba(0,0,0,0.1);
         }
         #sidebar nav { position: relative; min-height: 400px; }
 
@@ -525,12 +577,11 @@
 
         /* ─── Sidebar brand logo area ────────────── */
         #sidebar .p-4.border-b {
-            background: rgba(0,0,0,0.15);
-            padding: 1.25rem 1.5rem;
+            background: rgba(0,0,0,0.18);
         }
         #sidebar h1 {
-            font-size: 1.35rem;
-            letter-spacing: -0.5px;
+            font-size: 1.1rem;
+            letter-spacing: -0.3px;
         }
 
         /* ─── HR Module Tabs ─────────────────────── */
@@ -1068,6 +1119,135 @@
         }
         #settings .theme-swatch:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.12); }
         #settings .theme-swatch.active { border-color: #4f46e5; box-shadow: 0 0 0 3px rgba(99,102,241,0.2); }
+
+        /* ─── Shared Visibility Settings ─────────── */
+        .sv-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 10px;
+            margin-top: 4px;
+        }
+        .sv-toggle-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px 14px;
+            background: #f8fafc;
+            border: 1.5px solid #e2e8f0;
+            border-radius: 10px;
+            transition: all .18s;
+            cursor: pointer;
+            gap: 10px;
+        }
+        .sv-toggle-item:hover {
+            border-color: #a5b4fc;
+            background: #eef2ff;
+        }
+        .sv-toggle-item.sv-enabled {
+            border-color: #6366f1;
+            background: #eef2ff;
+        }
+        .sv-item-label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-family: 'Syne', sans-serif;
+            font-size: 0.82rem;
+            font-weight: 600;
+            color: #1e1b4b;
+        }
+        .sv-item-label i {
+            font-size: 0.75rem;
+            color: #6366f1;
+            width: 14px;
+            text-align: center;
+        }
+        /* Toggle switch */
+        .sv-switch {
+            position: relative;
+            width: 38px;
+            height: 22px;
+            flex-shrink: 0;
+        }
+        .sv-switch input { display: none; }
+        .sv-switch-track {
+            position: absolute;
+            inset: 0;
+            background: #cbd5e1;
+            border-radius: 99px;
+            transition: background .2s;
+            cursor: pointer;
+        }
+        .sv-switch-track::after {
+            content: '';
+            position: absolute;
+            top: 3px; left: 3px;
+            width: 16px; height: 16px;
+            background: #fff;
+            border-radius: 50%;
+            transition: transform .2s cubic-bezier(0.34,1.56,0.64,1);
+            box-shadow: 0 1px 4px rgba(0,0,0,0.18);
+        }
+        .sv-switch input:checked + .sv-switch-track {
+            background: #4f46e5;
+        }
+        .sv-switch input:checked + .sv-switch-track::after {
+            transform: translateX(16px);
+        }
+        .sv-save-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 22px;
+            background: #4f46e5;
+            color: #fff;
+            border: none;
+            border-radius: 10px;
+            font-family: 'Syne', sans-serif;
+            font-size: 0.875rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all .18s;
+            box-shadow: 0 4px 0 #3730a3;
+            margin-top: 14px;
+        }
+        .sv-save-btn:hover {
+            background: #4338ca;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 0 #3730a3, 0 8px 20px rgba(55,48,163,0.28);
+        }
+        .sv-save-btn:active {
+            transform: translateY(1px);
+            box-shadow: 0 2px 0 #3730a3;
+        }
+        .sv-status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 4px 10px;
+            border-radius: 99px;
+            font-size: 0.72rem;
+            font-weight: 600;
+            font-family: 'DM Sans', sans-serif;
+        }
+        .sv-status-badge.saved {
+            background: #d1fae5;
+            color: #065f46;
+        }
+        .sv-status-badge.saving {
+            background: #e0e7ff;
+            color: #3730a3;
+        }
+        .sv-note {
+            background: rgba(99,102,241,0.07);
+            border-left: 3px solid #4f46e5;
+            border-radius: 0 8px 8px 0;
+            padding: 10px 14px;
+            font-size: 0.78rem;
+            color: #1e1b4b;
+            margin-bottom: 14px;
+            line-height: 1.5;
+        }
     </style>
 </head>
 <!-- UPDATED: Body background color -->
@@ -1316,26 +1496,38 @@
     </main>
 
     <div id="main-app" class="hidden min-h-screen">
-        <aside id="sidebar" class="w-64 min-h-full fixed top-0 left-0 z-50 transform -translate-x-full md:translate-x-0 transition-transform duration-300 ease-in-out" style="background:linear-gradient(160deg,#1e1b4b 0%,#312e81 60%,#4f46e5 100%);box-shadow:4px 0 24px rgba(30,27,75,0.25);">
-            <div class="p-4 h-16 flex items-center" style="border-bottom:1px solid rgba(255,255,255,0.1);background:rgba(0,0,0,0.15);">
-                <h1 class="text-2xl font-bold" style="color:#ffffff;letter-spacing:-0.5px;">Darson Sargodha</h1>
+        <aside id="sidebar" class="w-64 fixed top-0 left-0 z-50 transform -translate-x-full md:translate-x-0 transition-transform duration-300 ease-in-out" style="background:linear-gradient(160deg,#1e1b4b 0%,#312e81 60%,#4f46e5 100%);box-shadow:4px 0 32px rgba(30,27,75,0.35);height:100vh;display:flex;flex-direction:column;">
+            <!-- Brand Header -->
+            <div class="flex items-center gap-3 flex-shrink-0" style="padding:1.1rem 1.25rem;border-bottom:1px solid rgba(255,255,255,0.1);background:rgba(0,0,0,0.18);">
+                <div style="width:36px;height:36px;border-radius:10px;background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.2);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                    <i class="fas fa-building" style="color:rgba(255,255,255,0.9);font-size:0.9rem;"></i>
+                </div>
+                <div>
+                    <h1 class="text-lg font-bold" style="color:#ffffff;letter-spacing:-0.3px;line-height:1.1;">Darson Sargodha</h1>
+                    <p style="font-size:0.6rem;color:rgba(255,255,255,0.4);font-family:'DM Sans',sans-serif;letter-spacing:0.05em;text-transform:uppercase;font-weight:500;">Brokerage System</p>
+                </div>
             </div>
-            <nav class="p-4">
-                <ul id="main-nav" class="space-y-2">
-                    <!-- UPDATED: Sidebar button styling. Active state is set by JS. -->
+            <!-- Scrollable Nav Area -->
+            <nav style="flex:1;overflow-y:auto;overflow-x:hidden;padding:0.75rem 0.75rem 0.5rem;min-height:0;">
+                <ul id="main-nav" class="space-y-1">
+                    <div class="nav-section-label">Main</div>
                     <li><button data-section="dashboard" class="nav-btn bg-indigo-600 text-white">Dashboard</button></li>
                     <li><button data-section="complaints" class="nav-btn text-slate-600 hover:bg-indigo-50 hover:text-indigo-600">Complaints</button></li>
                     <li><button data-section="commission" class="nav-btn text-slate-600 hover:bg-indigo-50 hover:text-indigo-600">Commission</button></li>
-                    <li><button data-section="calculator" class="nav-btn text-slate-600 hover:bg-indigo-50 hover:text-indigo-600">CGS</button></li>
+                    <li><button data-section="calculator" class="nav-btn text-slate-600 hover:bg-indigo-50 hover:text-indigo-600">CGS Calculator</button></li>
                     <li><button data-section="expenses" class="nav-btn text-slate-600 hover:bg-indigo-50 hover:text-indigo-600">Expenses</button></li>
-                    <li><button data-section="profiles" class="nav-btn text-slate-600 hover:bg-indigo-50 hover:text-indigo-600">Profiles</button></li>
-                    <li><button data-section="employees" class="nav-btn text-slate-600 hover:bg-indigo-50 hover:text-indigo-600">HR</button></li>
+                    <div class="nav-section-label" style="margin-top:0.5rem;">Management</div>
+                    <li><button data-section="profiles" class="nav-btn text-slate-600 hover:bg-indigo-50 hover:text-indigo-600">Client Profiles</button></li>
+                    <li><button data-section="employees" class="nav-btn text-slate-600 hover:bg-indigo-50 hover:text-indigo-600">HR &amp; Employees</button></li>
                     <li><button data-section="couriers" class="nav-btn text-slate-600 hover:bg-indigo-50 hover:text-indigo-600">Couriers</button></li>
                     <li><button data-section="phone-directory" class="nav-btn text-slate-600 hover:bg-indigo-50 hover:text-indigo-600">Phone Directory</button></li>
-                    <li style="margin-top:1rem;border-top:1px solid rgba(255,255,255,0.1);padding-top:1rem;"><button data-section="disclaimer" class="nav-btn text-slate-600 hover:bg-indigo-50 hover:text-indigo-600">Disclaimer</button></li>
+                    <div class="nav-section-label" style="margin-top:0.5rem;">System</div>
+                    <li><button data-section="disclaimer" class="nav-btn text-slate-600 hover:bg-indigo-50 hover:text-indigo-600">Disclaimer</button></li>
                     <li><button data-section="settings" class="nav-btn text-slate-600 hover:bg-indigo-50 hover:text-indigo-600">Settings</button></li>
                 </ul>
             </nav>
+            <!-- Footer Badge (always visible) -->
+            <div id="sidebar-footer-badge">Darson Brokerage</div>
         </aside>
 
         <!-- Main Content: Margin-left is applied on medium screens and up to make space for the sidebar -->
@@ -1660,7 +1852,7 @@
                         </div>
 
                         <!-- CLIENT COMMISSION DETAILS: Bulk Upload Panel -->
-                        <div class="card p-6 mt-6" id="client-commission-upload-panel">
+                        <div class="card p-6 mt-6" id="client-commission-upload-panel" style="display:none;">
                             <h3 class="text-xl font-semibold mb-1"><i class="fas fa-file-upload mr-2 text-indigo-600"></i>Client Commission Details</h3>
                             <p class="text-sm text-slate-500 mb-5">Upload a dealer-wise commission file to automatically assign commission amounts to each client's profile. The system will match client names and populate their payment records.</p>
 
@@ -2645,6 +2837,29 @@
                                 <i class="fas fa-undo"></i> Reset to Defaults
                             </button>
                         </div>
+
+                        <!-- Shared Frontend Visibility -->
+                        <div class="settings-card" style="margin-top:24px;">
+                            <div class="settings-card-header">
+                                <i class="fas fa-eye" style="color:#a5b4fc;"></i>
+                                <h3>Shared Frontend Visibility</h3>
+                            </div>
+                            <div class="settings-card-body">
+                                <div class="sv-note">
+                                    <strong>Shared Frontend</strong> jab aap "Share Frontend" button se share kartay hain to ek read-only link generate hota hai. Yahan aap choose kar saktay hain ke us link mein kaun kaun se sections dikhain. Sab kuch sirf <strong>read-only</strong> hoga — koi bhi add/edit/delete nahi kar sakta.
+                                </div>
+                                <p style="font-size:0.78rem;color:#64748b;margin-bottom:12px;font-family:'DM Sans',sans-serif;">Jo sections <strong>ON</strong> hain woh shared link mein dikhenge (read-only). Jo <strong>OFF</strong> hain woh bilkul nahi dikhenge.</p>
+                                <div class="sv-grid" id="sv-sections-grid">
+                                    <!-- Rendered by JS -->
+                                </div>
+                                <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
+                                    <button class="sv-save-btn" onclick="saveSharedVisibilitySettings()">
+                                        <i class="fas fa-save"></i> Save Visibility Settings
+                                    </button>
+                                    <span id="sv-status" style="display:none;" class="sv-status-badge"></span>
+                                </div>
+                            </div>
+                        </div>
                     </section>
 
                     <!-- ─── PHONE DIRECTORY SECTION ─── -->
@@ -3351,57 +3566,46 @@
                     hideLoading();
                     return;
                 }
+                // Read saved visibility preferences (if any)
+                const visibilitySettings = isSharedDoc.data().sharedVisibility || null;
+
+                isSharedView = true; // Activate read-only mode
+
+                // Hide auth and show the app view
+                authSection.style.display = 'none';
+                mainApp.classList.remove('hidden');
+                mainApp.classList.add('flex');
+                
+                // Configure UI for read-only view — hide all edit/write controls
+                document.getElementById('sign-out-btn').style.display = 'none';
+                shareDashboardBtn.style.display = 'none';
+                document.querySelectorAll('.actions-header').forEach(el => el.style.display = 'none');
+                document.getElementById('add-complaint-wrapper').style.display = 'none';
+                document.getElementById('add-commission-forms-wrapper').style.display = 'none';
+                document.getElementById('print-commission-btn').style.display = 'none';
+                document.getElementById('add-expense-forms-wrapper').style.display = 'none';
+                document.getElementById('print-expenses-btn').style.display = 'none';
+                document.getElementById('add-client-wrapper').style.display = 'none';
+                document.getElementById('add-employee-wrapper').style.display = 'none';
+                document.getElementById('add-courier-wrapper').style.display = 'none';
+                const downloadReportBtn = document.getElementById('download-client-report-btn');
+                if (downloadReportBtn) downloadReportBtn.style.display = 'none';
+
+                // Apply section visibility from owner's saved preferences
+                applySharedVisibility(visibilitySettings);
+
+                // Set header
+                document.getElementById('header-title').textContent = "Shared Frontend (Live View)";
+                
+                currentUserId = shareId;
+                startRealtimeListeners();
+                hideLoading();
+
             } catch (error) {
                 showMessage('Error', 'Could not verify dashboard. Please check the link.');
                 console.error("Share verification error:", error);
                 hideLoading();
-                return;
             }
-
-            isSharedView = true; // Activate read-only mode
-
-            // Hide auth and show the app view
-            authSection.style.display = 'none';
-            mainApp.classList.remove('hidden');
-            mainApp.classList.add('flex');
-            
-            // Configure UI for read-only view
-            document.getElementById('sign-out-btn').style.display = 'none';
-            shareDashboardBtn.style.display = 'none';
-            // Hide admin-only forms and action buttons
-            document.querySelectorAll('.actions-header').forEach(el => el.style.display = 'none');
-            document.getElementById('add-complaint-wrapper').style.display = 'none';
-            document.getElementById('add-commission-forms-wrapper').style.display = 'none';
-            document.getElementById('print-commission-btn').style.display = 'none';
-            document.getElementById('add-expense-forms-wrapper').style.display = 'none';
-            document.getElementById('print-expenses-btn').style.display = 'none';
-            document.getElementById('add-client-wrapper').style.display = 'none';
-            document.getElementById('add-employee-wrapper').style.display = 'none';
-            document.getElementById('add-courier-wrapper').style.display = 'none';
-            
-            // ADDED: Hide the new download report button in shared view
-            const downloadReportBtn = document.getElementById('download-client-report-btn');
-            if(downloadReportBtn) downloadReportBtn.style.display = 'none';
-
-            // UPDATE: Hide CGS button for shared view
-            document.querySelector('button[data-section="calculator"]').parentElement.style.display = 'none';
-
-            // Hide Phone Directory from frontend (backend only)
-            const pdNavBtn = document.querySelector('button[data-section="phone-directory"]');
-            if (pdNavBtn) pdNavBtn.parentElement.style.display = 'none';
-            const pdSection = document.getElementById('phone-directory');
-            if (pdSection) pdSection.style.display = 'none';
-
-
-            // Show dashboard by default
-            showSection('dashboard');
-            
-            // Set header
-            document.getElementById('header-title').textContent = "Shared Frontend (Live View)";
-            
-            currentUserId = shareId; // Set the user ID to the shared one for data fetching
-            startRealtimeListeners();
-            hideLoading();
         }
 
         loginForm.addEventListener('submit', async (e) => {
@@ -7194,6 +7398,139 @@ ${(d.totalDeductions > 0) ? `
 
         })(); // end Phone Directory module
 
+
+        // ─── SHARED VISIBILITY MODULE ────────────────────────────────────────────────
+        const SV_STORAGE_KEY = 'darson_shared_visibility_v1';
+
+        // All configurable sections with display info
+        const SV_SECTIONS = [
+            { id: 'dashboard',       label: 'Dashboard',        icon: 'fa-tachometer-alt', defaultOn: true  },
+            { id: 'complaints',      label: 'Complaints',       icon: 'fa-envelope',       defaultOn: true  },
+            { id: 'commission',      label: 'Commission',       icon: 'fa-dollar-sign',    defaultOn: true  },
+            { id: 'calculator',      label: 'CGS Calculator',   icon: 'fa-calculator',     defaultOn: false },
+            { id: 'expenses',        label: 'Expenses',         icon: 'fa-wallet',         defaultOn: true  },
+            { id: 'profiles',        label: 'Client Profiles',  icon: 'fa-user',           defaultOn: true  },
+            { id: 'employees',       label: 'HR & Employees',   icon: 'fa-users',          defaultOn: false },
+            { id: 'couriers',        label: 'Couriers',         icon: 'fa-truck',          defaultOn: false },
+            { id: 'phone-directory', label: 'Phone Directory',  icon: 'fa-phone',          defaultOn: false },
+            { id: 'disclaimer',      label: 'Disclaimer',       icon: 'fa-info-circle',    defaultOn: false },
+        ];
+
+        function getSVSettings() {
+            try {
+                const saved = JSON.parse(localStorage.getItem(SV_STORAGE_KEY) || 'null');
+                if (saved) return saved;
+            } catch(e) {}
+            // defaults
+            const defaults = {};
+            SV_SECTIONS.forEach(s => { defaults[s.id] = s.defaultOn; });
+            return defaults;
+        }
+
+        function saveSVSettingsLocal(settings) {
+            localStorage.setItem(SV_STORAGE_KEY, JSON.stringify(settings));
+        }
+
+        function renderSVGrid() {
+            const grid = document.getElementById('sv-sections-grid');
+            if (!grid) return;
+            const current = getSVSettings();
+            grid.innerHTML = '';
+            SV_SECTIONS.forEach(sec => {
+                const isOn = current[sec.id] !== undefined ? current[sec.id] : sec.defaultOn;
+                const item = document.createElement('label');
+                item.className = 'sv-toggle-item' + (isOn ? ' sv-enabled' : '');
+                item.innerHTML = `
+                    <span class="sv-item-label">
+                        <i class="fas ${sec.icon}"></i>
+                        ${sec.label}
+                    </span>
+                    <div class="sv-switch">
+                        <input type="checkbox" id="sv-chk-${sec.id}" ${isOn ? 'checked' : ''} onchange="svToggleItem('${sec.id}', this.checked)">
+                        <span class="sv-switch-track"></span>
+                    </div>
+                `;
+                grid.appendChild(item);
+            });
+        }
+
+        function svToggleItem(sectionId, isChecked) {
+            const settings = getSVSettings();
+            settings[sectionId] = isChecked;
+            saveSVSettingsLocal(settings);
+            // update item style
+            const chk = document.getElementById('sv-chk-' + sectionId);
+            if (chk) {
+                const item = chk.closest('.sv-toggle-item');
+                if (item) item.classList.toggle('sv-enabled', isChecked);
+            }
+        }
+
+        async function saveSharedVisibilitySettings() {
+            const settings = getSVSettings();
+            const statusEl = document.getElementById('sv-status');
+            statusEl.style.display = 'inline-flex';
+            statusEl.className = 'sv-status-badge saving';
+            statusEl.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+
+            // Save locally always
+            saveSVSettingsLocal(settings);
+
+            // Also push to Firestore if user is logged in (so shared link picks it up)
+            if (typeof db !== 'undefined' && currentUserId && !isSharedView) {
+                try {
+                    await db.collection('public_dashboards').doc(currentUserId).set({
+                        sharedVisibility: settings,
+                        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                    }, { merge: true });
+                    statusEl.className = 'sv-status-badge saved';
+                    statusEl.innerHTML = '<i class="fas fa-check"></i> Saved!';
+                } catch(e) {
+                    statusEl.className = 'sv-status-badge saved';
+                    statusEl.innerHTML = '<i class="fas fa-check"></i> Saved locally';
+                    console.warn('Firestore SV save failed:', e);
+                }
+            } else {
+                statusEl.className = 'sv-status-badge saved';
+                statusEl.innerHTML = '<i class="fas fa-check"></i> Saved locally';
+            }
+            setTimeout(() => { statusEl.style.display = 'none'; }, 2500);
+        }
+
+        // Apply visibility on shared view — called from loadSharedDashboard
+        function applySharedVisibility(visibilitySettings) {
+            const settings = visibilitySettings || {};
+            SV_SECTIONS.forEach(sec => {
+                // Check if section should be shown — default: use defaultOn if not set
+                const show = settings[sec.id] !== undefined ? settings[sec.id] : sec.defaultOn;
+
+                // Hide/show nav button
+                const navBtn = document.querySelector(`button[data-section="${sec.id}"]`);
+                if (navBtn) navBtn.parentElement.style.display = show ? '' : 'none';
+
+                // Hide/show section
+                const sectionEl = document.getElementById(sec.id);
+                if (sectionEl) sectionEl.style.display = show ? '' : 'none';
+            });
+
+            // Always hide Settings from shared view
+            const settingsNav = document.querySelector('button[data-section="settings"]');
+            if (settingsNav) settingsNav.parentElement.style.display = 'none';
+            const settingsSec = document.getElementById('settings');
+            if (settingsSec) settingsSec.style.display = 'none';
+
+            // Navigate to first visible section
+            const firstVisible = SV_SECTIONS.find(s => {
+                const show = settings[s.id] !== undefined ? settings[s.id] : s.defaultOn;
+                return show;
+            });
+            if (firstVisible) showSection(firstVisible.id);
+        }
+
+        // Init SV grid on page ready
+        document.addEventListener('DOMContentLoaded', () => {
+            renderSVGrid();
+        });
 
         // ─── APPEARANCE SETTINGS MODULE ──────────────────────────────────────────────
         const APP_SETTINGS_KEY = 'darson_app_appearance_v1';
