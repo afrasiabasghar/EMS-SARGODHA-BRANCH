@@ -315,6 +315,7 @@
         [data-section="disclaimer"]::before { content: "\f05a"; }
         [data-section="phone-directory"]::before { content: "\f095"; }
         [data-section="settings"]::before { content: "\f013"; }
+        [data-section="analytics"]::before { content: "\f080"; }
 
         /* ─── Header ─────────────────────────────── */
         header.bg-white {
@@ -1524,6 +1525,7 @@
                     <div class="nav-section-label" style="margin-top:0.5rem;">System</div>
                     <li><button data-section="disclaimer" class="nav-btn text-slate-600 hover:bg-indigo-50 hover:text-indigo-600">Disclaimer</button></li>
                     <li><button data-section="settings" class="nav-btn text-slate-600 hover:bg-indigo-50 hover:text-indigo-600">Settings</button></li>
+                    <li><button data-section="analytics" class="nav-btn text-slate-600 hover:bg-indigo-50 hover:text-indigo-600">Analytics</button></li>
                 </ul>
             </nav>
             <!-- Footer Badge (always visible) -->
@@ -2862,6 +2864,137 @@
                         </div>
                     </section>
 
+                    <!-- ─── ANALYTICS SECTION ─── -->
+                    <section id="analytics" class="section-container">
+                        <h2 class="text-3xl font-bold text-slate-800 mb-2">Analytics</h2>
+                        <p class="text-slate-500 mb-6" style="font-family:'DM Sans',sans-serif;font-size:0.9rem;">Session activity and access timestamps for this application.</p>
+
+                        <!-- Summary Stat Row -->
+                        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;margin-bottom:24px;">
+                            <div class="stat-card">
+                                <div class="stat-icon" style="background:linear-gradient(135deg,#4f46e5,#6366f1);">
+                                    <i class="fas fa-desktop" style="color:#fff;"></i>
+                                </div>
+                                <div style="font-size:0.73rem;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:#94a3b8;margin-bottom:4px;font-family:'DM Sans',sans-serif;">Frontend Last Seen</div>
+                                <div id="analytics-fe-last-seen" style="font-size:1rem;font-weight:700;color:#0f172a;font-family:'Syne',sans-serif;word-break:break-word;">—</div>
+                            </div>
+
+                            <div class="stat-card">
+                                <div class="stat-icon" style="background:linear-gradient(135deg,#d97706,#fbbf24);">
+                                    <i class="fas fa-clock" style="color:#fff;"></i>
+                                </div>
+                                <div style="font-size:0.73rem;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:#94a3b8;margin-bottom:4px;font-family:'DM Sans',sans-serif;">Current Session Duration</div>
+                                <div id="analytics-session-dur" style="font-size:1rem;font-weight:700;color:#0f172a;font-family:'Syne',sans-serif;">—</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-icon" style="background:linear-gradient(135deg,#7c3aed,#a78bfa);">
+                                    <i class="fas fa-sign-in-alt" style="color:#fff;"></i>
+                                </div>
+                                <div style="font-size:0.73rem;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:#94a3b8;margin-bottom:4px;font-family:'DM Sans',sans-serif;">Session Started</div>
+                                <div id="analytics-session-start" style="font-size:1rem;font-weight:700;color:#0f172a;font-family:'Syne',sans-serif;word-break:break-word;">—</div>
+                            </div>
+                        </div>
+
+                        <!-- Session History Table -->
+                        <div class="settings-card">
+                            <div class="settings-card-header">
+                                <i class="fas fa-history" style="color:#a5b4fc;"></i>
+                                <h3>Login Session History</h3>
+                            </div>
+                            <div class="settings-card-body" style="padding:0;">
+                                <div style="overflow-x:auto;">
+                                    <table style="width:100%;border-collapse:collapse;font-family:'DM Sans',sans-serif;font-size:0.82rem;">
+                                        <thead>
+                                            <tr style="background:linear-gradient(90deg,#f8fafc,#eef2ff);border-bottom:2px solid #e0e7ff;">
+                                                <th style="padding:10px 16px;text-align:left;font-weight:700;color:#475569;letter-spacing:0.04em;text-transform:uppercase;font-size:0.72rem;">#</th>
+                                                <th style="padding:10px 16px;text-align:left;font-weight:700;color:#475569;letter-spacing:0.04em;text-transform:uppercase;font-size:0.72rem;">Login Time</th>
+                                                <th style="padding:10px 16px;text-align:left;font-weight:700;color:#475569;letter-spacing:0.04em;text-transform:uppercase;font-size:0.72rem;">Logout / Last Active</th>
+                                                <th style="padding:10px 16px;text-align:left;font-weight:700;color:#475569;letter-spacing:0.04em;text-transform:uppercase;font-size:0.72rem;">Duration</th>
+                                                <th style="padding:10px 16px;text-align:left;font-weight:700;color:#475569;letter-spacing:0.04em;text-transform:uppercase;font-size:0.72rem;">Status</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="analytics-session-tbody">
+                                            <tr><td colspan="5" style="text-align:center;padding:24px;color:#94a3b8;">No sessions recorded yet.</td></tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Frontend Activity -->
+                        <div class="settings-card" style="margin-top:20px;">
+                            <div class="settings-card-header">
+                                <i class="fas fa-desktop" style="color:#a5b4fc;"></i>
+                                <h3>Frontend Activity</h3>
+                            </div>
+                            <div class="settings-card-body">
+                                <div style="background:#f8fafc;border-radius:12px;padding:16px;border:1px solid #e0e7ff;max-width:400px;">
+                                    <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;">
+                                        <div style="width:10px;height:10px;border-radius:50%;background:#4f46e5;flex-shrink:0;"></div>
+                                        <span style="font-weight:700;font-family:'Syne',sans-serif;font-size:0.9rem;color:#1e1b4b;">Frontend</span>
+                                    </div>
+                                    <div style="font-size:0.78rem;color:#64748b;margin-bottom:6px;font-family:'DM Sans',sans-serif;">Browser client activity</div>
+                                    <div style="font-size:0.78rem;color:#475569;font-family:'DM Sans',sans-serif;"><span style="color:#94a3b8;">First Visit:</span> <span id="analytics-fe-first">—</span></div>
+                                    <div style="font-size:0.78rem;color:#475569;font-family:'DM Sans',sans-serif;margin-top:4px;"><span style="color:#94a3b8;">Last Seen:</span> <span id="analytics-fe-last2">—</span></div>
+                                    <div style="font-size:0.78rem;color:#475569;font-family:'DM Sans',sans-serif;margin-top:4px;"><span style="color:#94a3b8;">Total Visits:</span> <span id="analytics-fe-visits">—</span></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Pages Spent Most Time -->
+                        <div class="settings-card" style="margin-top:20px;">
+                            <div class="settings-card-header">
+                                <i class="fas fa-hourglass-half" style="color:#a5b4fc;"></i>
+                                <h3>Pages Spent Most Time On</h3>
+                            </div>
+                            <div class="settings-card-body" style="padding:0;">
+                                <div style="overflow-x:auto;">
+                                    <table style="width:100%;border-collapse:collapse;font-family:'DM Sans',sans-serif;font-size:0.82rem;">
+                                        <thead>
+                                            <tr style="background:linear-gradient(90deg,#f8fafc,#eef2ff);border-bottom:2px solid #e0e7ff;">
+                                                <th style="padding:10px 16px;text-align:left;font-weight:700;color:#475569;letter-spacing:0.04em;text-transform:uppercase;font-size:0.72rem;">#</th>
+                                                <th style="padding:10px 16px;text-align:left;font-weight:700;color:#475569;letter-spacing:0.04em;text-transform:uppercase;font-size:0.72rem;">Page</th>
+                                                <th style="padding:10px 16px;text-align:left;font-weight:700;color:#475569;letter-spacing:0.04em;text-transform:uppercase;font-size:0.72rem;">Total Time Spent</th>
+                                                <th style="padding:10px 16px;text-align:left;font-weight:700;color:#475569;letter-spacing:0.04em;text-transform:uppercase;font-size:0.72rem;">Visits</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="analytics-page-time-tbody">
+                                            <tr><td colspan="4" style="text-align:center;padding:24px;color:#94a3b8;">No page activity recorded yet.</td></tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Shared Frontend Visitors -->
+                        <div class="settings-card" style="margin-top:20px;">
+                            <div class="settings-card-header">
+                                <i class="fas fa-share-alt" style="color:#a5b4fc;"></i>
+                                <h3>Shared Frontend Visitors</h3>
+                            </div>
+                            <div class="settings-card-body" style="padding:0;">
+                                <div id="analytics-shared-visitors-summary" style="padding:14px 20px 10px;font-family:'DM Sans',sans-serif;font-size:0.83rem;color:#475569;border-bottom:1px solid #f1f5f9;">
+                                    Loading visitor data…
+                                </div>
+                                <div style="overflow-x:auto;">
+                                    <table style="width:100%;border-collapse:collapse;font-family:'DM Sans',sans-serif;font-size:0.82rem;">
+                                        <thead>
+                                            <tr style="background:linear-gradient(90deg,#f8fafc,#eef2ff);border-bottom:2px solid #e0e7ff;">
+                                                <th style="padding:10px 16px;text-align:left;font-weight:700;color:#475569;letter-spacing:0.04em;text-transform:uppercase;font-size:0.72rem;">#</th>
+                                                <th style="padding:10px 16px;text-align:left;font-weight:700;color:#475569;letter-spacing:0.04em;text-transform:uppercase;font-size:0.72rem;">Visited At</th>
+                                                <th style="padding:10px 16px;text-align:left;font-weight:700;color:#475569;letter-spacing:0.04em;text-transform:uppercase;font-size:0.72rem;">Time Elapsed Since Visit</th>
+                                                <th style="padding:10px 16px;text-align:left;font-weight:700;color:#475569;letter-spacing:0.04em;text-transform:uppercase;font-size:0.72rem;">Referrer</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="analytics-shared-visitors-tbody">
+                                            <tr><td colspan="4" style="text-align:center;padding:24px;color:#94a3b8;">No shared-link visits recorded yet.</td></tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
                     <!-- ─── PHONE DIRECTORY SECTION ─── -->
                     <section id="phone-directory" class="section-container">
                         <h2 class="text-3xl font-bold text-slate-800 mb-6">Office Phone Directory</h2>
@@ -3536,26 +3669,7 @@
         });
 
         // --- AUTHENTICATION & APP INITIALIZATION ---
-        function initializeAuthentication() {
-            auth.onAuthStateChanged(user => {
-                if (user) {
-                    currentUserId = user.uid;
-                    authSection.style.display = 'none';
-                    mainApp.classList.remove('hidden');
-                    mainApp.classList.add('flex');
-                    showSection('dashboard');
-                    startRealtimeListeners();
-                    // Load Phone Directory from Firebase after auth is ready
-                    if (window._pdLoadFromFirebase) window._pdLoadFromFirebase();
-                } else {
-                    currentUserId = null;
-                    authSection.style.display = 'flex';
-                    mainApp.classList.add('hidden');
-                    mainApp.classList.remove('flex');
-                    stopRealtimeListeners();
-                }
-            });
-        }
+        // NOTE: initializeAuthentication is defined in the Analytics Module below, which wraps the auth logic.
 
         async function loadSharedDashboard(shareId) {
             showLoading();
@@ -3598,6 +3712,17 @@
                 document.getElementById('header-title').textContent = "Shared Frontend (Live View)";
                 
                 currentUserId = shareId;
+
+                // ── Log this shared-link visit to Firestore so owner can see it in Analytics ──
+                try {
+                    await db.collection('public_dashboards').doc(shareId)
+                        .collection('sharedVisitors').add({
+                            visitedAt: firebase.firestore.FieldValue.serverTimestamp(),
+                            userAgent: navigator.userAgent || '—',
+                            referrer: document.referrer || '—'
+                        });
+                } catch(e) { /* silent — visitor tracking is non-critical */ }
+
                 startRealtimeListeners();
                 hideLoading();
 
@@ -7414,6 +7539,7 @@ ${(d.totalDeductions > 0) ? `
             { id: 'couriers',        label: 'Couriers',         icon: 'fa-truck',          defaultOn: false },
             { id: 'phone-directory', label: 'Phone Directory',  icon: 'fa-phone',          defaultOn: false },
             { id: 'disclaimer',      label: 'Disclaimer',       icon: 'fa-info-circle',    defaultOn: false },
+            { id: 'analytics',       label: 'Analytics',        icon: 'fa-chart-bar',      defaultOn: false },
         ];
 
         function getSVSettings() {
@@ -7513,7 +7639,7 @@ ${(d.totalDeductions > 0) ? `
                 if (sectionEl) sectionEl.style.display = show ? '' : 'none';
             });
 
-            // Always hide Settings from shared view
+            // Always hide Settings from shared view (security — settings should never be shared)
             const settingsNav = document.querySelector('button[data-section="settings"]');
             if (settingsNav) settingsNav.parentElement.style.display = 'none';
             const settingsSec = document.getElementById('settings');
@@ -7646,6 +7772,295 @@ ${(d.totalDeductions > 0) ? `
             const radVal = document.getElementById('set-radius-val');
             if (radVal) radVal.textContent = s.borderRadius + 'px';
         }
+
+        // ─── ANALYTICS MODULE ──────────────────────────────────────────────
+        const ANALYTICS_KEY = 'dsl_analytics_v1';
+        let _analyticsSessionStart = null;
+        let _analyticsSessionTimer = null;
+        let _analyticsCurrentPage = null;
+        let _analyticsPageEnterTime = null;
+
+        function analyticsFlushCurrentPage() {
+            if (!_analyticsCurrentPage || !_analyticsPageEnterTime) return;
+            const elapsed = Date.now() - _analyticsPageEnterTime;
+            if (elapsed < 0) return;
+            const store = analyticsGetStore();
+            if (!store.pageTime) store.pageTime = {};
+            if (!store.pageTime[_analyticsCurrentPage]) store.pageTime[_analyticsCurrentPage] = { totalMs: 0, visits: 0 };
+            store.pageTime[_analyticsCurrentPage].totalMs += elapsed;
+            analyticsSetStore(store);
+            _analyticsPageEnterTime = Date.now(); // reset so we don't double-count on next flush
+        }
+
+        function analyticsStartPageTimeTracking() {
+            // Hook into showSection calls via a wrapper that fires after the original
+            const originalShowSection = window.showSection || (typeof showSection === 'function' ? showSection : null);
+            window._analyticsShowSectionHook = function(sectionId) {
+                analyticsFlushCurrentPage();
+                const store = analyticsGetStore();
+                if (!store.pageTime) store.pageTime = {};
+                if (!store.pageTime[sectionId]) store.pageTime[sectionId] = { totalMs: 0, visits: 0 };
+                store.pageTime[sectionId].visits += 1;
+                analyticsSetStore(store);
+                _analyticsCurrentPage = sectionId;
+                _analyticsPageEnterTime = Date.now();
+            };
+            // Patch nav buttons to fire the hook
+            document.querySelectorAll('#main-nav .nav-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    if (btn.dataset.section) window._analyticsShowSectionHook(btn.dataset.section);
+                });
+            });
+            // Record dashboard as the first page on login
+            window._analyticsShowSectionHook('dashboard');
+        }
+
+        function analyticsGetStore() {
+            try {
+                return JSON.parse(localStorage.getItem(ANALYTICS_KEY) || 'null') ||
+                    { sessions: [], feFirstVisit: null, feVisitCount: 0, feLastSeen: null, pageTime: {} };
+            } catch(e) {
+                return { sessions: [], feFirstVisit: null, feVisitCount: 0, feLastSeen: null, pageTime: {} };
+            }
+        }
+        function analyticsSetStore(data) {
+            try { localStorage.setItem(ANALYTICS_KEY, JSON.stringify(data)); } catch(e) {}
+        }
+
+        // 12-hour format: "15 Apr 2025, 02:45:09 PM"
+        function analyticsFmtDate(iso) {
+            if (!iso) return '—';
+            const d = new Date(iso);
+            if (isNaN(d)) return '—';
+            const day   = String(d.getDate()).padStart(2, '0');
+            const mon   = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][d.getMonth()];
+            const yr    = d.getFullYear();
+            let   hr    = d.getHours();
+            const min   = String(d.getMinutes()).padStart(2, '0');
+            const sec   = String(d.getSeconds()).padStart(2, '0');
+            const ampm  = hr >= 12 ? 'PM' : 'AM';
+            hr = hr % 12 || 12;
+            return `${day} ${mon} ${yr}, ${String(hr).padStart(2,'0')}:${min}:${sec} ${ampm}`;
+        }
+
+        function analyticsDuration(startIso, endIso) {
+            if (!startIso) return '—';
+            const ms = (endIso ? new Date(endIso) : new Date()) - new Date(startIso);
+            if (isNaN(ms) || ms < 0) return '—';
+            const tot = Math.floor(ms / 1000);
+            const h = Math.floor(tot / 3600);
+            const m = Math.floor((tot % 3600) / 60);
+            const s = tot % 60;
+            if (h > 0) return `${h}h ${m}m ${s}s`;
+            if (m > 0) return `${m}m ${s}s`;
+            return `${s}s`;
+        }
+
+        function analyticsOnLogin() {
+            const now = new Date().toISOString();
+            const store = analyticsGetStore();
+            _analyticsSessionStart = now;
+
+            // Frontend tracking
+            if (!store.feFirstVisit) store.feFirstVisit = now;
+            store.feVisitCount = (store.feVisitCount || 0) + 1;
+            store.feLastSeen = now;
+            if (!store.pageTime) store.pageTime = {};
+
+            // Close any unclosed session (e.g. page was closed without logout)
+            if (store.sessions.length > 0 && !store.sessions[0].logoutTime) {
+                store.sessions[0].logoutTime = now;
+                store.sessions[0].duration = analyticsDuration(store.sessions[0].loginTime, now);
+                store.sessions[0].closedByReload = true;
+            }
+
+            // Add fresh session
+            const userEmail = (typeof auth !== 'undefined' && auth.currentUser) ? auth.currentUser.email : null;
+            store.sessions.unshift({ loginTime: now, logoutTime: null, duration: null, userEmail });
+            if (store.sessions.length > 50) store.sessions = store.sessions.slice(0, 50);
+            analyticsSetStore(store);
+
+            // Start page time tracking
+            analyticsStartPageTimeTracking();
+
+            // Live ticker every 5s — update timestamps + refresh display if open
+            if (_analyticsSessionTimer) clearInterval(_analyticsSessionTimer);
+            _analyticsSessionTimer = setInterval(() => {
+                const s2 = analyticsGetStore();
+                const t  = new Date().toISOString();
+                s2.feLastSeen = t;
+                analyticsSetStore(s2);
+                const sec = document.getElementById('analytics');
+                if (sec && sec.classList.contains('active')) analyticsRefreshDisplay();
+            }, 5000);
+
+            analyticsRefreshDisplay();
+        }
+
+        function analyticsOnLogout() {
+            if (_analyticsSessionTimer) { clearInterval(_analyticsSessionTimer); _analyticsSessionTimer = null; }
+            analyticsFlushCurrentPage(); // save time for currently-open page
+            const now   = new Date().toISOString();
+            const store = analyticsGetStore();
+            if (store.sessions.length > 0 && !store.sessions[0].logoutTime) {
+                store.sessions[0].logoutTime = now;
+                store.sessions[0].duration   = analyticsDuration(store.sessions[0].loginTime, now);
+            }
+            store.feLastSeen = now;
+            analyticsSetStore(store);
+            _analyticsSessionStart = null;
+            _analyticsCurrentPage = null;
+            _analyticsPageEnterTime = null;
+        }
+
+        function analyticsRefreshDisplay() {
+            const store = analyticsGetStore();
+            const set = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
+
+            // ── Stat cards ──
+            set('analytics-fe-last-seen',  analyticsFmtDate(store.feLastSeen));
+            set('analytics-session-dur',   analyticsDuration(_analyticsSessionStart, null));
+            set('analytics-session-start', analyticsFmtDate(_analyticsSessionStart));
+
+            // ── Frontend activity panel ──
+            set('analytics-fe-first',  analyticsFmtDate(store.feFirstVisit));
+            set('analytics-fe-last2',  analyticsFmtDate(store.feLastSeen));
+            set('analytics-fe-visits', (store.feVisitCount || 0) + ' session(s)');
+
+            // ── Session history table ──
+            const tbody = document.getElementById('analytics-session-tbody');
+            if (tbody) {
+                if (!store.sessions || store.sessions.length === 0) {
+                    tbody.innerHTML = `<tr><td colspan="5" style="text-align:center;padding:28px;color:#94a3b8;font-family:'DM Sans',sans-serif;">No sessions recorded yet.</td></tr>`;
+                } else {
+                    tbody.innerHTML = store.sessions.map((s, i) => {
+                        const isActive  = !s.logoutTime;
+                        const rowNum    = store.sessions.length - i;
+                        const dur       = isActive
+                            ? analyticsDuration(s.loginTime, null) + ' <span style="color:#a5b4fc;font-size:0.7rem;">(live)</span>'
+                            : (s.duration || analyticsDuration(s.loginTime, s.logoutTime));
+                        const logoutCol = isActive
+                            ? '<span style="color:#059669;font-weight:600;font-size:0.8rem;">● Currently Active</span>'
+                            : analyticsFmtDate(s.logoutTime);
+                        const badge     = isActive
+                            ? '<span style="background:#dcfce7;color:#059669;padding:3px 11px;border-radius:20px;font-size:0.7rem;font-weight:700;letter-spacing:0.03em;">ACTIVE</span>'
+                            : (s.closedByReload
+                                ? '<span style="background:#fef3c7;color:#d97706;padding:3px 11px;border-radius:20px;font-size:0.7rem;font-weight:600;">Closed</span>'
+                                : '<span style="background:#f1f5f9;color:#64748b;padding:3px 11px;border-radius:20px;font-size:0.7rem;font-weight:600;">Ended</span>');
+                        return `<tr style="border-bottom:1px solid #f1f5f9;${i % 2 !== 0 ? 'background:#fafbff;' : ''}">
+                    <td style="padding:10px 14px;color:#94a3b8;font-size:0.78rem;font-weight:600;">${rowNum}</td>
+                    <td style="padding:10px 14px;color:#0f172a;font-weight:500;font-size:0.83rem;">${analyticsFmtDate(s.loginTime)}</td>
+                    <td style="padding:10px 14px;color:#475569;font-size:0.83rem;">${logoutCol}</td>
+                    <td style="padding:10px 14px;color:#475569;font-size:0.83rem;">${dur}</td>
+                    <td style="padding:10px 14px;">${badge}</td>
+                </tr>`;
+                    }).join('');
+                }
+            }
+
+            // ── Page time table ──
+            const pageTimeTbody = document.getElementById('analytics-page-time-tbody');
+            if (pageTimeTbody) {
+                const pageTime = store.pageTime || {};
+                const entries = Object.entries(pageTime)
+                    .map(([page, data]) => ({ page, totalMs: data.totalMs || 0, visits: data.visits || 0 }))
+                    .sort((a, b) => b.totalMs - a.totalMs);
+                if (entries.length === 0) {
+                    pageTimeTbody.innerHTML = `<tr><td colspan="4" style="text-align:center;padding:24px;color:#94a3b8;">No page activity recorded yet.</td></tr>`;
+                } else {
+                    pageTimeTbody.innerHTML = entries.map((e, i) => {
+                        const label = e.page.charAt(0).toUpperCase() + e.page.slice(1).replace(/-/g, ' ');
+                        const dur = analyticsDuration(new Date(Date.now() - e.totalMs).toISOString(), null);
+                        return `<tr style="border-bottom:1px solid #f1f5f9;${i % 2 !== 0 ? 'background:#fafbff;' : ''}">
+                            <td style="padding:10px 14px;color:#94a3b8;font-size:0.78rem;font-weight:600;">${i + 1}</td>
+                            <td style="padding:10px 14px;color:#0f172a;font-weight:500;font-size:0.83rem;">${label}</td>
+                            <td style="padding:10px 14px;color:#475569;font-size:0.83rem;">${dur}</td>
+                            <td style="padding:10px 14px;color:#475569;font-size:0.83rem;">${e.visits}</td>
+                        </tr>`;
+                    }).join('');
+                }
+            }
+        }
+
+        // ─── Shared Frontend Visitor Analytics ───────────────────────────────
+        function analyticsLoadSharedVisitors() {
+            if (isSharedView) return; // don't run for shared-link viewers
+            if (typeof db === 'undefined' || !currentUserId) {
+                const sum = document.getElementById('analytics-shared-visitors-summary');
+                if (sum) sum.textContent = 'Sign in required to load visitor data.';
+                return;
+            }
+            const sum  = document.getElementById('analytics-shared-visitors-summary');
+            const tbody = document.getElementById('analytics-shared-visitors-tbody');
+            if (sum) sum.textContent = 'Loading visitor data…';
+
+            db.collection('public_dashboards').doc(currentUserId)
+                .collection('sharedVisitors')
+                .orderBy('visitedAt', 'desc')
+                .limit(100)
+                .get()
+                .then(snap => {
+                    if (!tbody) return;
+                    if (snap.empty) {
+                        if (sum) sum.innerHTML = '<span style="color:#94a3b8;">No one has visited your shared link yet.</span>';
+                        tbody.innerHTML = `<tr><td colspan="4" style="text-align:center;padding:24px;color:#94a3b8;">No shared-link visits recorded yet.</td></tr>`;
+                        return;
+                    }
+                    if (sum) sum.innerHTML = `<span style="color:#4f46e5;font-weight:700;">${snap.size}</span> total visit${snap.size !== 1 ? 's' : ''} via your shared frontend link.`;
+                    tbody.innerHTML = snap.docs.map((doc, i) => {
+                        const d = doc.data();
+                        const visitedAt = d.visitedAt ? d.visitedAt.toDate().toISOString() : null;
+                        const elapsed   = visitedAt ? analyticsDuration(visitedAt, null) + ' ago' : '—';
+                        const ref       = d.referrer && d.referrer !== '—' && d.referrer !== '' ? d.referrer : '<span style="color:#94a3b8;">Direct / Unknown</span>';
+                        return `<tr style="border-bottom:1px solid #f1f5f9;${i % 2 !== 0 ? 'background:#fafbff;' : ''}">
+                            <td style="padding:10px 14px;color:#94a3b8;font-size:0.78rem;font-weight:600;">${snap.size - i}</td>
+                            <td style="padding:10px 14px;color:#0f172a;font-weight:500;font-size:0.83rem;">${analyticsFmtDate(visitedAt)}</td>
+                            <td style="padding:10px 14px;color:#475569;font-size:0.83rem;">${elapsed}</td>
+                            <td style="padding:10px 14px;color:#475569;font-size:0.83rem;word-break:break-all;">${ref}</td>
+                        </tr>`;
+                    }).join('');
+                })
+                .catch(err => {
+                    if (sum) sum.textContent = 'Could not load visitor data.';
+                    console.warn('Shared visitor load error:', err);
+                });
+        }
+
+        // ─── AUTH with analytics hooks ───────────────────────────────────────
+        function initializeAuthentication() {
+            auth.onAuthStateChanged(user => {
+                if (user) {
+                    currentUserId = user.uid;
+                    authSection.style.display = 'none';
+                    mainApp.classList.remove('hidden');
+                    mainApp.classList.add('flex');
+                    showSection('dashboard');   // Always open dashboard on login
+                    analyticsOnLogin();         // Record session in background
+                    startRealtimeListeners();
+                    if (window._pdLoadFromFirebase) window._pdLoadFromFirebase();
+                } else {
+                    if (currentUserId) analyticsOnLogout();
+                    currentUserId = null;
+                    authSection.style.display = 'flex';
+                    mainApp.classList.add('hidden');
+                    mainApp.classList.remove('flex');
+                    stopRealtimeListeners();
+                }
+            });
+        }
+
+        // Refresh analytics display when user navigates to section
+        document.addEventListener('DOMContentLoaded', () => {
+            document.querySelectorAll('#main-nav .nav-btn').forEach(btn => {
+                if (btn.dataset.section === 'analytics') {
+                    btn.addEventListener('click', () => {
+                        analyticsRefreshDisplay();
+                        analyticsLoadSharedVisitors();
+                    });
+                }
+            });
+        });
+        // ─── END ANALYTICS MODULE ──────────────────────────────────────────
 
         window.applyAppearance = function() {
             const s = readControlsToSettings();
