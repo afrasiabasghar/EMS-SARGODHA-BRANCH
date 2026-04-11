@@ -1854,7 +1854,7 @@
                         </div>
 
                         <!-- CLIENT COMMISSION DETAILS: Bulk Upload Panel -->
-                        <div class="card p-6 mt-6" id="client-commission-upload-panel" style="display:none;">
+                        <div class="card p-6 mt-6" id="client-commission-upload-panel">
                             <h3 class="text-xl font-semibold mb-1"><i class="fas fa-file-upload mr-2 text-indigo-600"></i>Client Commission Details</h3>
                             <p class="text-sm text-slate-500 mb-5">Upload a dealer-wise commission file to automatically assign commission amounts to each client's profile. The system will match client names and populate their payment records.</p>
 
@@ -4228,6 +4228,7 @@
             document.getElementById('add-commission-forms-wrapper').style.display = isSharedView ? 'none' : 'block';
             document.querySelectorAll('#commission .actions-header').forEach(el => el.style.display = isSharedView ? 'none' : 'table-cell');
             document.getElementById('print-commission-btn').style.display = isSharedView ? 'none' : 'block';
+            document.getElementById('client-commission-upload-panel').style.display = isSharedView ? 'none' : 'block';
 
             const houseCommissionByMonth = {};
             allDailyCommissions.forEach(c => {
