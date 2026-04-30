@@ -1880,6 +1880,13 @@
                                 <input type="file" id="bulk-commission-file-input" accept=".txt,.csv" class="hidden">
                             </label>
 
+                            <!-- Bulk Text input zone -->
+                            <div class="mb-4">
+                                <label class="block text-sm font-semibold text-slate-700 mb-2"><i class="fas fa-paste mr-1 text-indigo-500"></i>Or Paste Bulk Text</label>
+                                <textarea id="bulk-commission-text-input" rows="6" placeholder="Paste data here, e.g.:&#10;CLIENT CODE &amp; TITLE&#9;DEALER COMMISSION&#10;035020-KHALID NASEEM&#9;369.16&#10;035021-MALIK RIZWAN HAIDER&#9;73.87" class="w-full px-4 py-3 border border-slate-300 rounded-2xl focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm font-mono resize-y"></textarea>
+                                <button id="bulk-commission-text-parse-btn" class="mt-2 bg-indigo-600 text-white px-5 py-2 rounded-full text-sm font-semibold hover:bg-indigo-700 animated-btn"><i class="fas fa-search mr-2"></i>Preview</button>
+                            </div>
+
                             <!-- Preview table (hidden until file parsed) -->
                             <div id="bulk-commission-preview-wrapper" class="hidden">
                                 <div class="flex items-center gap-2 mb-3">
@@ -5662,32 +5669,62 @@
                 setTimeout(initBulkCommissionMonthDropdown, 100);
             });
 
-            // Parse the uploaded commission file (handles the TXT format from R_DLCOSTSUM)
-            // Tested against real file — extracts all 42 clients correctly
+            // Parse the uploaded commission file (handles TXT and CSV formats)
             function parseCommissionFile(text) {
                 // Normalize Windows line endings
                 const lines = text.replace(/\r/g, '').split('\n');
                 const rows = [];
 
-                // Exact regex proven against R_DLCOSTSUM.TXT:
-                // Line format: ACCCODE  CLIENT NAME IN CAPS     161.29   104.84 ...
-                // - Account code: starts with a digit, may have digits only
-                // - Name: uppercase letters and spaces only
-                // - First number: the COMMISSION column (first float after name)
-                const lineRe = /^(\d[\w]*)\s+([A-Z][A-Z ]+?)\s{2,}([\d,]+\.\d{2})/;
+                // Detect format: tab-delimited (e.g. "035020-KHALID NASEEM\t369.16")
+                // vs space-delimited legacy format (ACCCODE  CLIENT NAME IN CAPS  161.29)
+                const isTabFormat = lines.some(l => l.includes('\t') && /^\d{6}-/.test(l.trim()));
 
-                for (const line of lines) {
-                    const m = line.match(lineRe);
-                    if (!m) continue;
-                    const accCode = m[1].trim();
-                    const name    = m[2].trim().replace(/\s+/g, ' ');
-                    const amount  = parseFloat(m[3].replace(/,/g, ''));
+                if (isTabFormat) {
+                    // Tab-delimited TXT format: "CLIENT CODE & TITLE\tDEALER COMMISSION" header,
+                    // then rows like "035020-KHALID NASEEM\t369.16"
+                    for (const line of lines) {
+                        const trimmed = line.trim();
+                        if (!trimmed || !trimmed.includes('\t')) continue;
+                        const parts = trimmed.split('\t');
+                        if (parts.length < 2) continue;
 
-                    // Skip header/total lines that accidentally match
-                    if (name === 'DEALER TOTAL' || name === 'CLIENT CODE') continue;
+                        const codeTitle = parts[0].trim();
+                        const amountStr = parts[1].trim();
 
-                    if (!isNaN(amount) && amount > 0 && name.length >= 2) {
-                        rows.push({ accCode, name, amount });
+                        // Skip header row
+                        if (/CLIENT\s*CODE/i.test(codeTitle)) continue;
+
+                        // Parse "035020-KHALID NASEEM" → accCode="035020", name="KHALID NASEEM"
+                        const dashIdx = codeTitle.indexOf('-');
+                        if (dashIdx === -1) continue;
+                        const accCode = codeTitle.substring(0, dashIdx).trim();
+                        const name = codeTitle.substring(dashIdx + 1).trim();
+
+                        if (!accCode || !name || name.length < 2) continue;
+
+                        // Amount may be empty — preserve the row but set amount to 0
+                        const amount = amountStr === '' ? 0 : parseFloat(amountStr.replace(/,/g, ''));
+                        if (!isNaN(accCode) === false && accCode.length === 0) continue;
+
+                        rows.push({ accCode, name, amount: isNaN(amount) ? 0 : amount });
+                    }
+                } else {
+                    // Legacy space-delimited format:
+                    // ACCCODE  CLIENT NAME IN CAPS     161.29   104.84 ...
+                    const lineRe = /^(\d[\w]*)\s+([A-Z][A-Z ]+?)\s{2,}([\d,]+\.\d{2})/;
+                    for (const line of lines) {
+                        const m = line.match(lineRe);
+                        if (!m) continue;
+                        const accCode = m[1].trim();
+                        const name    = m[2].trim().replace(/\s+/g, ' ');
+                        const amount  = parseFloat(m[3].replace(/,/g, ''));
+
+                        // Skip header/total lines that accidentally match
+                        if (name === 'DEALER TOTAL' || name === 'CLIENT CODE') continue;
+
+                        if (!isNaN(amount) && amount > 0 && name.length >= 2) {
+                            rows.push({ accCode, name, amount });
+                        }
                     }
                 }
 
@@ -5698,6 +5735,39 @@
                     else map[r.accCode] = { accCode: r.accCode, name: r.name, amount: r.amount };
                 }
                 return Object.values(map);
+            }
+
+            // Parse bulk text pasted by admin (tab-delimited, same format as TXT upload)
+            function parseBulkText(text) {
+                const lines = text.replace(/\r/g, '').split('\n');
+                const rows = [];
+                for (const line of lines) {
+                    const trimmed = line.trim();
+                    if (!trimmed) continue;
+
+                    // Header row detection
+                    if (/CLIENT\s*CODE/i.test(trimmed)) continue;
+
+                    // Split on tab
+                    const parts = trimmed.split('\t');
+                    const codeTitle = parts[0] ? parts[0].trim() : '';
+                    const amountStr = parts[1] !== undefined ? parts[1].trim() : '';
+
+                    if (!codeTitle) continue;
+
+                    // Parse "035020-KHALID NASEEM"
+                    const dashIdx = codeTitle.indexOf('-');
+                    if (dashIdx === -1) continue;
+                    const accCode = codeTitle.substring(0, dashIdx).trim();
+                    const name = codeTitle.substring(dashIdx + 1).trim();
+
+                    if (!accCode || !name || name.length < 2) continue;
+
+                    // Preserve entries with empty commission values
+                    const amount = amountStr === '' ? 0 : parseFloat(amountStr.replace(/,/g, ''));
+                    rows.push({ accCode, name, amount: isNaN(amount) ? 0 : amount });
+                }
+                return rows;
             }
 
             // Match client using account code first (most reliable), then name fallback
@@ -5823,6 +5893,7 @@
                     document.getElementById('bulk-commission-preview-wrapper').classList.add('hidden');
                     document.getElementById('bulk-commission-file-label').textContent = 'Click to select commission file (.txt or .csv)';
                     document.getElementById('bulk-commission-file-input').value = '';
+                    document.getElementById('bulk-commission-text-input').value = '';
                     parsedCommissionRows = [];
                 } catch (err) {
                     showMessage('Error', 'Failed to save commission data: ' + err.message);
@@ -5831,11 +5902,31 @@
                 }
             });
 
+            // Bulk Text parse button handler
+            document.getElementById('bulk-commission-text-parse-btn').addEventListener('click', function() {
+                const text = document.getElementById('bulk-commission-text-input').value.trim();
+                if (!text) {
+                    showMessage('Error', 'Please paste commission data before clicking Preview.');
+                    return;
+                }
+                try {
+                    parsedCommissionRows = parseBulkText(text);
+                    if (parsedCommissionRows.length === 0) {
+                        showMessage('Error', 'No commission data could be extracted. Please check the format.');
+                        return;
+                    }
+                    renderPreview(parsedCommissionRows);
+                } catch (err) {
+                    showMessage('Error', 'Failed to parse text: ' + err.message);
+                }
+            });
+
             // Cancel button
             document.getElementById('bulk-commission-cancel-btn').addEventListener('click', function() {
                 document.getElementById('bulk-commission-preview-wrapper').classList.add('hidden');
                 document.getElementById('bulk-commission-file-label').textContent = 'Click to select commission file (.txt or .csv)';
                 document.getElementById('bulk-commission-file-input').value = '';
+                document.getElementById('bulk-commission-text-input').value = '';
                 parsedCommissionRows = [];
             });
 
