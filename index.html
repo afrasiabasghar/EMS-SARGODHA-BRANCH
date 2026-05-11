@@ -316,6 +316,7 @@
         [data-section="phone-directory"]::before { content: "\f095"; }
         [data-section="settings"]::before { content: "\f013"; }
         [data-section="analytics"]::before { content: "\f080"; }
+        [data-section="trade-log"]::before { content: "\f201"; }
 
         /* ─── Header ─────────────────────────────── */
         header.bg-white {
@@ -1526,6 +1527,7 @@
                     <li><button data-section="disclaimer" class="nav-btn text-slate-600 hover:bg-indigo-50 hover:text-indigo-600">Disclaimer</button></li>
                     <li><button data-section="settings" class="nav-btn text-slate-600 hover:bg-indigo-50 hover:text-indigo-600">Settings</button></li>
                     <li><button data-section="analytics" class="nav-btn text-slate-600 hover:bg-indigo-50 hover:text-indigo-600">Analytics</button></li>
+                    <li><button data-section="trade-log" class="nav-btn text-slate-600 hover:bg-indigo-50 hover:text-indigo-600">Trade Log</button></li>
                 </ul>
             </nav>
             <!-- Footer Badge (always visible) -->
@@ -3002,6 +3004,166 @@
                         </div>
                     </section>
 
+                    <!-- ─── TRADE LOG SECTION ─── -->
+                    <section id="trade-log" class="section-container">
+                        <h2 class="text-3xl font-bold text-slate-800 mb-6">Trade Log</h2>
+
+                        <!-- Manual Upload Card -->
+                        <div class="card p-6 mb-6" id="tl-upload-card">
+                            <h3 class="text-xl font-semibold mb-1"><i class="fas fa-cloud-upload-alt mr-2 text-indigo-500"></i>Manual Trade File Upload</h3>
+                            <p class="text-sm text-slate-500 mb-4">Upload a PSX trade log file (.txt) directly into the Trade Log. This is independent of the Commission Generator System.</p>
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                                <div>
+                                    <label class="block text-sm font-semibold text-slate-700 mb-1">Trade Date</label>
+                                    <input type="date" id="tl-manual-date" class="w-full px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                                </div>
+                                <div class="md:col-span-2">
+                                    <label class="block text-sm font-semibold text-slate-700 mb-1">Trade Log File (.txt)</label>
+                                    <label for="tl-manual-file-input" class="block cursor-pointer">
+                                        <div id="tl-manual-drop-zone" class="flex items-center gap-3 border-2 border-dashed border-indigo-300 rounded-xl px-4 py-3 hover:bg-indigo-50 transition-colors">
+                                            <i class="fas fa-file-alt text-indigo-400 text-xl"></i>
+                                            <span id="tl-manual-file-label" class="text-slate-500 text-sm truncate">Click to select trade log file (.txt)</span>
+                                        </div>
+                                        <input type="file" id="tl-manual-file-input" accept=".txt,.csv" class="hidden">
+                                    </label>
+                                </div>
+                            </div>
+                            <button id="tl-manual-upload-btn" class="bg-indigo-600 text-white px-6 py-2 rounded-full font-semibold hover:bg-indigo-700 animated-btn">
+                                <i class="fas fa-upload mr-2"></i>Upload & Save to Trade Log
+                            </button>
+                            <div id="tl-manual-status" class="mt-3 text-sm font-medium hidden"></div>
+                        </div>
+
+                        <!-- Trade Log Verification Panel (shown after parse, before save) -->
+                        <div id="tl-verify-panel" class="card p-6 mb-6 hidden border-2 border-amber-400">
+                            <div class="flex items-center gap-3 mb-4">
+                                <span class="text-2xl">⚠️</span>
+                                <div>
+                                    <h3 class="text-xl font-semibold text-amber-700">Verification Required — Review Trade Details</h3>
+                                    <p class="text-sm text-slate-500 mt-0.5">Please review ALL trade records below. Confirm they are correct before saving to Trade Log.</p>
+                                </div>
+                            </div>
+                            <div class="mb-3 flex items-center gap-4 flex-wrap">
+                                <span id="tl-verify-summary" class="text-sm font-semibold text-slate-700"></span>
+                                <span id="tl-verify-date-badge" class="text-xs font-semibold bg-indigo-100 text-indigo-700 px-3 py-1 rounded-full"></span>
+                            </div>
+                            <div class="overflow-x-auto mb-5 rounded-xl border border-amber-200">
+                                <table class="w-full text-left table-auto text-sm">
+                                    <thead class="bg-amber-50 border-b border-amber-200">
+                                        <tr class="text-slate-600 uppercase text-xs">
+                                            <th class="p-2">#</th>
+                                            <th class="p-2">Account</th>
+                                            <th class="p-2">Client</th>
+                                            <th class="p-2">Stock</th>
+                                            <th class="p-2 text-right">Qty</th>
+                                            <th class="p-2 text-right">Rate (PKR)</th>
+                                            <th class="p-2 text-right">Total Value (PKR)</th>
+                                            <th class="p-2">Side</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="tl-verify-tbody"></tbody>
+                                </table>
+                            </div>
+                            <div class="flex items-center gap-4 flex-wrap">
+                                <label class="flex items-center gap-2 cursor-pointer select-none">
+                                    <input type="checkbox" id="tl-verify-checkbox" class="w-4 h-4 accent-emerald-600">
+                                    <span class="text-sm font-semibold text-slate-700">I have reviewed all trade details above and confirm they are correct.</span>
+                                </label>
+                            </div>
+                            <div class="flex gap-3 mt-4 flex-wrap">
+                                <button id="tl-verify-confirm-btn" class="bg-emerald-600 text-white px-6 py-2 rounded-full font-semibold animated-btn" disabled>
+                                    <i class="fas fa-check mr-2"></i>Confirm & Save to Trade Log
+                                </button>
+                                <button id="tl-verify-cancel-btn" class="bg-slate-300 text-slate-800 px-6 py-2 rounded-full font-semibold animated-btn">
+                                    <i class="fas fa-times mr-2"></i>Cancel
+                                </button>
+                            </div>
+                            <div id="tl-verify-status" class="mt-3 text-sm font-medium hidden"></div>
+                        </div>
+
+                        <!-- Filter & View Controls -->
+                        <div class="card p-6 mb-6">
+                            <h3 class="text-xl font-semibold mb-4"><i class="fas fa-filter mr-2 text-indigo-500"></i>Filter & View Trades</h3>
+                            <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
+                                <div>
+                                    <label class="block text-sm font-semibold text-slate-700 mb-1">View Date</label>
+                                    <input type="date" id="tl-view-date" class="w-full px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                                </div>
+                                <div class="flex items-end">
+                                    <button id="tl-load-date-btn" class="w-full bg-indigo-600 text-white px-4 py-2 rounded-full font-semibold hover:bg-indigo-700 animated-btn">
+                                        <i class="fas fa-calendar-day mr-1"></i>Load Date
+                                    </button>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-semibold text-slate-700 mb-1">Filter by Client</label>
+                                    <input type="text" id="tl-client-filter" placeholder="Search client name..." class="w-full px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                                </div>
+                                <div class="flex items-end">
+                                    <button id="tl-clear-filter-btn" class="w-full bg-slate-300 text-slate-800 px-4 py-2 rounded-full font-semibold hover:bg-slate-400 animated-btn">
+                                        <i class="fas fa-times mr-1"></i>Clear
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="flex flex-wrap gap-3 mb-4">
+                                <button id="tl-download-date-btn" class="bg-emerald-600 text-white px-5 py-2 rounded-full font-semibold hover:bg-emerald-700 animated-btn text-sm">
+                                    <i class="fas fa-download mr-2"></i>Download This Date's Trades
+                                </button>
+                                <button id="tl-download-range-btn" class="bg-slate-700 text-white px-5 py-2 rounded-full font-semibold hover:bg-slate-800 animated-btn text-sm">
+                                    <i class="fas fa-file-export mr-2"></i>Download by Date Range
+                                </button>
+                            </div>
+                            <!-- Date Range Picker (hidden until clicked) -->
+                            <div id="tl-range-picker" class="hidden bg-slate-50 border border-slate-200 rounded-xl p-4 mb-4">
+                                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 items-end">
+                                    <div>
+                                        <label class="block text-sm font-semibold text-slate-700 mb-1">From Date</label>
+                                        <input type="date" id="tl-range-from" class="w-full px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-semibold text-slate-700 mb-1">To Date</label>
+                                        <input type="date" id="tl-range-to" class="w-full px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                                    </div>
+                                    <div>
+                                        <button id="tl-range-download-confirm-btn" class="w-full bg-emerald-600 text-white px-5 py-2 rounded-full font-semibold hover:bg-emerald-700 animated-btn">
+                                            <i class="fas fa-download mr-2"></i>Download Report
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Trade Table for Selected Date -->
+                        <div class="card p-6">
+                            <div class="flex items-center justify-between mb-4 flex-wrap gap-3">
+                                <div>
+                                    <h3 class="text-xl font-semibold" id="tl-table-title">Trades — Select a date to view</h3>
+                                    <p class="text-sm text-slate-500 mt-1" id="tl-table-subtitle"></p>
+                                </div>
+                                <span id="tl-total-badge" class="hidden text-xs font-semibold bg-indigo-100 text-indigo-700 px-3 py-1 rounded-full"></span>
+                            </div>
+                            <div class="overflow-x-auto">
+                                <table class="w-full text-left table-auto text-sm">
+                                    <thead class="border-b-2">
+                                        <tr class="text-slate-600 uppercase text-xs">
+                                            <th class="p-2">#</th>
+                                            <th class="p-2">Date</th>
+                                            <th class="p-2">Client / Account</th>
+                                            <th class="p-2">Stock</th>
+                                            <th class="p-2 text-right">Qty</th>
+                                            <th class="p-2 text-right">Rate (PKR)</th>
+                                            <th class="p-2 text-right">Total Value (PKR)</th>
+                                            <th class="p-2">Side</th>
+                                            <th class="p-2">Source</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="tl-trades-tbody">
+                                        <tr><td colspan="9" class="p-6 text-center text-slate-400">Select a date above to view trades.</td></tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </section>
+
                     <!-- ─── PHONE DIRECTORY SECTION ─── -->
                     <section id="phone-directory" class="section-container">
                         <h2 class="text-3xl font-bold text-slate-800 mb-6">Office Phone Directory</h2>
@@ -3513,8 +3675,9 @@
         let isSharedView = false; // Flag for read-only mode
 
         // REMOVED: allDeposits, allWithdrawals, allCourierRecords
-        let allComplaints = [], allDailyCommissions = [], allCommissionReceived = [], allExpenses = [], allClients = [], allEmployees = [], allClientPayments = [], allPettyCashEntries = [], allEmployeePerformance = [], allCgsEntries = {}, allCouriers = [];
+        let allComplaints = [], allDailyCommissions = [], allCommissionReceived = [], allExpenses = [], allClients = [], allEmployees = [], allClientPayments = [], allPettyCashEntries = [], allEmployeePerformance = [], allCgsEntries = {}, allCouriers = [], allTradeLogEntries = {};
         let calculatedTransactions = [];
+        let rawParsedTrades = []; // Complete per-trade details from uploaded file for Trade Log sync
 
         const loading = document.getElementById('loading');
         const authSection = document.getElementById('auth-section');
@@ -3623,6 +3786,8 @@
                     headerTitle.textContent = 'Disclaimer';
                 } else if (sectionId === 'phone-directory') {
                     headerTitle.textContent = 'Office Phone Directory';
+                } else if (sectionId === 'trade-log') {
+                    headerTitle.textContent = 'Trade Log';
                 } else if (sectionId === 'employees') {
                     headerTitle.textContent = 'HR Module';
                 } else {
@@ -3807,7 +3972,7 @@
         // --- REALTIME DATA LISTENERS ---
         function startRealtimeListeners() {
             if (unsubscribeListeners.length > 0) return; 
-            const collections = ['complaints', 'daily_commissions', 'commission_received', 'expenses', 'clients', 'employees', 'client_payments', 'petty_cash', 'employee_performance', 'cgs_entries', 'couriers'];
+            const collections = ['complaints', 'daily_commissions', 'commission_received', 'expenses', 'clients', 'employees', 'client_payments', 'petty_cash', 'employee_performance', 'cgs_entries', 'couriers', 'trade_log_entries'];
             const dataHandlers = {
                 complaints: data => { allComplaints = data; renderComplaints(); updateDashboard(); },
                 daily_commissions: data => { allDailyCommissions = data; renderCommissionSection(); updateDashboard(); },
@@ -3842,6 +4007,15 @@
                     }
                 },
                 couriers: data => { allCouriers = data; renderCouriers(); },
+                trade_log_entries: data => {
+                    allTradeLogEntries = data.reduce((acc, item) => {
+                        acc[item.id] = item;
+                        return acc;
+                    }, {});
+                    if (document.getElementById('trade-log').classList.contains('active')) {
+                        renderTradeLogForCurrentDate();
+                    }
+                },
             };
 
             collections.forEach(col => {
@@ -4590,6 +4764,65 @@
             showLoading();
             try {
                 await db.collection(`users/${currentUserId}/cgs_entries`).doc(date).set({ transactions: transactionsToSave });
+
+                // ─── Auto-sync to Trade Log — complete per-trade details ──────────
+                let tlTrades = [];
+
+                if (rawParsedTrades.length > 0) {
+                    // rawParsedTrades has buy/sell aggregated per stock with per-account rows
+                    for (const t of rawParsedTrades) {
+                        if (t.accounts && t.accounts.length > 0) {
+                            // Expand: one row per account per side per stock
+                            for (const row of t.accounts) {
+                                tlTrades.push({
+                                    stockName:   t.stockName,
+                                    quantity:    row.qty,
+                                    rate:        parseFloat(row.price.toFixed(2)),
+                                    totalValue:  parseFloat(row.totalValue.toFixed(2)),
+                                    side:        row.side,
+                                    clientName:  row.clientName || '',
+                                    account:     row.account || '',
+                                    source:      'CGS'
+                                });
+                            }
+                        } else {
+                            // No per-account breakdown — push aggregated side row
+                            tlTrades.push({
+                                stockName:  t.stockName,
+                                quantity:   t.quantity,
+                                rate:       t.rate,
+                                totalValue: t.totalValue,
+                                side:       t.side,
+                                clientName: '',
+                                account:    '',
+                                source:     'CGS'
+                            });
+                        }
+                    }
+                } else {
+                    // Fallback: raw trades not available (manual entry), use calculatedTransactions
+                    tlTrades = transactionsToSave.map(tx => ({
+                        stockName:            tx.stockName,
+                        quantity:             tx.quantity,
+                        rate:                 tx.rate,
+                        totalValue:           tx.quantity * tx.rate,
+                        side:                 'both',
+                        commissionPerStock:   tx.commissionPerStock,
+                        totalStockCommission: tx.totalStockCommission,
+                        clientName:           '',
+                        account:              '',
+                        source:               'CGS'
+                    }));
+                }
+
+                await db.collection(`users/${currentUserId}/trade_log_entries`).doc(date).set({
+                    trades:       tlTrades,
+                    date:         date,
+                    source:       'CGS',
+                    lastUpdated:  firebase.firestore.FieldValue.serverTimestamp()
+                }, { merge: true });
+                // ────────────────────────────────────────────────────────────────
+
                 showMessage('Success', `Today's entries have been saved successfully.`);
             } catch (error) {
                  showMessage('Error', `Failed to save entries: ${error.message}`);
@@ -6353,11 +6586,29 @@
                             if (!stockMap[stockName]) {
                                 stockMap[stockName] = {
                                     buy:  { totalQty: 0, totalValue: 0 },
-                                    sell: { totalQty: 0, totalValue: 0 }
+                                    sell: { totalQty: 0, totalValue: 0 },
+                                    rawAccounts: []
                                 };
                             }
                             stockMap[stockName][side].totalQty  += qty;
                             stockMap[stockName][side].totalValue += qty * price;
+
+                            // Store each individual row for Trade Log
+                            const accountRaw = fields[3] ? fields[3].trim() : '';
+                            const matchedClient = allClients.find(c => {
+                                const acct = String(c.tradingAccount || '').trim().toUpperCase();
+                                const acctUp = accountRaw.toUpperCase();
+                                const codePart = acctUp.includes('-') ? acctUp.split('-')[0] : acctUp;
+                                return acct === codePart || acct === acctUp;
+                            });
+                            stockMap[stockName].rawAccounts.push({
+                                account: accountRaw,
+                                clientName: matchedClient ? matchedClient.name : '',
+                                side,
+                                qty,
+                                price,
+                                totalValue: qty * price
+                            });
                         }
 
                         const stockNames = Object.keys(stockMap);
@@ -6370,6 +6621,7 @@
 
                         // Clear existing transactions
                         calculatedTransactions = [];
+                        rawParsedTrades = []; // reset raw trades
 
                         let imported = 0;
                         for (const stockName of stockNames) {
@@ -6404,6 +6656,35 @@
                             imported++;
                         }
 
+                        // Also store raw per-trade details from stockMap for Trade Log
+                        for (const stockName of stockNames) {
+                            const b = stockMap[stockName].buy;
+                            const s = stockMap[stockName].sell;
+                            const rawAccounts = stockMap[stockName].rawAccounts || [];
+                            if (b.totalQty > 0) {
+                                rawParsedTrades.push({
+                                    stockName,
+                                    quantity: b.totalQty,
+                                    rate: parseFloat((b.totalValue / b.totalQty).toFixed(2)),
+                                    totalValue: parseFloat(b.totalValue.toFixed(2)),
+                                    side: 'buy',
+                                    accounts: rawAccounts.filter(r => r.side === 'buy'),
+                                    source: 'CGS'
+                                });
+                            }
+                            if (s.totalQty > 0) {
+                                rawParsedTrades.push({
+                                    stockName,
+                                    quantity: s.totalQty,
+                                    rate: parseFloat((s.totalValue / s.totalQty).toFixed(2)),
+                                    totalValue: parseFloat(s.totalValue.toFixed(2)),
+                                    side: 'sell',
+                                    accounts: rawAccounts.filter(r => r.side === 'sell'),
+                                    source: 'CGS'
+                                });
+                            }
+                        }
+
                         renderCalculatorTransactionsTable();
                         updateCalculatorSummary();
 
@@ -6425,6 +6706,421 @@
                 reader.readAsText(fileInput.files[0]);
             });
         })();
+
+        // ─── TRADE LOG MODULE ─────────────────────────────────────────────────────
+        (function() {
+
+            // ── Parse a raw PSX trade log TXT into an array of trade objects ──────────
+            function parseTradeTxt(text) {
+                const lines = text.split('\n');
+                const trades = [];
+                for (const line of lines) {
+                    const trimmed = line.trim();
+                    if (!trimmed || !trimmed.startsWith('"')) continue;
+                    const fields = [];
+                    let inQ = false, cur = '';
+                    for (let i = 0; i < trimmed.length; i++) {
+                        const ch = trimmed[i];
+                        if (ch === '"') { inQ = !inQ; continue; }
+                        if (ch === ',' && !inQ) { fields.push(cur); cur = ''; continue; }
+                        cur += ch;
+                    }
+                    fields.push(cur);
+                    if (fields.length < 13) continue;
+                    if (fields[7] !== 'Filled') continue;
+
+                    const rawStock = fields[2].trim();
+                    const stockName = rawStock.replace(/-[A-Z]{3,4}B?$/, '').trim();
+                    const accountRaw = fields[3] ? fields[3].trim() : '';
+                    const side  = fields[8].trim().toLowerCase();
+                    const qty   = parseFloat(fields[9]) || 0;
+                    const price = parseFloat(fields[12]) || 0;
+
+                    if (!stockName || qty <= 0 || price <= 0) continue;
+                    if (side !== 'buy' && side !== 'sell') continue;
+
+                    // Try to match account code with a client profile
+                    let clientName = '';
+                    const matchedClient = allClients.find(c => {
+                        const acct = String(c.tradingAccount || '').trim().toUpperCase();
+                        const acctRaw = accountRaw.toUpperCase();
+                        // match if account number contains the code portion after dash
+                        const codePart = acctRaw.includes('-') ? acctRaw.split('-')[0] : acctRaw;
+                        return acct === codePart || acct === acctRaw;
+                    });
+                    if (matchedClient) clientName = matchedClient.name;
+
+                    trades.push({
+                        stockName,
+                        quantity: qty,
+                        rate: price,
+                        totalValue: qty * price,
+                        side,
+                        clientName,
+                        account: accountRaw,
+                        source: 'Upload'
+                    });
+                }
+                return trades;
+            }
+
+            // ── Render trades table for the currently-selected view date ──────────────
+            window.renderTradeLogForCurrentDate = function() {
+                const date = document.getElementById('tl-view-date').value;
+                const clientFilter = (document.getElementById('tl-client-filter').value || '').trim().toLowerCase();
+                const tbody  = document.getElementById('tl-trades-tbody');
+                const title  = document.getElementById('tl-table-title');
+                const sub    = document.getElementById('tl-table-subtitle');
+                const badge  = document.getElementById('tl-total-badge');
+
+                if (!date) {
+                    tbody.innerHTML = '<tr><td colspan="9" class="p-6 text-center text-slate-400">Select a date above to view trades.</td></tr>';
+                    title.textContent = 'Trades — Select a date to view';
+                    sub.textContent = '';
+                    badge.classList.add('hidden');
+                    return;
+                }
+
+                const entry = allTradeLogEntries[date];
+                let trades = entry ? (entry.trades || []) : [];
+
+                // CGS fallback: if no trade_log_entries record yet for this date,
+                // try to build from rawParsedTrades (in-memory, before save) or cgs_entries
+                if (!entry) {
+                    // Check if there are in-memory raw trades for this date (file parsed but not saved yet)
+                    const calcDate = document.getElementById('calculatorDateInput') ? document.getElementById('calculatorDateInput').value : '';
+                    if (calcDate === date && rawParsedTrades.length > 0) {
+                        // Expand from rawParsedTrades in memory
+                        for (const t of rawParsedTrades) {
+                            if (t.accounts && t.accounts.length > 0) {
+                                for (const row of t.accounts) {
+                                    trades.push({
+                                        stockName: t.stockName,
+                                        quantity: row.qty,
+                                        rate: parseFloat(row.price.toFixed(2)),
+                                        totalValue: parseFloat(row.totalValue.toFixed(2)),
+                                        side: row.side,
+                                        clientName: row.clientName || '',
+                                        account: row.account || '',
+                                        source: 'CGS (unsaved)'
+                                    });
+                                }
+                            } else {
+                                trades.push({
+                                    stockName: t.stockName, quantity: t.quantity, rate: t.rate,
+                                    totalValue: t.totalValue, side: t.side,
+                                    clientName: '', account: '', source: 'CGS (unsaved)'
+                                });
+                            }
+                        }
+                    } else {
+                        // Fall back to old cgs_entries aggregated data
+                        const cgsEntry = allCgsEntries[date];
+                        if (cgsEntry && cgsEntry.transactions) {
+                            trades = cgsEntry.transactions.map(tx => ({
+                                stockName: tx.stockName, quantity: tx.quantity, rate: tx.rate,
+                                totalValue: tx.quantity * tx.rate, side: 'both',
+                                clientName: '', account: '', source: 'CGS'
+                            }));
+                        }
+                    }
+                }
+
+                // Apply client filter
+                let filtered = clientFilter
+                    ? trades.filter(t => (t.clientName || '').toLowerCase().includes(clientFilter) || (t.account || '').toLowerCase().includes(clientFilter))
+                    : trades;
+
+                const fmtDate = new Date(date + 'T00:00:00').toLocaleDateString('en-GB', { weekday:'long', year:'numeric', month:'long', day:'numeric' });
+                title.textContent = `Trades — ${fmtDate}`;
+                sub.textContent = entry
+                    ? `Source: ${entry.source || 'Unknown'} — ${trades.length} record(s)`
+                    : trades.length > 0
+                        ? 'Source: CGS (file loaded, not yet saved to Trade Log)'
+                        : 'No trade data found for this date.';
+
+                if (filtered.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="9" class="p-6 text-center text-slate-400">No trades found for this date' + (clientFilter ? ' matching the filter.' : '.') + '</td></tr>';
+                    badge.classList.add('hidden');
+                    return;
+                }
+
+                badge.textContent = `${filtered.length} trade${filtered.length !== 1 ? 's' : ''}`;
+                badge.classList.remove('hidden');
+
+                tbody.innerHTML = filtered.map((t, i) => {
+                    const sideBadge = t.side === 'buy'
+                        ? `<span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-emerald-100 text-emerald-700">Buy</span>`
+                        : t.side === 'sell'
+                        ? `<span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-rose-100 text-rose-700">Sell</span>`
+                        : `<span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-slate-100 text-slate-600">Both</span>`;
+                    const srcBadge = t.source === 'CGS'
+                        ? `<span class="text-xs font-semibold text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded-full">CGS</span>`
+                        : `<span class="text-xs font-semibold text-amber-600 bg-amber-50 px-2 py-0.5 rounded-full">Upload</span>`;
+                    return `<tr class="border-b hover:bg-slate-50 ${i % 2 !== 0 ? 'bg-slate-50/50' : ''}">
+                        <td class="p-2 text-slate-400 text-xs">${i + 1}</td>
+                        <td class="p-2 text-xs text-slate-500">${date}</td>
+                        <td class="p-2 font-medium text-slate-700">${t.clientName || '<span class="text-slate-400 italic text-xs">House</span>'} <span class="text-xs text-slate-400">${t.account ? '(' + t.account + ')' : ''}</span></td>
+                        <td class="p-2 font-semibold text-slate-800">${t.stockName}</td>
+                        <td class="p-2 text-right font-mono text-slate-700">${Number(t.quantity).toLocaleString()}</td>
+                        <td class="p-2 text-right font-mono text-slate-700">${Number(t.rate).toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2})}</td>
+                        <td class="p-2 text-right font-mono text-indigo-700">${Number(t.totalValue).toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2})}</td>
+                        <td class="p-2">${sideBadge}</td>
+                        <td class="p-2">${srcBadge}</td>
+                    </tr>`;
+                }).join('');
+            };
+
+            // ── Get all trades across all dates for report generation ─────────────────
+            function getAllTradesFlatSorted() {
+                const out = [];
+                // From trade_log_entries (complete data — per account, per side)
+                for (const [date, entry] of Object.entries(allTradeLogEntries)) {
+                    (entry.trades || []).forEach(t => out.push({ ...t, date }));
+                }
+                // Fallback: dates that only exist in cgs_entries (saved before this fix)
+                for (const [date, entry] of Object.entries(allCgsEntries)) {
+                    if (allTradeLogEntries[date]) continue; // already covered by trade_log_entries
+                    (entry.transactions || []).forEach(tx => out.push({
+                        date,
+                        stockName:  tx.stockName,
+                        quantity:   tx.quantity,
+                        rate:       tx.rate,
+                        totalValue: tx.quantity * tx.rate,
+                        side:       'both (aggregated)',
+                        clientName: '',
+                        account:    '',
+                        source:     'CGS (legacy)'
+                    }));
+                }
+                return out.sort((a, b) => a.date.localeCompare(b.date));
+            }
+
+            // ── Generate and download an XLSX-like CSV report ─────────────────────────
+            function downloadTradeReport(trades, filename) {
+                if (!trades.length) { showMessage('Info', 'No trades found for the selected criteria.'); return; }
+                const header = ['Date','Client','Account','Stock','Qty','Rate (PKR)','Total Value (PKR)','Side','Source'];
+                const rows   = trades.map(t => [
+                    t.date,
+                    t.clientName || 'House',
+                    t.account || '',
+                    t.stockName,
+                    t.quantity,
+                    t.rate,
+                    t.totalValue,
+                    t.side,
+                    t.source
+                ]);
+                const csvContent = [header, ...rows].map(r => r.map(v => `"${String(v).replace(/"/g,'""')}"`).join(',')).join('\r\n');
+                const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+                const url  = URL.createObjectURL(blob);
+                const a    = document.createElement('a');
+                a.href     = url;
+                a.download = filename;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+            }
+
+            // ── Event: Load date button ───────────────────────────────────────────────
+            document.getElementById('tl-load-date-btn').addEventListener('click', () => {
+                renderTradeLogForCurrentDate();
+            });
+
+            document.getElementById('tl-view-date').addEventListener('change', () => {
+                renderTradeLogForCurrentDate();
+            });
+
+            document.getElementById('tl-client-filter').addEventListener('input', () => {
+                renderTradeLogForCurrentDate();
+            });
+
+            document.getElementById('tl-clear-filter-btn').addEventListener('click', () => {
+                document.getElementById('tl-client-filter').value = '';
+                renderTradeLogForCurrentDate();
+            });
+
+            // ── Event: Download this date's trades ────────────────────────────────────
+            document.getElementById('tl-download-date-btn').addEventListener('click', () => {
+                const date = document.getElementById('tl-view-date').value;
+                if (!date) { showMessage('Info', 'Please select a date first.'); return; }
+
+                const entry = allTradeLogEntries[date];
+                let trades = entry ? (entry.trades || []) : [];
+                if (!trades.length) {
+                    const cgsEntry = allCgsEntries[date];
+                    if (cgsEntry && cgsEntry.transactions) {
+                        trades = cgsEntry.transactions.map(tx => ({
+                            date,
+                            stockName: tx.stockName, quantity: tx.quantity, rate: tx.rate,
+                            totalValue: tx.quantity * tx.rate, side: 'both', clientName: '', account: '', source: 'CGS'
+                        }));
+                    }
+                } else {
+                    trades = trades.map(t => ({ ...t, date }));
+                }
+                downloadTradeReport(trades, `Trade_Report_${date}.csv`);
+            });
+
+            // ── Event: Toggle date range picker ───────────────────────────────────────
+            document.getElementById('tl-download-range-btn').addEventListener('click', () => {
+                const picker = document.getElementById('tl-range-picker');
+                picker.classList.toggle('hidden');
+            });
+
+            // ── Event: Confirm range download ─────────────────────────────────────────
+            document.getElementById('tl-range-download-confirm-btn').addEventListener('click', () => {
+                const from = document.getElementById('tl-range-from').value;
+                const to   = document.getElementById('tl-range-to').value;
+                if (!from || !to) { showMessage('Error', 'Please select both From and To dates.'); return; }
+                if (from > to) { showMessage('Error', 'From date must be on or before To date.'); return; }
+
+                const all   = getAllTradesFlatSorted();
+                const filtered = all.filter(t => t.date >= from && t.date <= to);
+                downloadTradeReport(filtered, `Trade_Report_${from}_to_${to}.csv`);
+                document.getElementById('tl-range-picker').classList.add('hidden');
+            });
+
+            // ── Event: Manual file upload ─────────────────────────────────────────────
+            document.getElementById('tl-manual-file-input').addEventListener('change', function() {
+                const lbl = document.getElementById('tl-manual-file-label');
+                lbl.textContent = this.files.length > 0 ? this.files[0].name : 'Click to select trade log file (.txt)';
+                document.getElementById('tl-manual-status').classList.add('hidden');
+            });
+
+            // Holds parsed trades pending verification
+            let _tlPendingTrades = [];
+            let _tlPendingDate = '';
+
+            function _tlShowVerifyPanel(trades, date) {
+                _tlPendingTrades = trades;
+                _tlPendingDate = date;
+
+                document.getElementById('tl-verify-summary').textContent = `${trades.length} trade record(s) parsed from file`;
+                document.getElementById('tl-verify-date-badge').textContent = `Date: ${date}`;
+
+                const tbody = document.getElementById('tl-verify-tbody');
+                tbody.innerHTML = trades.map((t, i) => {
+                    const sideBadge = t.side === 'buy'
+                        ? `<span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-emerald-100 text-emerald-700">Buy</span>`
+                        : `<span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-rose-100 text-rose-700">Sell</span>`;
+                    return `<tr class="border-b hover:bg-amber-50 ${i % 2 !== 0 ? 'bg-slate-50/50' : ''}">
+                        <td class="p-2 text-slate-400 text-xs">${i + 1}</td>
+                        <td class="p-2 text-xs text-slate-600 font-mono">${t.account || '<span class="text-slate-400 italic">—</span>'}</td>
+                        <td class="p-2 text-sm text-slate-700">${t.clientName || '<span class="text-slate-400 italic text-xs">House</span>'}</td>
+                        <td class="p-2 font-semibold text-slate-800">${t.stockName}</td>
+                        <td class="p-2 text-right font-mono text-slate-700">${Number(t.quantity).toLocaleString()}</td>
+                        <td class="p-2 text-right font-mono text-slate-700">${Number(t.rate).toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2})}</td>
+                        <td class="p-2 text-right font-mono text-indigo-700">${Number(t.totalValue).toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2})}</td>
+                        <td class="p-2">${sideBadge}</td>
+                    </tr>`;
+                }).join('');
+
+                const checkbox = document.getElementById('tl-verify-checkbox');
+                checkbox.checked = false;
+                document.getElementById('tl-verify-confirm-btn').disabled = true;
+                document.getElementById('tl-verify-status').classList.add('hidden');
+                document.getElementById('tl-verify-panel').classList.remove('hidden');
+                document.getElementById('tl-verify-panel').scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+
+            document.getElementById('tl-verify-checkbox').addEventListener('change', function() {
+                document.getElementById('tl-verify-confirm-btn').disabled = !this.checked;
+            });
+
+            document.getElementById('tl-verify-cancel-btn').addEventListener('click', () => {
+                document.getElementById('tl-verify-panel').classList.add('hidden');
+                _tlPendingTrades = [];
+                _tlPendingDate = '';
+            });
+
+            document.getElementById('tl-verify-confirm-btn').addEventListener('click', async () => {
+                if (!_tlPendingTrades.length || !_tlPendingDate) return;
+                const verifyStatus = document.getElementById('tl-verify-status');
+                try {
+                    showLoading();
+                    await db.collection(`users/${currentUserId}/trade_log_entries`).doc(_tlPendingDate).set({
+                        trades: _tlPendingTrades,
+                        date: _tlPendingDate,
+                        source: 'Upload',
+                        lastUpdated: firebase.firestore.FieldValue.serverTimestamp()
+                    });
+
+                    document.getElementById('tl-verify-panel').classList.add('hidden');
+
+                    const statusDiv = document.getElementById('tl-manual-status');
+                    statusDiv.textContent = `✅ ${_tlPendingTrades.length} trade(s) verified and saved to Trade Log for ${_tlPendingDate}.`;
+                    statusDiv.className = 'mt-3 text-sm font-medium text-emerald-700';
+                    statusDiv.classList.remove('hidden');
+
+                    document.getElementById('tl-view-date').value = _tlPendingDate;
+                    renderTradeLogForCurrentDate();
+
+                    _tlPendingTrades = [];
+                    _tlPendingDate = '';
+                } catch (err) {
+                    verifyStatus.textContent = '❌ Error saving: ' + err.message;
+                    verifyStatus.className = 'mt-3 text-sm font-medium text-rose-600';
+                    verifyStatus.classList.remove('hidden');
+                } finally {
+                    hideLoading();
+                }
+            });
+
+            document.getElementById('tl-manual-upload-btn').addEventListener('click', () => {
+                const fileInput = document.getElementById('tl-manual-file-input');
+                const dateInput = document.getElementById('tl-manual-date');
+                const statusDiv = document.getElementById('tl-manual-status');
+
+                const date = dateInput.value;
+                if (!date) {
+                    statusDiv.textContent = '⚠ Please select a trade date first.';
+                    statusDiv.className = 'mt-3 text-sm font-medium text-amber-600';
+                    statusDiv.classList.remove('hidden');
+                    return;
+                }
+                if (!fileInput.files.length) {
+                    statusDiv.textContent = '⚠ Please select a trade log file.';
+                    statusDiv.className = 'mt-3 text-sm font-medium text-amber-600';
+                    statusDiv.classList.remove('hidden');
+                    return;
+                }
+
+                statusDiv.classList.add('hidden');
+                document.getElementById('tl-verify-panel').classList.add('hidden');
+
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    try {
+                        const trades = parseTradeTxt(e.target.result);
+                        if (trades.length === 0) {
+                            statusDiv.textContent = '❌ No valid "Filled" trades found in file. Check file format.';
+                            statusDiv.className = 'mt-3 text-sm font-medium text-rose-600';
+                            statusDiv.classList.remove('hidden');
+                            return;
+                        }
+                        // Reset file input after reading
+                        fileInput.value = '';
+                        document.getElementById('tl-manual-file-label').textContent = 'Click to select trade log file (.txt)';
+                        // Show verification panel — do NOT save yet
+                        _tlShowVerifyPanel(trades, date);
+                    } catch (err) {
+                        statusDiv.textContent = '❌ File parse error: ' + err.message;
+                        statusDiv.className = 'mt-3 text-sm font-medium text-rose-600';
+                        statusDiv.classList.remove('hidden');
+                    }
+                };
+                reader.onerror = () => {
+                    statusDiv.textContent = '❌ Could not read file.';
+                    statusDiv.className = 'mt-3 text-sm font-medium text-rose-600';
+                    statusDiv.classList.remove('hidden');
+                };
+                reader.readAsText(fileInput.files[0]);
+            });
+
+        })();
+        // ─── END TRADE LOG MODULE ─────────────────────────────────────────────────
 
         // Make openEditComplaintModal globally accessible
         window.openEditComplaintModal = openEditComplaintModal;
@@ -7632,6 +8328,7 @@ ${(d.totalDeductions > 0) ? `
             { id: 'phone-directory', label: 'Phone Directory',  icon: 'fa-phone',          defaultOn: false },
             { id: 'disclaimer',      label: 'Disclaimer',       icon: 'fa-info-circle',    defaultOn: false },
             { id: 'analytics',       label: 'Analytics',        icon: 'fa-chart-bar',      defaultOn: false },
+            { id: 'trade-log',       label: 'Trade Log',        icon: 'fa-chart-line',     defaultOn: false },
         ];
 
         function getSVSettings() {
@@ -8148,6 +8845,13 @@ ${(d.totalDeductions > 0) ? `
                     btn.addEventListener('click', () => {
                         analyticsRefreshDisplay();
                         analyticsLoadSharedVisitors();
+                    });
+                }
+                if (btn.dataset.section === 'trade-log') {
+                    btn.addEventListener('click', () => {
+                        if (typeof renderTradeLogForCurrentDate === 'function') {
+                            renderTradeLogForCurrentDate();
+                        }
                     });
                 }
             });
