@@ -317,6 +317,7 @@
         [data-section="settings"]::before { content: "\f013"; }
         [data-section="analytics"]::before { content: "\f080"; }
         [data-section="trade-log"]::before { content: "\f201"; }
+        [data-section="backup"]::before { content: "\f019"; }
 
         /* ─── Header ─────────────────────────────── */
         header.bg-white {
@@ -1528,6 +1529,7 @@
                     <li><button data-section="settings" class="nav-btn text-slate-600 hover:bg-indigo-50 hover:text-indigo-600">Settings</button></li>
                     <li><button data-section="analytics" class="nav-btn text-slate-600 hover:bg-indigo-50 hover:text-indigo-600">Analytics</button></li>
                     <li><button data-section="trade-log" class="nav-btn text-slate-600 hover:bg-indigo-50 hover:text-indigo-600">Trade Log</button></li>
+                    <li><button data-section="backup" class="nav-btn text-slate-600 hover:bg-indigo-50 hover:text-indigo-600">Backup & Restore</button></li>
                 </ul>
             </nav>
             <!-- Footer Badge (always visible) -->
@@ -2871,6 +2873,112 @@
                                 </div>
                             </div>
                         </div>
+
+                        <!-- Backup & Restore (quick access from Settings) -->
+                        <div class="settings-card" style="margin-top:24px;">
+                            <div class="settings-card-header">
+                                <i class="fas fa-database" style="color:#a5b4fc;"></i>
+                                <h3>Backup &amp; Restore</h3>
+                            </div>
+                            <div class="settings-card-body">
+                                <p style="font-size:0.78rem;color:#64748b;margin-bottom:14px;font-family:'DM Sans',sans-serif;">Apna poora system data export (download) karen ya pehle se downloaded backup se restore karen. Full backup section ke liye sidebar mein <strong>Backup &amp; Restore</strong> par click karen.</p>
+                                <div style="display:flex;gap:12px;flex-wrap:wrap;">
+                                    <button onclick="backupRequestPassword(()=>showSection('backup'))" class="sv-save-btn" style="background:#059669;box-shadow:0 4px 0 #047857;">
+                                        <i class="fas fa-download"></i> Go to Backup Section
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- ─── BACKUP SECTION ─── -->
+                    <section id="backup" class="section-container">
+                        <h2 class="text-3xl font-bold text-slate-800 mb-6">Backup &amp; Restore</h2>
+
+                        <!-- Info note -->
+                        <div style="background:rgba(99,102,241,0.07);border-left:4px solid #4f46e5;border-radius:0 12px 12px 0;padding:14px 18px;margin-bottom:24px;font-size:0.85rem;color:#1e1b4b;font-family:'DM Sans',sans-serif;line-height:1.6;">
+                            <strong><i class="fas fa-shield-alt mr-2" style="color:#4f46e5;"></i>Backup kya hai?</strong><br>
+                            Yahan se aap apna poora system data (complaints, commission, expenses, clients, employees, couriers) ek JSON file ke tor par download (export) kar saktay hain. Agar kabhi system crash ho ya data kharab ho jaye to usi JSON file ko yahan upload (import) kar ke system wahan se continue kar saktay hain jahan chhora tha.
+                        </div>
+
+                        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:24px;">
+
+                            <!-- Export Card -->
+                            <div class="settings-card">
+                                <div class="settings-card-header">
+                                    <i class="fas fa-file-export" style="color:#a5b4fc;"></i>
+                                    <h3>Export Data (Download Backup)</h3>
+                                </div>
+                                <div class="settings-card-body">
+                                    <p style="font-size:0.8rem;color:#64748b;margin-bottom:16px;font-family:'DM Sans',sans-serif;">Apna poora Firestore data ek JSON file mein download karen. Yeh file safe jagah rakhein.</p>
+                                    <div id="backup-export-collections" style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:18px;font-size:0.78rem;color:#1e1b4b;font-family:'DM Sans',sans-serif;">
+                                        <span><i class="fas fa-check-circle mr-1" style="color:#059669;"></i> Complaints</span>
+                                        <span><i class="fas fa-check-circle mr-1" style="color:#059669;"></i> Daily Commissions</span>
+                                        <span><i class="fas fa-check-circle mr-1" style="color:#059669;"></i> Commission Received</span>
+                                        <span><i class="fas fa-check-circle mr-1" style="color:#059669;"></i> Expenses</span>
+                                        <span><i class="fas fa-check-circle mr-1" style="color:#059669;"></i> Client Profiles</span>
+                                        <span><i class="fas fa-check-circle mr-1" style="color:#059669;"></i> Client Payments</span>
+                                        <span><i class="fas fa-check-circle mr-1" style="color:#059669;"></i> Employees</span>
+                                        <span><i class="fas fa-check-circle mr-1" style="color:#059669;"></i> Couriers</span>
+                                        <span><i class="fas fa-check-circle mr-1" style="color:#059669;"></i> Petty Cash</span>
+                                        <span><i class="fas fa-check-circle mr-1" style="color:#059669;"></i> Trade Log</span>
+                                    </div>
+                                    <button id="backup-export-btn" onclick="backupExportData()" class="sv-save-btn" style="width:100%;justify-content:center;background:#059669;box-shadow:0 4px 0 #047857;">
+                                        <i class="fas fa-download"></i> Download Backup (JSON)
+                                    </button>
+                                    <div id="backup-export-status" style="display:none;margin-top:12px;padding:10px 14px;border-radius:8px;font-size:0.8rem;font-family:'DM Sans',sans-serif;"></div>
+                                </div>
+                            </div>
+
+                            <!-- Import Card -->
+                            <div class="settings-card">
+                                <div class="settings-card-header">
+                                    <i class="fas fa-file-import" style="color:#a5b4fc;"></i>
+                                    <h3>Import Data (Restore Backup)</h3>
+                                </div>
+                                <div class="settings-card-body">
+                                    <p style="font-size:0.8rem;color:#64748b;margin-bottom:8px;font-family:'DM Sans',sans-serif;">Pehle se downloaded JSON backup file upload karen. <strong style="color:#e11d48;">Warning: yeh action existing data ke sath merge karega — duplicate entries ho sakti hain agar same data pehle se exist karta ho.</strong></p>
+                                    <div style="border:2px dashed #e2e8f0;border-radius:10px;padding:22px 16px;text-align:center;background:#f8fafc;margin-bottom:14px;cursor:pointer;transition:all .2s;" id="backup-drop-zone"
+                                        ondragover="event.preventDefault();this.style.borderColor='#4f46e5';this.style.background='rgba(99,102,241,0.05)'"
+                                        ondragleave="this.style.borderColor='';this.style.background=''"
+                                        ondrop="backupHandleDrop(event)">
+                                        <i class="fas fa-cloud-upload-alt" style="font-size:2rem;color:#94a3b8;margin-bottom:8px;display:block;"></i>
+                                        <p style="font-size:0.82rem;color:#94a3b8;font-family:'DM Sans',sans-serif;margin-bottom:8px;">JSON backup file yahan drag karo ya neeche se select karo</p>
+                                        <label style="display:inline-flex;align-items:center;gap:6px;padding:8px 18px;background:#4f46e5;color:#fff;border-radius:8px;font-size:0.8rem;font-weight:600;cursor:pointer;font-family:'Syne',sans-serif;">
+                                            <i class="fas fa-folder-open"></i> File Choose Karo
+                                            <input type="file" id="backup-import-file" accept=".json" style="display:none;" onchange="backupHandleFileSelect(this)">
+                                        </label>
+                                    </div>
+                                    <div id="backup-import-preview" style="display:none;"></div>
+                                    <button id="backup-import-btn" onclick="backupImportData()" style="display:none;width:100%;justify-content:center;" class="sv-save-btn">
+                                        <i class="fas fa-upload"></i> Restore Backup
+                                    </button>
+                                    <div id="backup-import-status" style="display:none;margin-top:12px;padding:10px 14px;border-radius:8px;font-size:0.8rem;font-family:'DM Sans',sans-serif;"></div>
+                                </div>
+                            </div>
+
+                        </div>
+
+                        <!-- Weekly Reminder Settings -->
+                        <div class="settings-card" style="margin-top:24px;">
+                            <div class="settings-card-header">
+                                <i class="fas fa-bell" style="color:#a5b4fc;"></i>
+                                <h3>Weekly Backup Reminder</h3>
+                            </div>
+                            <div class="settings-card-body">
+                                <p style="font-size:0.8rem;color:#64748b;margin-bottom:14px;font-family:'DM Sans',sans-serif;">Har 6-7 din baad ek reminder notification show hogi ke backup download kar lein. Reminder last backup download ki date se count hota hai.</p>
+                                <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;">
+                                    <div>
+                                        <div class="settings-label">Last Backup Download</div>
+                                        <div class="settings-desc" id="backup-last-date-display">Koi backup abhi tak download nahi kiya gaya</div>
+                                    </div>
+                                    <button onclick="backupMarkDownloaded()" class="sv-save-btn" style="background:#6366f1;box-shadow:0 4px 0 #4338ca;margin-top:0;">
+                                        <i class="fas fa-check"></i> Mark as Downloaded Today
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
                     </section>
 
                     <!-- ─── ANALYTICS SECTION ─── -->
@@ -3788,6 +3896,8 @@
                     headerTitle.textContent = 'Office Phone Directory';
                 } else if (sectionId === 'trade-log') {
                     headerTitle.textContent = 'Trade Log';
+                } else if (sectionId === 'backup') {
+                    headerTitle.textContent = 'Backup & Restore';
                 } else if (sectionId === 'employees') {
                     headerTitle.textContent = 'HR Module';
                 } else {
@@ -3820,6 +3930,18 @@
         // --- SIDEBAR NAVIGATION ---
         mainNavButtons.forEach(btn => {
             btn.addEventListener('click', () => {
+                if (btn.dataset.section === 'backup') {
+                    // Password protect backup section
+                    backupRequestPassword(() => {
+                        showSection('backup');
+                        backupUpdateLastDateDisplay();
+                        if (window.innerWidth < 768) {
+                            sidebar.classList.add('-translate-x-full');
+                            sidebarOverlay.classList.add('hidden');
+                        }
+                    });
+                    return;
+                }
                 if (btn.dataset.section) {
                     showSection(btn.dataset.section);
                     if (window.innerWidth < 768) {
@@ -3930,7 +4052,7 @@
             }
         });
         
-        signOutBtn.addEventListener('click', () => auth.signOut());
+        signOutBtn.addEventListener('click', () => { backupLockSession(); auth.signOut(); });
         
         showSignupBtn.addEventListener('click', (e) => { e.preventDefault(); loginForm.classList.add('hidden'); signupForm.classList.remove('hidden'); });
         showLoginBtn.addEventListener('click', (e) => { e.preventDefault(); signupForm.classList.add('hidden'); loginForm.classList.remove('hidden'); });
@@ -8329,6 +8451,7 @@ ${(d.totalDeductions > 0) ? `
             { id: 'disclaimer',      label: 'Disclaimer',       icon: 'fa-info-circle',    defaultOn: false },
             { id: 'analytics',       label: 'Analytics',        icon: 'fa-chart-bar',      defaultOn: false },
             { id: 'trade-log',       label: 'Trade Log',        icon: 'fa-chart-line',     defaultOn: false },
+            { id: 'backup',          label: 'Backup & Restore', icon: 'fa-database',        defaultOn: false },
         ];
 
         function getSVSettings() {
@@ -8428,11 +8551,15 @@ ${(d.totalDeductions > 0) ? `
                 if (sectionEl) sectionEl.style.display = show ? '' : 'none';
             });
 
-            // Always hide Settings from shared view (security — settings should never be shared)
+            // Always hide Settings and Backup from shared view
             const settingsNav = document.querySelector('button[data-section="settings"]');
             if (settingsNav) settingsNav.parentElement.style.display = 'none';
             const settingsSec = document.getElementById('settings');
             if (settingsSec) settingsSec.style.display = 'none';
+            const backupNav = document.querySelector('button[data-section="backup"]');
+            if (backupNav) backupNav.parentElement.style.display = 'none';
+            const backupSec = document.getElementById('backup');
+            if (backupSec) backupSec.style.display = 'none';
 
             // Navigate to first visible section
             const firstVisible = SV_SECTIONS.find(s => {
@@ -8827,6 +8954,7 @@ ${(d.totalDeductions > 0) ? `
                     analyticsOnLogin();         // Record session in background
                     startRealtimeListeners();
                     if (window._pdLoadFromFirebase) window._pdLoadFromFirebase();
+                    backupCheckWeeklyReminder();
                 } else {
                     if (currentUserId) analyticsOnLogout();
                     currentUserId = null;
@@ -8857,6 +8985,238 @@ ${(d.totalDeductions > 0) ? `
             });
         });
         // ─── END ANALYTICS MODULE ──────────────────────────────────────────
+
+        // ─── BACKUP MODULE ────────────────────────────────────────────────────────
+        const BACKUP_LAST_DATE_KEY = 'darson_backup_last_date_v1';
+        const BACKUP_REMINDER_DAYS = 7;
+        let _backupImportParsed = null;
+        let _backupUnlocked = false; // session-level unlock flag
+
+        const BACKUP_COLLECTIONS = [
+            'complaints', 'daily_commissions', 'commission_received',
+            'expenses', 'clients', 'client_payments',
+            'employees', 'couriers', 'petty_cash', 'trade_log_entries'
+        ];
+
+        // Password protect — uses existing password verification modal
+        function backupRequestPassword(onSuccess) {
+            if (_backupUnlocked) { onSuccess(); return; }
+            // Use existing requestPasswordVerification — reauthentication already handled by form submit
+            requestPasswordVerification(() => {
+                _backupUnlocked = true;
+                onSuccess();
+            });
+        }
+
+        // Lock backup again on sign-out
+        function backupLockSession() { _backupUnlocked = false; }
+
+        async function backupExportData() {
+            if (!currentUserId) return showMessage('Error', 'Pehle login karen.');
+            const btn = document.getElementById('backup-export-btn');
+            const statusEl = document.getElementById('backup-export-status');
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Exporting...';
+            statusEl.style.display = 'block';
+            statusEl.style.background = '#eef2ff';
+            statusEl.style.color = '#3730a3';
+            statusEl.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Firestore se data fetch ho raha hai...';
+
+            try {
+                const backup = { exportedAt: new Date().toISOString(), userId: currentUserId, collections: {} };
+                for (const col of BACKUP_COLLECTIONS) {
+                    try {
+                        const snap = await db.collection(`users/${currentUserId}/${col}`).get();
+                        backup.collections[col] = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+                    } catch(e) {
+                        backup.collections[col] = [];
+                    }
+                }
+                const json = JSON.stringify(backup, null, 2);
+                const blob = new Blob([json], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                const dateStr = new Date().toISOString().slice(0,10);
+                a.href = url;
+                a.download = `darson_backup_${dateStr}.json`;
+                a.click();
+                URL.revokeObjectURL(url);
+                backupMarkDownloaded();
+                statusEl.style.background = '#d1fae5';
+                statusEl.style.color = '#065f46';
+                statusEl.innerHTML = '<i class="fas fa-check-circle mr-2"></i> Backup successfully downloaded!';
+            } catch(err) {
+                statusEl.style.background = '#fff1f2';
+                statusEl.style.color = '#be123c';
+                statusEl.innerHTML = '<i class="fas fa-exclamation-circle mr-2"></i> Export failed: ' + err.message;
+            }
+            btn.disabled = false;
+            btn.innerHTML = '<i class="fas fa-download"></i> Download Backup (JSON)';
+            setTimeout(() => { statusEl.style.display = 'none'; }, 5000);
+        }
+
+        function backupHandleDrop(e) {
+            e.preventDefault();
+            document.getElementById('backup-drop-zone').style.borderColor = '';
+            document.getElementById('backup-drop-zone').style.background = '';
+            const file = e.dataTransfer.files[0];
+            if (file) backupReadFile(file);
+        }
+
+        function backupHandleFileSelect(input) {
+            const file = input.files[0];
+            if (file) backupReadFile(file);
+        }
+
+        function backupReadFile(file) {
+            if (!file.name.endsWith('.json')) {
+                showMessage('Error', 'Sirf .json file upload karen.');
+                return;
+            }
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const data = JSON.parse(e.target.result);
+                    if (!data.collections) {
+                        showMessage('Error', 'Invalid backup file — yeh Darson backup file nahi lagti.');
+                        return;
+                    }
+                    _backupImportParsed = data;
+                    const preview = document.getElementById('backup-import-preview');
+                    const colNames = Object.keys(data.collections);
+                    const totalDocs = colNames.reduce((s, c) => s + (data.collections[c]?.length || 0), 0);
+                    preview.style.display = 'block';
+                    preview.innerHTML = `
+                        <div style="background:#eef2ff;border:1px solid #a5b4fc;border-radius:10px;padding:12px 16px;margin-bottom:12px;font-family:'DM Sans',sans-serif;font-size:0.8rem;">
+                            <div style="font-weight:700;color:#1e1b4b;margin-bottom:6px;"><i class="fas fa-file-check mr-2" style="color:#4f46e5;"></i>Backup Preview</div>
+                            <div style="color:#475569;">Exported: <strong>${data.exportedAt ? new Date(data.exportedAt).toLocaleString() : 'N/A'}</strong></div>
+                            <div style="color:#475569;margin-top:4px;">Total Records: <strong style="color:#4f46e5;">${totalDocs}</strong> across ${colNames.length} collections</div>
+                            <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px;margin-top:8px;">
+                                ${colNames.map(c => `<span style="color:#64748b;"><i class="fas fa-dot-circle mr-1" style="color:#6366f1;font-size:0.65rem;"></i>${c}: <strong>${data.collections[c]?.length || 0}</strong></span>`).join('')}
+                            </div>
+                        </div>`;
+                    const btn = document.getElementById('backup-import-btn');
+                    btn.style.display = 'inline-flex';
+                } catch(err) {
+                    showMessage('Error', 'File parse nahi ho saki: ' + err.message);
+                }
+            };
+            reader.readAsText(file);
+        }
+
+        async function backupImportData() {
+            if (!currentUserId) return showMessage('Error', 'Pehle login karen.');
+            if (!_backupImportParsed) return showMessage('Error', 'Pehle backup file select karen.');
+            if (!confirm('Kya aap waqai yeh backup restore karna chahtay hain?\n\nYeh action existing Firestore data mein records ADD karega (delete nahi karega). Duplicate entries ho sakti hain.\n\nProceed?')) return;
+            const btn = document.getElementById('backup-import-btn');
+            const statusEl = document.getElementById('backup-import-status');
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Restoring...';
+            statusEl.style.display = 'block';
+            statusEl.style.background = '#eef2ff';
+            statusEl.style.color = '#3730a3';
+            statusEl.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Data restore ho raha hai...';
+            try {
+                const data = _backupImportParsed;
+                let totalRestored = 0;
+                for (const col of Object.keys(data.collections)) {
+                    const docs = data.collections[col] || [];
+                    for (const doc of docs) {
+                        const { id, ...fields } = doc;
+                        // Convert ISO strings that look like Firestore timestamps back to plain values
+                        const cleaned = JSON.parse(JSON.stringify(fields, (k, v) => {
+                            if (v && typeof v === 'object' && v._seconds) return new Date(v._seconds * 1000).toISOString();
+                            return v;
+                        }));
+                        if (id) {
+                            await db.collection(`users/${currentUserId}/${col}`).doc(id).set(cleaned, { merge: true });
+                        } else {
+                            await db.collection(`users/${currentUserId}/${col}`).add(cleaned);
+                        }
+                        totalRestored++;
+                    }
+                }
+                statusEl.style.background = '#d1fae5';
+                statusEl.style.color = '#065f46';
+                statusEl.innerHTML = `<i class="fas fa-check-circle mr-2"></i> ${totalRestored} records successfully restored! Page refresh karen.`;
+                _backupImportParsed = null;
+                document.getElementById('backup-import-btn').style.display = 'none';
+                document.getElementById('backup-import-preview').style.display = 'none';
+                document.getElementById('backup-import-file').value = '';
+            } catch(err) {
+                statusEl.style.background = '#fff1f2';
+                statusEl.style.color = '#be123c';
+                statusEl.innerHTML = '<i class="fas fa-exclamation-circle mr-2"></i> Restore failed: ' + err.message;
+            }
+            btn.disabled = false;
+            btn.innerHTML = '<i class="fas fa-upload"></i> Restore Backup';
+        }
+
+        function backupMarkDownloaded() {
+            const now = new Date().toISOString();
+            localStorage.setItem(BACKUP_LAST_DATE_KEY, now);
+            backupUpdateLastDateDisplay();
+        }
+
+        function backupUpdateLastDateDisplay() {
+            const last = localStorage.getItem(BACKUP_LAST_DATE_KEY);
+            const el = document.getElementById('backup-last-date-display');
+            if (!el) return;
+            if (!last) {
+                el.textContent = 'Koi backup abhi tak download nahi kiya gaya';
+            } else {
+                const d = new Date(last);
+                const daysSince = Math.floor((Date.now() - d.getTime()) / (1000 * 60 * 60 * 24));
+                el.textContent = `${d.toLocaleDateString('en-PK', { day:'2-digit', month:'short', year:'numeric' })} (${daysSince} din pehle)`;
+            }
+        }
+
+        function backupCheckWeeklyReminder() {
+            if (isSharedView) return;
+            const last = localStorage.getItem(BACKUP_LAST_DATE_KEY);
+            if (!last) {
+                // Never backed up — show reminder after 1 minute of session
+                setTimeout(() => backupShowReminderNotification(), 60000);
+                return;
+            }
+            const daysSince = Math.floor((Date.now() - new Date(last).getTime()) / (1000 * 60 * 60 * 24));
+            if (daysSince >= BACKUP_REMINDER_DAYS) {
+                setTimeout(() => backupShowReminderNotification(daysSince), 8000);
+            }
+        }
+
+        function backupShowReminderNotification(daysSince) {
+            if (document.getElementById('backup-reminder-toast')) return;
+            const toast = document.createElement('div');
+            toast.id = 'backup-reminder-toast';
+            toast.style.cssText = 'position:fixed;bottom:24px;right:24px;z-index:9999;background:#1e1b4b;color:#fff;border-radius:14px;padding:16px 20px;box-shadow:0 8px 32px rgba(30,27,75,0.35);max-width:340px;font-family:\'DM Sans\',sans-serif;border-left:4px solid #f59e0b;animation:pdSlideIn .3s ease;';
+            const msg = daysSince ? `${daysSince} din se backup nahi liya!` : 'Abhi tak koi backup download nahi kiya!';
+            toast.innerHTML = `
+                <div style="display:flex;align-items:flex-start;gap:12px;">
+                    <i class="fas fa-bell" style="color:#f59e0b;font-size:1.3rem;flex-shrink:0;margin-top:2px;"></i>
+                    <div style="flex:1;">
+                        <div style="font-weight:700;font-size:0.88rem;margin-bottom:4px;font-family:'Syne',sans-serif;">⏰ Backup Reminder</div>
+                        <div style="font-size:0.78rem;color:rgba(255,255,255,0.8);margin-bottom:10px;">${msg} System ka backup download kar lein takey data safe rahe.</div>
+                        <div style="display:flex;gap:8px;">
+                            <button onclick="document.getElementById('backup-reminder-toast').remove();backupRequestPassword(()=>showSection('backup'));" style="padding:6px 14px;background:#f59e0b;color:#1e1b4b;border:none;border-radius:6px;font-size:0.75rem;font-weight:700;cursor:pointer;font-family:'Syne',sans-serif;">Backup Karo</button>
+                            <button onclick="document.getElementById('backup-reminder-toast').remove();" style="padding:6px 14px;background:rgba(255,255,255,0.12);color:#fff;border:none;border-radius:6px;font-size:0.75rem;cursor:pointer;font-family:'DM Sans',sans-serif;">Bad Mein</button>
+                        </div>
+                    </div>
+                </div>`;
+            document.body.appendChild(toast);
+        }
+
+        // Init backup section display updates when navigating to it
+        document.addEventListener('DOMContentLoaded', () => {
+            document.querySelectorAll('#main-nav .nav-btn').forEach(btn => {
+                if (btn.dataset.section === 'backup') {
+                    btn.addEventListener('click', () => backupUpdateLastDateDisplay());
+                }
+            });
+            // Check weekly reminder on load (after auth)
+            // Will be called from initializeAuthentication hook below
+        });
+        // ─── END BACKUP MODULE ────────────────────────────────────────────────────
 
         window.applyAppearance = function() {
             const s = readControlsToSettings();
