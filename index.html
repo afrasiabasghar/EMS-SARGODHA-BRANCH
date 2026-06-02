@@ -1301,6 +1301,63 @@
         </div>
     </div>
     
+    <!-- OE Add/Edit Expense Modal -->
+    <div id="oe-add-modal" class="modal-overlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:200;display:none;align-items:center;justify-content:center;padding:20px;">
+        <div class="card p-6" style="width:100%;max-width:480px;max-height:90vh;overflow-y:auto;">
+            <h3 id="oe-modal-title" class="text-lg font-bold mb-4">Add Expense</h3>
+            <div class="space-y-3">
+                <div>
+                    <label class="text-xs font-semibold text-slate-500 mb-1 block">Category</label>
+                    <select id="oe-f-cat" class="w-full px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm">
+                        <option value="STAFF">Staff &amp; Payroll</option>
+                        <option value="OFFICE_PREMISES">Office Premises</option>
+                        <option value="UTILITY">Utility Bills</option>
+                        <option value="OPERATIONS">Office Operations</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="text-xs font-semibold text-slate-500 mb-1 block">Description</label>
+                    <input id="oe-f-desc" type="text" placeholder="e.g. Monthly salary for Afrasiab Asghar"
+                        class="w-full px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm"/>
+                </div>
+                <div>
+                    <label class="text-xs font-semibold text-slate-500 mb-1 block">Breakdown (optional)</label>
+                    <input id="oe-f-breakdown" type="text" placeholder="e.g. 48,000 + 2,000"
+                        class="w-full px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm"/>
+                </div>
+                <div>
+                    <label class="text-xs font-semibold text-slate-500 mb-1 block">Amount (PKR)</label>
+                    <input id="oe-f-amount" type="number" min="0" placeholder="e.g. 50000"
+                        class="w-full px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm font-mono"/>
+                </div>
+            </div>
+            <div class="flex justify-end gap-3 mt-5">
+                <button onclick="oeCloseModal('oe-add-modal')" class="bg-slate-200 text-slate-700 px-5 py-2 rounded-full font-semibold hover:bg-slate-300 text-sm">Cancel</button>
+                <button id="oe-save-btn" onclick="oeSaveExpense()" class="bg-indigo-600 text-white px-5 py-2 rounded-full font-semibold hover:bg-indigo-700 animated-btn text-sm">Save Expense</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- OE Bulk Import Modal -->
+    <div id="oe-bulk-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:200;align-items:center;justify-content:center;padding:20px;">
+        <div class="card p-6" style="width:100%;max-width:600px;max-height:90vh;overflow-y:auto;">
+            <h3 class="text-lg font-bold mb-1">Bulk Import — Paste &amp; Auto-Parse</h3>
+            <p class="text-slate-400 text-xs mb-3">Paste expense lines in any freeform format. Parser will extract category, description and amount.</p>
+            <div class="p-3 rounded-xl text-xs text-slate-500 mb-3" style="background:#f1f5ff;border:1px dashed #a5b4fc;line-height:1.8;">
+                Examples: <code>salary afrasiab 50000</code> | <code>office rent 21500</code> | <code>electricity bill 6028</code> | <code>internet 3449</code>
+            </div>
+            <textarea id="oe-bulk-text" rows="8" placeholder="Yahan paste karo, jaise:&#10;salary afrasiab 50000&#10;commission rohail 25000&#10;office rent 21500&#10;electricity 6028&#10;internet 3449&#10;petrol 3500"
+                class="w-full px-4 py-3 border rounded-2xl focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm font-mono resize-y"
+                style="border-color:#c7d2fe;background:#fafbff;min-height:150px;"></textarea>
+            <button onclick="oeParseBulk()" class="mt-3 bg-indigo-600 text-white px-5 py-2 rounded-full text-sm font-semibold hover:bg-indigo-700 animated-btn">Parse Expenses</button>
+            <div id="oe-bulk-preview" class="mt-3"></div>
+            <div class="flex justify-end gap-3 mt-4">
+                <button onclick="oeCloseModal('oe-bulk-modal')" class="bg-slate-200 text-slate-700 px-5 py-2 rounded-full font-semibold hover:bg-slate-300 text-sm">Cancel</button>
+                <button id="oe-confirm-bulk-btn" onclick="oeConfirmBulk()" style="display:none" class="bg-emerald-600 text-white px-5 py-2 rounded-full font-semibold hover:bg-emerald-700 animated-btn text-sm">Import All</button>
+            </div>
+        </div>
+    </div>
+
     <!-- Expense Import Preview Modal -->
     <div id="expense-import-preview-modal" class="modal-overlay">
         <div class="modal-content card" style="max-width:640px;width:95%;">
@@ -2032,103 +2089,151 @@
                     </section>
     
                     <section id="expenses" class="section-container">
-                        <!-- UPDATED: Text color -->
-                        <h2 class="text-3xl font-bold text-slate-800 mb-6">House Expenses</h2>
-                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                            <div id="add-expense-forms-wrapper">
-                                <div class="card p-6 mb-6">
-                                    <h3 class="text-xl font-semibold mb-4">Petty Cash Management</h3>
-                                    <div class="mb-4">
-                                        <!-- UPDATED: Text color -->
-                                        <p class="text-slate-500">Overall Remaining Balance</p>
-                                        <!-- UPDATED: Text color -->
-                                        <p id="petty-cash-balance" class="text-3xl font-bold text-indigo-600">PKR 0</p>
+                        <h2 class="text-3xl font-bold text-slate-800 mb-6">Office Expenses</h2>
+
+                        <!-- TABS -->
+                        <div class="flex gap-0 mb-6 border-b border-slate-200">
+                            <button id="oe-tab-expenses" onclick="oeShowTab('expenses')"
+                                class="px-6 py-2.5 text-sm font-semibold border-b-2 border-indigo-600 text-indigo-600 -mb-px">
+                                <i class="fas fa-list mr-2"></i>Expenses
+                            </button>
+                            <button id="oe-tab-reports" onclick="oeShowTab('reports')"
+                                class="px-6 py-2.5 text-sm font-semibold border-b-2 border-transparent text-slate-500 hover:text-indigo-500 -mb-px">
+                                <i class="fas fa-file-alt mr-2"></i>Saved Reports
+                            </button>
+                        </div>
+
+                        <!-- ── TAB: EXPENSES ── -->
+                        <div id="oe-pane-expenses">
+
+                            <!-- MONTH SELECTOR -->
+                            <div class="card p-4 mb-6 flex flex-col sm:flex-row items-center gap-4">
+                                <label class="font-semibold text-slate-700 whitespace-nowrap">Select Month:</label>
+                                <select id="oe-month-select" onchange="oeSetMonth(this.value)"
+                                    class="px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-indigo-500 w-full sm:w-auto"></select>
+                            </div>
+
+                            <!-- STATS BAR -->
+                            <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+                                <div class="card p-4">
+                                    <p class="text-xs text-slate-400 uppercase tracking-wider mb-1">Entries</p>
+                                    <p id="oe-stat-entries" class="text-2xl font-bold font-mono text-slate-800">0</p>
+                                </div>
+                                <div class="card p-4">
+                                    <p class="text-xs text-slate-400 uppercase tracking-wider mb-1">Total Expenses</p>
+                                    <p id="oe-stat-total" class="text-2xl font-bold font-mono text-rose-600">PKR 0</p>
+                                </div>
+                                <div class="card p-4">
+                                    <p class="text-xs text-slate-400 uppercase tracking-wider mb-1">Gross Income</p>
+                                    <p id="oe-stat-income" class="text-2xl font-bold font-mono text-indigo-600">PKR 0</p>
+                                </div>
+                                <div class="card p-4">
+                                    <p class="text-xs text-slate-400 uppercase tracking-wider mb-1">Net Profit</p>
+                                    <p id="oe-stat-profit" class="text-2xl font-bold font-mono text-emerald-600">PKR 0</p>
+                                </div>
+                            </div>
+
+                            <!-- INCOME INPUT -->
+                            <div id="oe-add-forms-wrapper" class="card p-5 mb-6">
+                                <h3 class="text-base font-semibold text-slate-600 mb-3">Gross Income for This Month</h3>
+                                <div class="flex items-center gap-3 flex-wrap">
+                                    <input type="number" id="oe-income-input" placeholder="e.g. 144000" min="0"
+                                        class="px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-indigo-500 font-mono w-56"/>
+                                    <button onclick="oeSaveIncome()" class="bg-indigo-600 text-white px-5 py-2 rounded-full font-semibold hover:bg-indigo-700 animated-btn text-sm">Set Income</button>
+                                </div>
+                            </div>
+
+                            <!-- EXPENSE TABLE -->
+                            <div class="card overflow-hidden mb-6">
+                                <div class="flex items-center justify-between px-5 py-3 border-b border-slate-100 flex-wrap gap-3">
+                                    <h3 id="oe-table-title" class="font-semibold text-slate-800">Expenses</h3>
+                                    <div id="oe-action-btns" class="flex gap-2 flex-wrap">
+                                        <button onclick="oeOpenBulkModal()" class="bg-slate-100 text-slate-700 border border-slate-200 px-4 py-1.5 rounded-full text-sm font-semibold hover:bg-slate-200 animated-btn">⚡ Bulk Import</button>
+                                        <button onclick="oeOpenAddModal()" class="bg-indigo-600 text-white px-4 py-1.5 rounded-full text-sm font-semibold hover:bg-indigo-700 animated-btn">+ Add Expense</button>
                                     </div>
-                                    <form id="add-petty-cash-form" class="space-y-4">
-                                        <!-- UPDATED: Focus ring color -->
-                                        <input type="number" id="petty-cash-amount" placeholder="Cash In Amount (PKR)" required
-                                               class="w-full px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                                        <input type="date" id="petty-cash-date" required
-                                               class="w-full px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                                        <!-- UPDATED: Button color -->
-                                        <button type="submit" class="w-full bg-emerald-600 text-white py-2 rounded-full font-semibold hover:bg-emerald-700 animated-btn">
-                                            Add Cash In
-                                        </button>
-                                    </form>
                                 </div>
-                                <div class="card p-6 mb-6">
-                                    <h3 class="text-xl font-semibold mb-4">Add New Expense</h3>
-                                    <form id="add-expense-form" class="space-y-4">
-                                        <!-- UPDATED: Focus ring color -->
-                                        <input type="text" id="expense-name" placeholder="Expense Name (e.g., Electricity Bill)" required
-                                               class="w-full px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                                        <input type="number" id="expense-amount" placeholder="Amount (PKR)" required
-                                               class="w-full px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                                        <input type="date" id="expense-date" required
-                                               class="w-full px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                                        <!-- UPDATED: Button color -->
-                                        <button type="submit" class="w-full bg-indigo-600 text-white py-2 rounded-full font-semibold hover:bg-indigo-700 animated-btn">
-                                            Save Expense
-                                        </button>
-                                    </form>
+                                <div class="overflow-x-auto">
+                                    <table class="w-full text-left text-sm">
+                                        <thead>
+                                            <tr class="bg-slate-50 text-slate-400 uppercase text-xs">
+                                                <th class="px-4 py-2 w-8">#</th>
+                                                <th class="px-4 py-2">Category</th>
+                                                <th class="px-4 py-2">Description</th>
+                                                <th class="px-4 py-2">Breakdown</th>
+                                                <th class="px-4 py-2 text-right">Amount (PKR)</th>
+                                                <th class="px-4 py-2 w-24 actions-header"></th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="oe-expense-tbody"></tbody>
+                                    </table>
                                 </div>
-                                <div class="card p-6 mb-6">
-                                    <h3 class="text-xl font-semibold mb-4">Import Expenses from File</h3>
-                                    <p class="text-slate-500 text-sm mb-4">Upload a <code>.txt</code> or <code>.csv</code> file with expense data. All expenses will be previewed before being added.</p>
-                                    <div class="space-y-4">
-                                        <input type="file" id="expense-file-upload" accept=".txt,.csv"
-                                               class="w-full px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm text-slate-600 file:mr-4 file:py-1 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100 cursor-pointer">
-                                        <input type="date" id="expense-import-date"
-                                               class="w-full px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                                        <button type="button" id="fetch-expenses-btn" class="w-full bg-indigo-600 text-white py-2 rounded-full font-semibold hover:bg-indigo-700 animated-btn">
-                                            <i class="fas fa-file-import mr-2"></i>Fetch &amp; Preview Expenses
+                                <div id="oe-table-footer" class="hidden px-4 py-2 text-right text-sm font-bold font-mono text-slate-700 bg-slate-50 border-t border-slate-100"></div>
+                            </div>
+
+                            <!-- SAVE + PRINT ACTIONS -->
+                            <div id="oe-add-forms-wrapper2" class="card p-5 mb-6">
+                                <div class="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+                                    <div class="flex-1">
+                                        <p class="font-semibold text-slate-700">Save &amp; Report</p>
+                                        <p class="text-xs text-slate-400 mt-1">Firebase mein save karo aur formatted report print karo.</p>
+                                    </div>
+                                    <div class="flex gap-3 flex-wrap">
+                                        <button onclick="oePrintReport()" class="bg-slate-700 text-white px-5 py-2 rounded-full font-semibold hover:bg-slate-800 animated-btn text-sm whitespace-nowrap">
+                                            <i class="fas fa-print mr-2"></i>Print Report
+                                        </button>
+                                        <button onclick="oeSaveMonthlyTotal()" class="bg-emerald-600 text-white px-5 py-2 rounded-full font-semibold hover:bg-emerald-700 animated-btn text-sm whitespace-nowrap">
+                                            <i class="fas fa-save mr-2"></i>Save Report
                                         </button>
                                     </div>
                                 </div>
                             </div>
-                            <div class="card p-6">
-                                <h3 class="text-xl font-semibold mb-4">Monthly Petty Cash Ledger</h3>
-                                <div class="flex flex-col sm:flex-row items-center space-y-4 sm:space-y-0 sm:space-x-4 mb-4">
-                                    <!-- UPDATED: Focus ring color -->
-                                    <select id="expense-report-month" class="w-full sm:w-auto px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-indigo-500"></select>
-                                    <input type="number" id="expense-report-year" placeholder="Year"
-                                           class="w-full sm:w-auto px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                                    <!-- UPDATED: Button color -->
-                                    <button id="print-expenses-btn" class="w-full sm:w-auto bg-slate-700 text-white px-6 py-2 rounded-full font-semibold hover:bg-slate-800 animated-btn">
-                                        Print Report
+
+                        </div><!-- end oe-pane-expenses -->
+
+                        <!-- ── TAB: SAVED REPORTS ── -->
+                        <div id="oe-pane-reports" style="display:none">
+                            <div id="oe-reports-list" class="space-y-4">
+                                <div class="text-center py-16 text-slate-400">
+                                    <i class="fas fa-file-alt text-4xl mb-3 block opacity-30"></i>
+                                    <p class="text-sm">Koi report nahi mili. Pehle expenses enter karo aur "Save Report" dabao.</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- ── REPORT PREVIEW MODAL ── -->
+                        <div id="oe-report-preview-modal" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(15,23,42,0.7);backdrop-filter:blur(6px);z-index:2000;justify-content:center;align-items:center;padding:20px;">
+                            <div style="background:#fff;border-radius:16px;width:100%;max-width:920px;height:90vh;display:flex;flex-direction:column;box-shadow:0 32px 80px rgba(30,27,75,0.35);overflow:hidden;">
+                                <div style="display:flex;justify-content:space-between;align-items:center;padding:1rem 1.5rem;background:linear-gradient(90deg,#1e1b4b,#312e81);flex-shrink:0;">
+                                    <span id="oe-report-preview-title" style="color:#fff;font-family:Syne,sans-serif;font-weight:700;font-size:1rem;"></span>
+                                    <button onclick="document.getElementById('oe-report-preview-modal').style.display='none';document.getElementById('oe-report-preview-frame').src='about:blank';"
+                                        style="background:rgba(255,255,255,0.15);color:#fff;border:1px solid rgba(255,255,255,0.2);border-radius:8px;padding:6px 16px;font-weight:600;cursor:pointer;font-size:0.85rem;">
+                                        <i class="fas fa-times" style="margin-right:6px;"></i>Close
                                     </button>
                                 </div>
-                                <div id="expenses-report-container">
-                                    <div class="flex justify-between items-center mb-2 p-2 bg-slate-50 rounded-lg">
-                                        <span class="font-semibold">Opening Balance:</span>
-                                        <!-- UPDATED: Text color -->
-                                        <span id="opening-balance-display" class="font-bold text-slate-700">PKR 0</span>
-                                    </div>
-                                    <div class="overflow-y-auto max-h-80">
-                                        <table class="w-full text-left table-auto">
-                                            <thead class="border-b-2 sticky top-0 bg-white">
-                                                <!-- UPDATED: Text color -->
-                                                <tr class="text-slate-600 uppercase text-sm">
-                                                    <th class="p-2">Date</th>
-                                                    <th class="p-2">Description</th>
-                                                    <th class="p-2 text-right">Debit (DR)</th>
-                                                    <th class="p-2 text-right">Credit (CR)</th>
-                                                    <th class="p-2 text-right">Balance</th>
-                                                    <th class="p-2 actions-header">Actions</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody id="expense-statement-list">
-                                                <!-- Rows will be generated by JS -->
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                    <div class="flex justify-between items-center mt-2 p-2 bg-slate-50 rounded-lg">
-                                        <span class="font-semibold">Closing Balance:</span>
-                                        <!-- UPDATED: Text color -->
-                                        <span id="closing-balance-display" class="font-bold text-indigo-600">PKR 0</span>
-                                    </div>
-                                </div>
+                                <iframe id="oe-report-preview-frame" src="about:blank" style="flex:1;border:none;width:100%;"></iframe>
                             </div>
+                        </div>
+
+                        <!-- Hidden elements for backward compatibility -->
+                        <div style="display:none">
+                            <div id="add-expense-forms-wrapper"></div>
+                            <select id="expense-report-month"></select>
+                            <input id="expense-report-year" type="number"/>
+                            <button id="print-expenses-btn"></button>
+                            <div id="expenses-report-container">
+                                <span id="opening-balance-display"></span>
+                                <tbody id="expense-statement-list"></tbody>
+                                <span id="closing-balance-display"></span>
+                            </div>
+                            <div id="petty-cash-balance"></div>
+                            <form id="add-petty-cash-form"><input id="petty-cash-amount"/><input id="petty-cash-date"/><textarea id="petty-cash-notes"></textarea></form>
+                            <form id="add-expense-form"><input id="expense-name"/><input id="expense-amount"/><input id="expense-date"/></form>
+                            <input id="expense-file-upload" type="file"/>
+                            <input id="expense-import-date" type="date"/>
+                            <button id="fetch-expenses-btn"></button>
+                            <textarea id="bulk-expense-text"></textarea>
+                            <input id="bulk-expense-date" type="date"/>
+                            <button id="bulk-fetch-expenses-btn"></button>
                         </div>
                     </section>
     
@@ -3884,7 +3989,7 @@
         let isSharedView = false; // Flag for read-only mode
 
         // REMOVED: allDeposits, allWithdrawals, allCourierRecords
-        let allComplaints = [], allDailyCommissions = [], allCommissionReceived = [], allExpenses = [], allClients = [], allEmployees = [], allClientPayments = [], allPettyCashEntries = [], allEmployeePerformance = [], allCgsEntries = {}, allCouriers = [], allTradeLogEntries = {}, allUtilityBills = [];
+        let allComplaints = [], allDailyCommissions = [], allCommissionReceived = [], allExpenses = [], allClients = [], allEmployees = [], allClientPayments = [], allPettyCashEntries = [], allEmployeePerformance = [], allCgsEntries = {}, allCouriers = [], allTradeLogEntries = {}, allUtilityBills = [], allMonthlyExpenses = [];
         let calculatedTransactions = [];
         let rawParsedTrades = []; // Complete per-trade details from uploaded file for Trade Log sync
 
@@ -4123,6 +4228,8 @@
                 } catch(e) { /* silent — visitor tracking is non-critical */ }
 
                 startRealtimeListeners();
+                // Expenses section: hide report-generator tab, show only Saved Reports
+                oeApplySharedView();
                 hideLoading();
 
             } catch (error) {
@@ -4253,6 +4360,9 @@
                 }, err => console.error(`Error listening to ${col}:`, err));
                 unsubscribeListeners.push(unsub);
             });
+
+            // Start monthly_expenses listener (for OE dashboard graph)
+            startMonthlyExpensesListener();
         }
 
         function stopRealtimeListeners() {
@@ -4409,24 +4519,20 @@
                 options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } } } }
             });
 
-            const expensesByMonth = {};
-            allExpenses.filter(e => !e.isHome).forEach(e => {
-                const date = new Date(e.date);
-                const key = `${date.getFullYear()}-${String(date.getMonth()).padStart(2, '0')}`;
-                if (!expensesByMonth[key]) expensesByMonth[key] = 0;
-                expensesByMonth[key] += e.amount;
-            });
-            const sortedExpenses = Object.entries(expensesByMonth).sort(([keyA], [keyB]) => keyA.localeCompare(keyB)).slice(-12);
+            // Use saved monthly totals from Firebase for the expenses chart
+            const sortedExpenses = [...allMonthlyExpenses]
+                .filter(e => e.monthKey && e.total != null)
+                .sort((a, b) => a.monthKey.localeCompare(b.monthKey))
+                .slice(-12);
             if (monthlyExpensesChart) monthlyExpensesChart.destroy();
             monthlyExpensesChart = new Chart('monthlyExpensesChart', {
                 type: 'bar',
                 data: {
-                    labels: sortedExpenses.map(([key]) => {
-                        const [year, month] = key.split('-');
-                        return `${months[parseInt(month)]} '${year.slice(2)}`;
+                    labels: sortedExpenses.map(e => {
+                        const [year, month] = e.monthKey.split('-');
+                        return `${months[parseInt(month)-1]} '${year.slice(2)}`;
                     }),
-                    // UPDATED: Theme color
-                    datasets: [{ label: 'Office Expenses', data: sortedExpenses.map(([, value]) => value), backgroundColor: '#a855f7' }] // purple-500
+                    datasets: [{ label: 'Office Expenses', data: sortedExpenses.map(e => e.total), backgroundColor: '#a855f7' }]
                 },
                 options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true } } }
             });
@@ -5199,12 +5305,14 @@
             const form = e.target;
             const amount = parseFloat(form['petty-cash-amount'].value);
             const date = form['petty-cash-date'].value;
+            const notes = (document.getElementById('petty-cash-notes').value || '').trim();
             if (isNaN(amount) || amount <= 0 || !date) return showMessage('Error', 'Please enter a valid amount and date.');
             showLoading();
             try {
                 await db.collection(`users/${currentUserId}/petty_cash`).add({
                     amount: amount,
                     date: date,
+                    notes: notes,
                     timestamp: firebase.firestore.FieldValue.serverTimestamp()
                 });
                 showMessage('Success', 'Cash In added successfully!');
@@ -5215,6 +5323,552 @@
                 hideLoading();
             }
         });
+
+        // ═══════════════════════════════════════════════════════════════════
+        // ─── OFFICE EXPENSE MANAGER MODULE ──────────────────────────────────
+        // ═══════════════════════════════════════════════════════════════════
+
+        const OE_CATS = {
+            STAFF: 'Staff & Payroll',
+            OFFICE_PREMISES: 'Office Premises',
+            UTILITY: 'Utility Bills',
+            OPERATIONS: 'Office Operations'
+        };
+        const OE_CAT_ORDER = ['STAFF','OFFICE_PREMISES','UTILITY','OPERATIONS'];
+        const OE_CAT_COLORS = {
+            STAFF: 'background:#e8e4ff;color:#3d2fa0',
+            OFFICE_PREMISES: 'background:#d4f0e8;color:#007055',
+            UTILITY: 'background:#fff3cd;color:#856404',
+            OPERATIONS: 'background:#fde8e4;color:#993c1d'
+        };
+
+        let oeData = {};
+        let oeCurrentMonth = '';
+        let oeEditId = null;
+        window.oeParsedBulk = [];
+
+        const OE_KEYWORD_CAT = {
+            salary:'STAFF', commission:'STAFF', guard:'STAFF', wage:'STAFF', bonus:'STAFF', payroll:'STAFF',
+            rent:'OFFICE_PREMISES', lease:'OFFICE_PREMISES',
+            water:'UTILITY', electricity:'UTILITY', telephone:'UTILITY', internet:'UTILITY', phone:'UTILITY',
+            utility:'UTILITY', bill:'UTILITY', wifi:'UTILITY', broadband:'UTILITY',
+            tea:'OPERATIONS', milk:'OPERATIONS', sugar:'OPERATIONS', refreshment:'OPERATIONS', petrol:'OPERATIONS',
+            fuel:'OPERATIONS', stationery:'OPERATIONS', paper:'OPERATIONS', tissue:'OPERATIONS',
+            soap:'OPERATIONS', cleaning:'OPERATIONS', courier:'OPERATIONS', tcs:'OPERATIONS',
+            bin:'OPERATIONS', bags:'OPERATIONS', calling:'OPERATIONS', package:'OPERATIONS',
+            port:'OPERATIONS', extension:'OPERATIONS', equipment:'OPERATIONS', supplies:'OPERATIONS'
+        };
+
+        function oeGuessCategory(line) {
+            const l = line.toLowerCase();
+            for (const [kw, cat] of Object.entries(OE_KEYWORD_CAT)) {
+                if (l.includes(kw)) return cat;
+            }
+            return 'OPERATIONS';
+        }
+
+        function oeExtractAmount(line) {
+            const nums = line.match(/[\d,]+(?:\.\d+)?/g);
+            if (!nums) return 0;
+            const vals = nums.map(n => parseFloat(n.replace(/,/g,''))).filter(n => n > 0);
+            if (!vals.length) return 0;
+            return Math.max(...vals);
+        }
+
+        function oeCleanDesc(line) {
+            return line.replace(/[\d,]+(?:\.\d+)?/g,'').replace(/rs\.?/gi,'').replace(/rupees?/gi,'').replace(/pkr\.?/gi,'').replace(/\s+/g,' ').trim();
+        }
+
+        function oeFmt(n) {
+            return (parseFloat(n)||0).toLocaleString('en-PK', {maximumFractionDigits:0});
+        }
+
+        function oeUid() { return Date.now() + Math.random().toString(36).slice(2,6); }
+
+        function oeGetMonths() {
+            const list = [];
+            const now = new Date();
+            for (let i = 0; i < 18; i++) {
+                const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+                const key = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;
+                const label = d.toLocaleDateString('en-PK', {month:'long', year:'numeric'});
+                list.push({key, label});
+            }
+            return list;
+        }
+
+        function oeInitMonthSelect() {
+            const sel = document.getElementById('oe-month-select');
+            if (!sel) return;
+            const list = oeGetMonths();
+            sel.innerHTML = list.map(m => `<option value="${m.key}">${m.label}</option>`).join('');
+            if (!oeCurrentMonth) oeCurrentMonth = list[0].key;
+            sel.value = oeCurrentMonth;
+        }
+
+        function oeSetMonth(v) {
+            oeCurrentMonth = v;
+            oeRender();
+        }
+
+        function oeGetMonthLabel() {
+            const sel = document.getElementById('oe-month-select');
+            if (!sel) return oeCurrentMonth;
+            return sel.options[sel.selectedIndex]?.text || oeCurrentMonth;
+        }
+
+        function oeGetExpenses(m) { return (oeData[m] && oeData[m].expenses) ? oeData[m].expenses : []; }
+        function oeGetIncome(m)   { return (oeData[m] && oeData[m].income)   ? oeData[m].income   : 0; }
+        function oeTotalExpenses(m) { return oeGetExpenses(m).reduce((a,e) => a + (parseFloat(e.amount)||0), 0); }
+
+        // ── Tab switching ──
+        function oeShowTab(tab) {
+            document.getElementById('oe-pane-expenses').style.display = tab === 'expenses' ? '' : 'none';
+            document.getElementById('oe-pane-reports').style.display = tab === 'reports' ? '' : 'none';
+            const tabExp = document.getElementById('oe-tab-expenses');
+            const tabRep = document.getElementById('oe-tab-reports');
+            if (tab === 'expenses') {
+                tabExp.classList.add('border-indigo-600','text-indigo-600');
+                tabExp.classList.remove('border-transparent','text-slate-500');
+                tabRep.classList.add('border-transparent','text-slate-500');
+                tabRep.classList.remove('border-indigo-600','text-indigo-600');
+            } else {
+                tabRep.classList.add('border-indigo-600','text-indigo-600');
+                tabRep.classList.remove('border-transparent','text-slate-500');
+                tabExp.classList.add('border-transparent','text-slate-500');
+                tabExp.classList.remove('border-indigo-600','text-indigo-600');
+                oeRenderReports();
+            }
+        }
+
+        // ── Apply shared-view restrictions on OE section ──
+        function oeApplySharedView() {
+            if (!isSharedView) return;
+            // Hide Expenses tab button, show only Saved Reports
+            const tabExp = document.getElementById('oe-tab-expenses');
+            if (tabExp) tabExp.style.display = 'none';
+            // Switch to reports tab
+            oeShowTab('reports');
+        }
+
+        // ── Render saved reports list ──
+        function oeRenderReports() {
+            const container = document.getElementById('oe-reports-list');
+            if (!container) return;
+            if (!allMonthlyExpenses || allMonthlyExpenses.length === 0) {
+                container.innerHTML = `<div class="text-center py-16 text-slate-400">
+                    <i class="fas fa-file-alt text-4xl mb-3 block opacity-30"></i>
+                    <p class="text-sm">Koi report nahi mili. Pehle expenses enter karo aur "Save Report" dabao.</p>
+                </div>`;
+                return;
+            }
+            const sorted = [...allMonthlyExpenses].sort((a,b) => (b.monthKey||'').localeCompare(a.monthKey||''));
+            container.innerHTML = sorted.map(r => {
+                const profit = (r.income||0) - (r.total||0);
+                const profitColor = profit >= 0 ? 'color:#059669' : 'color:#e11d48';
+                return `
+                <div class="card p-5 flex flex-col sm:flex-row items-start sm:items-center gap-4">
+                    <div class="flex-1">
+                        <div class="flex items-center gap-3 mb-2 flex-wrap">
+                            <span class="font-bold text-slate-800 text-base">${r.monthLabel || r.monthKey}</span>
+                            <span class="text-xs px-2 py-0.5 rounded-full bg-indigo-50 text-indigo-600 font-semibold">${r.monthKey}</span>
+                        </div>
+                        <div class="grid grid-cols-3 gap-3 text-sm">
+                            <div>
+                                <p class="text-xs text-slate-400 uppercase tracking-wide">Expenses</p>
+                                <p class="font-bold font-mono text-rose-600">PKR ${oeFmt(r.total)}</p>
+                            </div>
+                            <div>
+                                <p class="text-xs text-slate-400 uppercase tracking-wide">Income</p>
+                                <p class="font-bold font-mono text-indigo-600">PKR ${oeFmt(r.income)}</p>
+                            </div>
+                            <div>
+                                <p class="text-xs text-slate-400 uppercase tracking-wide">Net Profit</p>
+                                <p class="font-bold font-mono" style="${profitColor}">${profit >= 0 ? 'PKR ' : '−PKR '}${oeFmt(Math.abs(profit))}</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="flex gap-2">
+                        <button onclick="oePreviewSavedReport('${r.monthKey}')"
+                            class="bg-indigo-600 text-white px-4 py-2 rounded-full text-sm font-semibold hover:bg-indigo-700 animated-btn whitespace-nowrap">
+                            <i class="fas fa-eye mr-1"></i>Preview
+                        </button>
+                        ${!isSharedView ? `<button onclick="oePrintSavedReport('${r.monthKey}')"
+                            class="bg-slate-700 text-white px-4 py-2 rounded-full text-sm font-semibold hover:bg-slate-800 animated-btn whitespace-nowrap">
+                            <i class="fas fa-print mr-1"></i>Print
+                        </button>` : ''}
+                        ${!isSharedView ? `<button onclick="oeDeleteReport('${r.monthKey}')"
+                            class="bg-rose-50 text-rose-600 border border-rose-200 px-3 py-2 rounded-full text-sm font-semibold hover:bg-rose-100 animated-btn">
+                            <i class="fas fa-trash"></i>
+                        </button>` : ''}
+                    </div>
+                </div>`;
+            }).join('');
+        }
+
+        // ── Build report HTML (used for both current and saved reports) ──
+        function oeBuildReportHtml(monthKey, monthLabel, expenses, income) {
+            const total = expenses.reduce((a,e) => a + (parseFloat(e.amount)||0), 0);
+            const profit = income - total;
+            const sorted = [...expenses].sort((a,b) => OE_CAT_ORDER.indexOf(a.cat) - OE_CAT_ORDER.indexOf(b.cat));
+
+            let rowNum = 0;
+            let lastCat = '';
+            let tableRows = '';
+            sorted.forEach(e => {
+                if (e.cat !== lastCat) {
+                    tableRows += `<tr style="background:#3d2fa0;color:#fff;">
+                        <td colspan="5" style="padding:5px 10px;font-size:11px;font-weight:600;letter-spacing:.4px;text-transform:uppercase;">${OE_CATS[e.cat]||e.cat}</td>
+                    </tr>`;
+                    lastCat = e.cat;
+                }
+                rowNum++;
+                tableRows += `<tr>
+                    <td style="width:32px;color:#8888aa;font-size:11px;padding:7px 10px;border:1px solid #dddce8;">${rowNum}</td>
+                    <td style="padding:7px 10px;border:1px solid #dddce8;font-size:12px;">${OE_CATS[e.cat]||e.cat}</td>
+                    <td style="padding:7px 10px;border:1px solid #dddce8;font-size:12px;">${e.desc}</td>
+                    <td style="padding:7px 10px;border:1px solid #dddce8;font-size:12px;text-align:right;font-family:monospace;">${e.breakdown||'—'}</td>
+                    <td style="padding:7px 10px;border:1px solid #dddce8;font-size:12px;text-align:right;font-family:monospace;">PKR ${oeFmt(e.amount)}</td>
+                </tr>`;
+            });
+
+            if (!tableRows) tableRows = `<tr><td colspan="5" style="padding:20px;text-align:center;color:#8888aa;font-size:12px;">No expenses recorded.</td></tr>`;
+
+            return `<!DOCTYPE html><html><head><meta charset="UTF-8">
+            <title>Expense Report — ${monthLabel}</title>
+            <style>
+                * { box-sizing:border-box; margin:0; padding:0; }
+                body { font-family:'Segoe UI',Arial,sans-serif; background:#fff; color:#1a1a2e; font-size:14px; }
+                .page { max-width:820px; margin:0 auto; padding:32px; }
+                .report-header { text-align:center; margin-bottom:24px; border-bottom:3px double #3d2fa0; padding-bottom:16px; }
+                .report-header h1 { font-size:18px; font-weight:700; color:#3d2fa0; letter-spacing:-.3px; }
+                .report-header h2 { font-size:14px; font-weight:500; color:#4a4a6a; margin-top:2px; }
+                .report-header p  { font-size:12px; color:#8888aa; margin-top:4px; }
+                .report-meta { display:flex; justify-content:space-between; margin-bottom:20px; font-size:12px; }
+                .report-meta strong { color:#1a1a2e; display:block; }
+                .report-meta span { color:#4a4a6a; }
+                table { width:100%; border-collapse:collapse; margin-bottom:16px; border:1px solid #dddce8; }
+                thead th { background:#f4f3f8; padding:7px 10px; font-size:11px; font-weight:600; text-transform:uppercase; letter-spacing:.3px; color:#4a4a6a; border:1px solid #dddce8; text-align:left; }
+                .summary { margin-top:20px; border:1px solid #dddce8; border-radius:8px; overflow:hidden; }
+                .sum-row { display:flex; justify-content:space-between; align-items:center; padding:9px 14px; border-bottom:1px solid #dddce8; font-size:13px; }
+                .sum-row:last-child { border-bottom:none; }
+                .sum-row.hl { background:#eceaf4; }
+                .sum-row.profit { background:#3d2fa0; color:#fff; }
+                .sum-val { font-family:monospace; font-weight:700; font-size:14px; }
+                .sig { display:flex; justify-content:space-between; margin-top:24px; font-size:12px; }
+                .sig > div { text-align:center; flex:1; }
+                .sig-line { border-bottom:1px solid #1a1a2e; margin:0 10px 4px; height:28px; }
+                .cert { margin-top:16px; text-align:center; font-size:11px; color:#8888aa; border-top:1px solid #dddce8; padding-top:12px; }
+                @media print { body { -webkit-print-color-adjust:exact; print-color-adjust:exact; } }
+            </style></head><body>
+            <div class="page">
+                <div class="report-header">
+                    <h1>Darson Securities (Pvt) Limited</h1>
+                    <h2>Sargodha Branch</h2>
+                    <p>MONTHLY EXPENSE REPORT — ${monthLabel.toUpperCase()}</p>
+                </div>
+                <div class="report-meta">
+                    <div><span>Prepared by:</span><strong>Afrasiab Asghar</strong></div>
+                    <div style="text-align:right"><span>Signed by:</span><strong>Zafar Hayat</strong></div>
+                </div>
+                <table>
+                    <thead><tr>
+                        <th style="width:36px">#</th>
+                        <th>Category</th>
+                        <th>Description</th>
+                        <th style="text-align:right;width:130px">Breakdown</th>
+                        <th style="text-align:right;width:120px">Amount (PKR)</th>
+                    </tr></thead>
+                    <tbody>${tableRows}</tbody>
+                </table>
+                <div class="summary">
+                    <div class="sum-row hl"><span>GROSS TOTAL EXPENSES</span><span class="sum-val">PKR ${oeFmt(total)}</span></div>
+                    <div class="sum-row hl"><span>NET TOTAL EXPENSE</span><span class="sum-val">PKR ${oeFmt(total)}</span></div>
+                    <div class="sum-row"><span>GROSS INCOME</span><span class="sum-val">PKR ${oeFmt(income)}</span></div>
+                    <div class="sum-row profit"><span>NET PROFIT (Gross Income − Net Total Expense)</span><span class="sum-val">PKR ${oeFmt(profit)}</span></div>
+                </div>
+                <div class="sig">
+                    <div><div class="sig-line"></div><div style="font-weight:600">Afrasiab Asghar</div><div style="color:#8888aa">Prepared by</div></div>
+                    <div><div class="sig-line"></div><div style="font-weight:600">Zafar Hayat</div><div style="color:#8888aa">Branch Manager</div></div>
+                </div>
+                <div class="cert">
+                    This report is certified accurate and approved by the Branch Manager.<br>
+                    Darson Securities (Pvt) Limited | Sargodha Branch | ${monthLabel}
+                </div>
+            </div></body></html>`;
+        }
+
+        // ── Print current month's report ──
+        function oePrintReport() {
+            const m = oeCurrentMonth;
+            const label = oeGetMonthLabel();
+            const exps = oeGetExpenses(m);
+            const income = oeGetIncome(m);
+            if (!exps.length) { showMessage('Empty', 'Is month ke liye koi expense nahi hai.'); return; }
+            const html = oeBuildReportHtml(m, label, exps, income);
+            const win = window.open('', '_blank');
+            win.document.write(html);
+            win.document.close();
+            win.onload = () => { win.focus(); win.print(); };
+        }
+
+        // ── Preview a saved report in modal (frontend & backend) ──
+        function oePreviewSavedReport(monthKey) {
+            const rec = allMonthlyExpenses.find(r => r.monthKey === monthKey);
+            if (!rec) { showMessage('Error', 'Report nahi mili.'); return; }
+            const exps = rec.expenses || [];
+            const html = oeBuildReportHtml(rec.monthKey, rec.monthLabel || rec.monthKey, exps, rec.income || 0);
+            const blob = new Blob([html], { type: 'text/html' });
+            const blobUrl = URL.createObjectURL(blob);
+            document.getElementById('oe-report-preview-frame').src = blobUrl;
+            document.getElementById('oe-report-preview-title').textContent = 'Report Preview — ' + (rec.monthLabel || rec.monthKey);
+            document.getElementById('oe-report-preview-modal').style.display = 'flex';
+        }
+
+        // ── Print a saved report by monthKey (backend only) ──
+        function oePrintSavedReport(monthKey) {
+            const rec = allMonthlyExpenses.find(r => r.monthKey === monthKey);
+            if (!rec) { showMessage('Error', 'Report nahi mili.'); return; }
+            const exps = rec.expenses || [];
+            const html = oeBuildReportHtml(rec.monthKey, rec.monthLabel || rec.monthKey, exps, rec.income || 0);
+            const win = window.open('', '_blank');
+            win.document.write(html);
+            win.document.close();
+            win.onload = () => { win.focus(); win.print(); };
+        }
+
+        // ── Delete a saved report ──
+        async function oeDeleteReport(monthKey) {
+            if (!currentUserId || isSharedView) return;
+            if (!confirm(`${monthKey} ki report delete karni hai?`)) return;
+            showLoading();
+            try {
+                await db.collection(`users/${currentUserId}/monthly_expenses`).doc(monthKey).delete();
+                showMessage('Deleted', 'Report delete ho gayi.');
+            } catch(err) {
+                showMessage('Error', err.message);
+            } finally {
+                hideLoading();
+            }
+        }
+
+        function oeRender() {
+            const m = oeCurrentMonth;
+            const exps = oeGetExpenses(m);
+            const total = oeTotalExpenses(m);
+            const income = oeGetIncome(m);
+            const profit = income - total;
+
+            document.getElementById('oe-stat-entries').textContent = exps.length;
+            document.getElementById('oe-stat-total').textContent = 'PKR ' + oeFmt(total);
+            document.getElementById('oe-stat-income').textContent = 'PKR ' + oeFmt(income);
+            const profitEl = document.getElementById('oe-stat-profit');
+            profitEl.textContent = profit >= 0 ? 'PKR ' + oeFmt(profit) : '−PKR ' + oeFmt(Math.abs(profit));
+            profitEl.style.color = profit >= 0 ? '#059669' : '#e11d48';
+
+            document.getElementById('oe-table-title').textContent = 'Expenses — ' + oeGetMonthLabel();
+
+            const incEl = document.getElementById('oe-income-input');
+            if (incEl) incEl.value = income || '';
+
+            const tbody = document.getElementById('oe-expense-tbody');
+            if (!tbody) return;
+            if (exps.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="6" class="text-center py-10 text-slate-400 text-sm">No expenses for this month. Add manually or use Bulk Import.</td></tr>`;
+                document.getElementById('oe-table-footer').classList.add('hidden');
+            } else {
+                tbody.innerHTML = exps.map((e, i) => `
+                    <tr class="border-b border-slate-100 hover:bg-slate-50">
+                        <td class="px-4 py-2 text-slate-400 text-xs">${i+1}</td>
+                        <td class="px-4 py-2"><span style="display:inline-block;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:600;${OE_CAT_COLORS[e.cat]||''}">${OE_CATS[e.cat]||e.cat}</span></td>
+                        <td class="px-4 py-2 text-sm">${e.desc}</td>
+                        <td class="px-4 py-2 text-xs text-slate-400 font-mono">${e.breakdown||'—'}</td>
+                        <td class="px-4 py-2 text-right font-mono font-semibold text-sm">PKR ${oeFmt(e.amount)}</td>
+                        <td class="px-4 py-2">
+                            <div class="flex gap-1 justify-end actions-header">
+                                <button onclick="oeEditExpense('${e.id}')" class="text-xs px-3 py-1 rounded-full bg-slate-100 text-slate-600 hover:bg-slate-200 font-semibold">Edit</button>
+                                <button onclick="oeDeleteExpense('${e.id}')" class="text-xs px-3 py-1 rounded-full bg-rose-50 text-rose-600 hover:bg-rose-100 font-semibold">Del</button>
+                            </div>
+                        </td>
+                    </tr>`).join('');
+                const footEl = document.getElementById('oe-table-footer');
+                footEl.textContent = 'Total: PKR ' + oeFmt(total);
+                footEl.classList.remove('hidden');
+            }
+
+            if (isSharedView) {
+                const ab = document.getElementById('oe-action-btns');
+                const fw = document.getElementById('oe-add-forms-wrapper');
+                const fw2 = document.getElementById('oe-add-forms-wrapper2');
+                if (ab) ab.style.display = 'none';
+                if (fw) fw.style.display = 'none';
+                if (fw2) fw2.style.display = 'none';
+                document.querySelectorAll('#expenses .actions-header').forEach(el => el.style.display = 'none');
+                oeApplySharedView();
+            }
+        }
+
+        function oeOpenAddModal(id) {
+            oeEditId = id || null;
+            document.getElementById('oe-modal-title').textContent = id ? 'Edit Expense' : 'Add Expense';
+            document.getElementById('oe-save-btn').textContent = id ? 'Update' : 'Save Expense';
+            if (id) {
+                const exp = oeGetExpenses(oeCurrentMonth).find(e => e.id === id);
+                if (exp) {
+                    document.getElementById('oe-f-cat').value = exp.cat;
+                    document.getElementById('oe-f-desc').value = exp.desc;
+                    document.getElementById('oe-f-breakdown').value = exp.breakdown || '';
+                    document.getElementById('oe-f-amount').value = exp.amount;
+                }
+            } else {
+                document.getElementById('oe-f-cat').value = 'STAFF';
+                document.getElementById('oe-f-desc').value = '';
+                document.getElementById('oe-f-breakdown').value = '';
+                document.getElementById('oe-f-amount').value = '';
+            }
+            document.getElementById('oe-add-modal').style.display = 'flex';
+        }
+
+        function oeEditExpense(id) { oeOpenAddModal(id); }
+
+        function oeSaveExpense() {
+            const cat = document.getElementById('oe-f-cat').value;
+            const desc = document.getElementById('oe-f-desc').value.trim();
+            const breakdown = document.getElementById('oe-f-breakdown').value.trim();
+            const amount = parseFloat(document.getElementById('oe-f-amount').value) || 0;
+            if (!desc) { showMessage('Error', 'Please enter a description'); return; }
+            if (!amount) { showMessage('Error', 'Please enter an amount'); return; }
+            const m = oeCurrentMonth;
+            if (!oeData[m]) oeData[m] = { expenses: [], income: 0 };
+            if (oeEditId) {
+                const idx = oeData[m].expenses.findIndex(e => e.id === oeEditId);
+                if (idx >= 0) oeData[m].expenses[idx] = { ...oeData[m].expenses[idx], cat, desc, breakdown, amount };
+            } else {
+                oeData[m].expenses.push({ id: oeUid(), cat, desc, breakdown, amount });
+            }
+            oeCloseModal('oe-add-modal');
+            oeRender();
+        }
+
+        function oeDeleteExpense(id) {
+            if (!confirm('Delete this expense?')) return;
+            const m = oeCurrentMonth;
+            if (oeData[m]) oeData[m].expenses = oeData[m].expenses.filter(e => e.id !== id);
+            oeRender();
+        }
+
+        function oeSaveIncome() {
+            const v = parseFloat(document.getElementById('oe-income-input').value) || 0;
+            const m = oeCurrentMonth;
+            if (!oeData[m]) oeData[m] = { expenses: [], income: 0 };
+            oeData[m].income = v;
+            oeRender();
+        }
+
+        async function oeSaveMonthlyTotal() {
+            if (!currentUserId || isSharedView) return;
+            const m = oeCurrentMonth;
+            const total = oeTotalExpenses(m);
+            const income = oeGetIncome(m);
+            const exps = oeGetExpenses(m);
+            const label = oeGetMonthLabel();
+            if (!exps.length) { showMessage('Empty', 'Is month ke liye koi expense nahi hai. Pehle add karo.'); return; }
+            showLoading();
+            try {
+                await db.collection(`users/${currentUserId}/monthly_expenses`).doc(m).set({
+                    monthKey: m,
+                    monthLabel: label,
+                    total: total,
+                    income: income,
+                    expenses: exps,
+                    updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                });
+                showMessage('Saved ✓', `${label} ki report save ho gayi (PKR ${oeFmt(total)}). Dashboard graph update ho jayega.`);
+            } catch(err) {
+                showMessage('Error', 'Save nahi hua: ' + err.message);
+            } finally {
+                hideLoading();
+            }
+        }
+
+        function oeCloseModal(id) {
+            document.getElementById(id).style.display = 'none';
+        }
+
+        function oeOpenBulkModal() {
+            document.getElementById('oe-bulk-text').value = '';
+            document.getElementById('oe-bulk-preview').innerHTML = '';
+            document.getElementById('oe-confirm-bulk-btn').style.display = 'none';
+            window.oeParsedBulk = [];
+            document.getElementById('oe-bulk-modal').style.display = 'flex';
+        }
+
+        function oeParseBulk() {
+            const text = document.getElementById('oe-bulk-text').value;
+            const lines = text.split('\n').map(l => l.trim()).filter(l => l.length > 2);
+            window.oeParsedBulk = lines.map(line => ({
+                id: oeUid(),
+                cat: oeGuessCategory(line),
+                desc: oeCleanDesc(line) || line,
+                breakdown: '',
+                amount: oeExtractAmount(line),
+                _raw: line
+            })).filter(e => e.amount > 0);
+
+            if (!window.oeParsedBulk.length) {
+                document.getElementById('oe-bulk-preview').innerHTML = '<p style="color:#e11d48;font-size:12px;margin-top:10px">No valid expense lines detected. Make sure each line has an amount.</p>';
+                document.getElementById('oe-confirm-bulk-btn').style.display = 'none';
+                return;
+            }
+
+            const catOptions = Object.entries(OE_CATS).map(([k,v]) => `<option value="${k}">${v}</option>`).join('');
+            const rows = window.oeParsedBulk.map((e, i) => `
+                <tr class="border-b border-slate-100">
+                    <td class="p-1.5 text-slate-400 text-xs">${i+1}</td>
+                    <td class="p-1.5">
+                        <select onchange="window.oeParsedBulk[${i}].cat=this.value" class="text-xs px-2 py-1 border rounded-full">
+                            ${catOptions.replace(`value="${e.cat}"`, `value="${e.cat}" selected`)}
+                        </select>
+                    </td>
+                    <td class="p-1.5"><input type="text" value="${e.desc}" oninput="window.oeParsedBulk[${i}].desc=this.value" class="text-xs px-2 py-1 border rounded-full w-44"/></td>
+                    <td class="p-1.5 text-right font-mono text-xs font-semibold">PKR ${oeFmt(e.amount)}</td>
+                </tr>`).join('');
+
+            document.getElementById('oe-bulk-preview').innerHTML = `
+                <p class="text-xs text-emerald-600 mt-3 mb-2 font-semibold">✓ ${window.oeParsedBulk.length} expense(s) parsed. Review below:</p>
+                <div class="overflow-x-auto border rounded-xl">
+                    <table class="w-full text-left text-sm">
+                        <thead><tr class="bg-slate-50 text-slate-400 text-xs uppercase">
+                            <th class="p-1.5">#</th><th class="p-1.5">Category</th><th class="p-1.5">Description</th><th class="p-1.5 text-right">Amount</th>
+                        </tr></thead>
+                        <tbody>${rows}</tbody>
+                    </table>
+                </div>`;
+            document.getElementById('oe-confirm-bulk-btn').style.display = 'inline-flex';
+        }
+
+        function oeConfirmBulk() {
+            const m = oeCurrentMonth;
+            if (!oeData[m]) oeData[m] = { expenses: [], income: 0 };
+            window.oeParsedBulk.forEach(e => oeData[m].expenses.push(e));
+            oeCloseModal('oe-bulk-modal');
+            oeRender();
+        }
+
+        function startMonthlyExpensesListener() {
+            const unsub = db.collection(`users/${currentUserId}/monthly_expenses`)
+                .onSnapshot(snapshot => {
+                    allMonthlyExpenses = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                    updateDashboard();
+                    // Refresh reports tab if visible
+                    const repPane = document.getElementById('oe-pane-reports');
+                    if (repPane && repPane.style.display !== 'none') oeRenderReports();
+                }, err => console.error('Error listening to monthly_expenses:', err));
+            unsubscribeListeners.push(unsub);
+        }
+
+        // ─── END OFFICE EXPENSE MANAGER MODULE ──────────────────────────────
+        // ═══════════════════════════════════════════════════════════════════
 
         document.getElementById('add-expense-form').addEventListener('submit', async (e) => {
             e.preventDefault();
@@ -5395,6 +6049,8 @@
                 await batch.commit();
                 _pendingImportedExpenses = [];
                 document.getElementById('expense-file-upload').value = '';
+                const bulkTA = document.getElementById('bulk-expense-text');
+                if (bulkTA) bulkTA.value = '';
                 showMessage('Success', `${count} expenses have been added successfully.`);
             } catch (error) {
                 showMessage('Error', error.message);
@@ -5403,6 +6059,95 @@
             }
         });
         // ─── End Expense File Import Logic ──────────────────────────────────
+
+        // ─── BULK TEXT AUTO-FETCH LOGIC ───────────────────────────────────────
+        function parseBulkExpenseText(text) {
+            const expenses = [];
+            const lines = text.split(/\r?\n/);
+            for (const line of lines) {
+                const trimmed = line.trim();
+                if (!trimmed) continue;
+                // Remove PKR/Rs prefix
+                const cleaned = trimmed.replace(/\bpkr\b/gi, '').replace(/\brs\.?\b/gi, '').trim();
+                // Find all numbers in line
+                const numMatches = [...cleaned.matchAll(/[\d,]+(?:\.\d+)?/g)];
+                if (!numMatches.length) continue;
+                const lastNum = numMatches[numMatches.length - 1];
+                const amount = parseFloat(lastNum[0].replace(/,/g, ''));
+                if (isNaN(amount) || amount <= 0) continue;
+                // Name = everything before the last number
+                let nameRaw = cleaned.slice(0, lastNum.index).trim().replace(/[-\u2013,\s]+$/, '').trim();
+                if (!nameRaw) nameRaw = cleaned.replace(lastNum[0], '').trim();
+                if (!nameRaw) continue;
+                const finalName = nameRaw.charAt(0).toUpperCase() + nameRaw.slice(1);
+                expenses.push({ name: finalName, amount });
+            }
+            return expenses;
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const bulkDateInput = document.getElementById('bulk-expense-date');
+            if (bulkDateInput && !bulkDateInput.value) {
+                bulkDateInput.value = new Date().toISOString().split('T')[0];
+            }
+        });
+
+        document.getElementById('bulk-fetch-expenses-btn').addEventListener('click', () => {
+            const textInput = document.getElementById('bulk-expense-text');
+            const dateInput = document.getElementById('bulk-expense-date');
+            const rawText = textInput ? textInput.value.trim() : '';
+            if (!rawText) {
+                return showMessage('Error', 'Pehle expenses ka text paste karo textarea mein.');
+            }
+            if (!dateInput || !dateInput.value) {
+                return showMessage('Error', 'Date select karo imported expenses ke liye.');
+            }
+            const expenses = parseBulkExpenseText(rawText);
+            if (!expenses.length) {
+                return showMessage('Error', 'Koi bhi expense detect nahi hua. Format check karo \u2014 har line mein naam phir amount hona chahiye.');
+            }
+            // Sync date to file-import date field so confirm handler works
+            document.getElementById('expense-import-date').value = dateInput.value;
+            _pendingImportedExpenses = expenses;
+
+            const tbody = document.getElementById('expense-import-preview-list');
+            tbody.innerHTML = expenses.map((exp, i) => `
+                <tr class="border-b" id="imp-row-${i}">
+                    <td class="p-2 text-slate-400">${i + 1}</td>
+                    <td class="p-2 font-medium" colspan="2">${exp.name}</td>
+                    <td class="p-2 text-right text-rose-600 font-semibold">PKR ${exp.amount.toLocaleString()}</td>
+                    <td class="p-2 text-center">
+                        <input type="checkbox" class="imp-home-chk w-4 h-4 accent-amber-500 cursor-pointer" data-idx="${i}"
+                            title="Mark as Home Expense">
+                    </td>
+                </tr>
+            `).join('');
+
+            function updateBulkTotals() {
+                const checkboxes = document.querySelectorAll('.imp-home-chk');
+                let officeTotal = 0, homeTotal = 0;
+                checkboxes.forEach((chk, idx) => {
+                    const amt = _pendingImportedExpenses[idx].amount;
+                    if (chk.checked) { homeTotal += amt; document.getElementById(`imp-row-${idx}`).style.opacity = '0.55'; }
+                    else { officeTotal += amt; document.getElementById(`imp-row-${idx}`).style.opacity = '1'; }
+                });
+                document.getElementById('expense-import-office-total').textContent = `PKR ${officeTotal.toLocaleString()}`;
+                document.getElementById('expense-import-home-total').textContent = `PKR ${homeTotal.toLocaleString()}`;
+                const totalIn = allPettyCashEntries.reduce((s, e) => s + e.amount, 0);
+                const totalOut = allExpenses.reduce((s, e) => s + e.amount, 0);
+                const bal = totalIn - totalOut;
+                const dw = document.getElementById('expense-import-debt-warning');
+                if (officeTotal > bal) {
+                    dw.textContent = `Warning: Office expenses (PKR ${officeTotal.toLocaleString()}) exceed balance (PKR ${bal.toLocaleString()}). Debt: PKR ${(officeTotal - bal).toLocaleString()}.`;
+                    dw.classList.remove('hidden');
+                } else { dw.classList.add('hidden'); }
+            }
+
+            document.querySelectorAll('.imp-home-chk').forEach(chk => chk.addEventListener('change', updateBulkTotals));
+            updateBulkTotals();
+            document.getElementById('expense-import-preview-modal').style.display = 'flex';
+        });
+        // ─── END BULK TEXT AUTO-FETCH LOGIC ──────────────────────────────────
 
         function renderExpenses() {
             document.getElementById('add-expense-forms-wrapper').style.display = isSharedView ? 'none' : 'block';
@@ -5431,8 +6176,8 @@
             const openingBalance = previousCashIn - previousExpenses;
             document.getElementById('opening-balance-display').textContent = `PKR ${openingBalance.toLocaleString()}`;
 
-            const cashInThisMonth = allPettyCashEntries.filter(e => { const date = new Date(e.date); return date.getMonth() === selectedMonth && date.getFullYear() === selectedYear; }).map(e => ({ id: e.id, date: e.date, description: 'Petty Cash In', cr: e.amount, dr: 0, type: 'petty_cash', isHome: false }));
-            const expensesThisMonth = allExpenses.filter(e => { const date = new Date(e.date); return date.getMonth() === selectedMonth && date.getFullYear() === selectedYear; }).map(e => ({ id: e.id, date: e.date, description: e.name, cr: 0, dr: e.amount, type: 'expenses', isHome: !!e.isHome }));
+            const cashInThisMonth = allPettyCashEntries.filter(e => { const date = new Date(e.date); return date.getMonth() === selectedMonth && date.getFullYear() === selectedYear; }).map(e => ({ id: e.id, date: e.date, description: 'Petty Cash In', notes: e.notes || '', cr: e.amount, dr: 0, type: 'petty_cash', isHome: false }));
+            const expensesThisMonth = allExpenses.filter(e => { const date = new Date(e.date); return date.getMonth() === selectedMonth && date.getFullYear() === selectedYear; }).map(e => ({ id: e.id, date: e.date, description: e.name, notes: e.notes || '', cr: 0, dr: e.amount, type: 'expenses', isHome: !!e.isHome }));
             const transactions = [...cashInThisMonth, ...expensesThisMonth].sort((a, b) => new Date(a.date) - new Date(b.date));
 
             const statementList = document.getElementById('expense-statement-list');
@@ -5448,7 +6193,7 @@
                 return `
                     <tr class="border-b" style="${rowStyle}">
                         <td class="p-2">${new Date(t.date).toLocaleDateString()}</td>
-                        <td class="p-2">${t.description}${homeTag}</td>
+                        <td class="p-2">${t.description}${homeTag}${t.notes ? `<br><span style="font-size:0.72rem;color:#64748b;font-style:italic;"><i class="fas fa-sticky-note" style="color:#a5b4fc;margin-right:3px;"></i>${t.notes}</span>` : ''}</td>
                         <td class="p-2 text-right text-rose-600">${t.dr > 0 ? `PKR ${t.dr.toLocaleString()}` : '-'}</td>
                         <td class="p-2 text-right text-emerald-600">${t.cr > 0 ? `PKR ${t.cr.toLocaleString()}` : '-'}</td>
                         <td class="p-2 text-right font-semibold">PKR ${runningBalance.toLocaleString()}</td>
@@ -9519,6 +10264,10 @@ ${(d.totalDeductions > 0) ? `
             populateMonthDropdown(document.getElementById('salary-slip-section-month'));
             populateMonthDropdown(document.getElementById('bulk-commission-month'));
             populateMonthDropdown(document.getElementById('payroll-month'));
+            
+            // Initialize Office Expense Manager
+            oeInitMonthSelect();
+            oeRender();
             
             initializeCalculator();
         });
