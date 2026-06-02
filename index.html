@@ -2113,6 +2113,11 @@
                                     class="px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-indigo-500 w-full sm:w-auto"></select>
                             </div>
 
+                            <!-- LOADED BADGE -->
+                            <div id="oe-loaded-badge" style="display:none;" class="mb-4 px-4 py-2 bg-emerald-50 border border-emerald-200 rounded-full text-emerald-700 text-sm font-semibold flex items-center gap-2">
+                                <i class="fas fa-check-circle"></i><span></span>
+                            </div>
+
                             <!-- STATS BAR -->
                             <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
                                 <div class="card p-4">
@@ -2186,6 +2191,20 @@
                                         </button>
                                     </div>
                                 </div>
+                            </div>
+
+                            <!-- IMPORT FROM OLD DATA -->
+                            <div id="oe-import-old-wrapper" class="card p-5 mb-6 border-2 border-dashed border-amber-300 bg-amber-50">
+                                <div class="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+                                    <div class="flex-1">
+                                        <p class="font-semibold text-amber-800"><i class="fas fa-history mr-2"></i>Import Old Expense Data</p>
+                                        <p class="text-xs text-amber-600 mt-1">Purane system ki expenses (petty cash ledger) se month-wise reports automatically bana ke Saved Reports mein add karo.</p>
+                                    </div>
+                                    <button onclick="oeImportOldData()" class="bg-amber-500 text-white px-5 py-2 rounded-full font-semibold hover:bg-amber-600 animated-btn text-sm whitespace-nowrap flex-shrink-0">
+                                        <i class="fas fa-file-import mr-2"></i>Import Old Data
+                                    </button>
+                                </div>
+                                <div id="oe-import-log" class="mt-3 hidden text-xs font-mono text-amber-900 bg-amber-100 rounded-lg p-3 max-h-48 overflow-y-auto space-y-1"></div>
                             </div>
 
                         </div><!-- end oe-pane-expenses -->
@@ -5404,11 +5423,37 @@
             sel.innerHTML = list.map(m => `<option value="${m.key}">${m.label}</option>`).join('');
             if (!oeCurrentMonth) oeCurrentMonth = list[0].key;
             sel.value = oeCurrentMonth;
+            // Load saved data for current month if available
+            oeSetMonth(oeCurrentMonth);
         }
 
         function oeSetMonth(v) {
             oeCurrentMonth = v;
+            // If this month has a saved report in Firebase, load it into oeData for editing
+            if (allMonthlyExpenses && allMonthlyExpenses.length) {
+                const saved = allMonthlyExpenses.find(r => r.monthKey === v);
+                if (saved) {
+                    oeData[v] = {
+                        expenses: (saved.expenses || []).map(e => ({ ...e, id: e.id || oeUid() })),
+                        income: saved.income || 0
+                    };
+                    oeShowLoadedBadge(true, saved.monthLabel || v);
+                } else {
+                    oeShowLoadedBadge(false, null);
+                }
+            }
             oeRender();
+        }
+
+        function oeShowLoadedBadge(loaded, label) {
+            const badge = document.getElementById('oe-loaded-badge');
+            if (!badge) return;
+            if (loaded) {
+                badge.querySelector('span').textContent = '↓ ' + label + ' ki saved report load ho gayi — ab edit karo aur re-save karo.';
+                badge.style.display = 'flex';
+            } else {
+                badge.style.display = 'none';
+            }
         }
 
         function oeGetMonthLabel() {
@@ -5740,6 +5785,7 @@
             if (!amount) { showMessage('Error', 'Please enter an amount'); return; }
             const m = oeCurrentMonth;
             if (!oeData[m]) oeData[m] = { expenses: [], income: 0 };
+            oeData[m]._dirty = true;
             if (oeEditId) {
                 const idx = oeData[m].expenses.findIndex(e => e.id === oeEditId);
                 if (idx >= 0) oeData[m].expenses[idx] = { ...oeData[m].expenses[idx], cat, desc, breakdown, amount };
@@ -5753,7 +5799,10 @@
         function oeDeleteExpense(id) {
             if (!confirm('Delete this expense?')) return;
             const m = oeCurrentMonth;
-            if (oeData[m]) oeData[m].expenses = oeData[m].expenses.filter(e => e.id !== id);
+            if (oeData[m]) {
+                oeData[m].expenses = oeData[m].expenses.filter(e => e.id !== id);
+                oeData[m]._dirty = true;
+            }
             oeRender();
         }
 
@@ -5762,6 +5811,7 @@
             const m = oeCurrentMonth;
             if (!oeData[m]) oeData[m] = { expenses: [], income: 0 };
             oeData[m].income = v;
+            oeData[m]._dirty = true;
             oeRender();
         }
 
@@ -5783,6 +5833,8 @@
                     expenses: exps,
                     updatedAt: firebase.firestore.FieldValue.serverTimestamp()
                 });
+                if (oeData[m]) oeData[m]._dirty = false;
+                oeShowLoadedBadge(true, label);
                 showMessage('Saved ✓', `${label} ki report save ho gayi (PKR ${oeFmt(total)}). Dashboard graph update ho jayega.`);
             } catch(err) {
                 showMessage('Error', 'Save nahi hua: ' + err.message);
@@ -5790,6 +5842,115 @@
                 hideLoading();
             }
         }
+
+        // ── Import from old expenses/petty_cash collections ──────────────────────
+        async function oeImportOldData() {
+            if (!currentUserId || isSharedView) return;
+            const logEl = document.getElementById('oe-import-log');
+            logEl.innerHTML = '';
+            logEl.classList.remove('hidden');
+
+            function log(msg, color) {
+                const el = document.createElement('div');
+                el.style.color = color || '#78350f';
+                el.textContent = msg;
+                logEl.appendChild(el);
+                logEl.scrollTop = logEl.scrollHeight;
+            }
+
+            log('⏳ Purani expenses fetch ho rahi hain...');
+
+            try {
+                // Fetch old expenses and petty_cash
+                const [expSnap, pcSnap, savedSnap] = await Promise.all([
+                    db.collection(`users/${currentUserId}/expenses`).get(),
+                    db.collection(`users/${currentUserId}/petty_cash`).get(),
+                    db.collection(`users/${currentUserId}/monthly_expenses`).get()
+                ]);
+
+                const oldExpenses = expSnap.docs.map(d => ({ ...d.data(), id: d.id }));
+                const oldPettyCash = pcSnap.docs.map(d => ({ ...d.data(), id: d.id }));
+                const alreadySaved = new Set(savedSnap.docs.map(d => d.id));
+
+                log(`✓ ${oldExpenses.length} expenses, ${oldPettyCash.length} petty cash entries mili.`);
+
+                if (!oldExpenses.length && !oldPettyCash.length) {
+                    log('⚠ Koi purani data nahi mili.', '#b45309');
+                    return;
+                }
+
+                const monthNames = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+
+                // Group expenses by YYYY-MM
+                const byMonth = {};
+                oldExpenses.forEach(e => {
+                    if (!e.date) return;
+                    const d = new Date(e.date);
+                    if (isNaN(d)) return;
+                    const key = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;
+                    if (!byMonth[key]) byMonth[key] = { expenses: [], cashIn: 0, label: `${monthNames[d.getMonth()]} ${d.getFullYear()}` };
+                    byMonth[key].expenses.push(e);
+                });
+
+                // Add petty cash totals per month as income
+                oldPettyCash.forEach(e => {
+                    if (!e.date) return;
+                    const d = new Date(e.date);
+                    if (isNaN(d)) return;
+                    const key = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;
+                    if (!byMonth[key]) byMonth[key] = { expenses: [], cashIn: 0, label: `${monthNames[d.getMonth()]} ${d.getFullYear()}` };
+                    byMonth[key].cashIn += parseFloat(e.amount) || 0;
+                });
+
+                const sortedKeys = Object.keys(byMonth).sort();
+                log(`📅 ${sortedKeys.length} mahine mile: ${sortedKeys.join(', ')}`);
+
+                let saved = 0, skipped = 0;
+
+                for (const key of sortedKeys) {
+                    if (alreadySaved.has(key)) {
+                        log(`⏭ ${key} already saved — skip.`, '#6b7280');
+                        skipped++;
+                        continue;
+                    }
+
+                    const rec = byMonth[key];
+                    // Convert old expense entries → OE format (OPERATIONS category)
+                    const oeEntries = rec.expenses.map(e => ({
+                        id: 'old_' + (e.id || Math.random().toString(36).slice(2)),
+                        cat: e.isHome ? 'OPERATIONS' : 'OPERATIONS',
+                        desc: e.name || 'Expense',
+                        breakdown: e.isHome ? '🏠 Home' : '',
+                        amount: parseFloat(e.amount) || 0
+                    }));
+
+                    const total = oeEntries.reduce((a, e) => a + e.amount, 0);
+                    const income = rec.cashIn;
+
+                    await db.collection(`users/${currentUserId}/monthly_expenses`).doc(key).set({
+                        monthKey: key,
+                        monthLabel: rec.label,
+                        total: total,
+                        income: income,
+                        expenses: oeEntries,
+                        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                    });
+
+                    log(`✅ ${rec.label} — ${oeEntries.length} entries, PKR ${total.toLocaleString()} saved.`, '#065f46');
+                    saved++;
+                }
+
+                log(`
+🎉 Done! ${saved} reports save hue, ${skipped} skip (already existed).`, '#1e40af');
+
+                // Refresh saved reports
+                oeRenderReports();
+
+            } catch(err) {
+                log('❌ Error: ' + err.message, '#be123c');
+            }
+        }
+        // ─────────────────────────────────────────────────────────────────────────
 
         function oeCloseModal(id) {
             document.getElementById(id).style.display = 'none';
@@ -5863,6 +6024,18 @@
                     // Refresh reports tab if visible
                     const repPane = document.getElementById('oe-pane-reports');
                     if (repPane && repPane.style.display !== 'none') oeRenderReports();
+                    // Reload current month data into oeData if a saved report exists
+                    if (oeCurrentMonth) {
+                        const saved = allMonthlyExpenses.find(r => r.monthKey === oeCurrentMonth);
+                        if (saved && (!oeData[oeCurrentMonth] || !oeData[oeCurrentMonth]._dirty)) {
+                            oeData[oeCurrentMonth] = {
+                                expenses: (saved.expenses || []).map(e => ({ ...e, id: e.id || oeUid() })),
+                                income: saved.income || 0
+                            };
+                            oeShowLoadedBadge(true, saved.monthLabel || oeCurrentMonth);
+                            oeRender();
+                        }
+                    }
                 }, err => console.error('Error listening to monthly_expenses:', err));
             unsubscribeListeners.push(unsub);
         }
