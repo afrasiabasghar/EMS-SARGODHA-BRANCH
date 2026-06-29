@@ -4484,7 +4484,7 @@
                 await db.collection('public_dashboards').doc(currentUserId).set({
                     isShared: true,
                     sharedAt: firebase.firestore.FieldValue.serverTimestamp()
-                });
+                }, { merge: true });
                 
                 const shareLink = `${window.location.origin}${window.location.pathname}?share=${currentUserId}`;
                 shareLinkInput.value = shareLink;
