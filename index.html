@@ -11,45 +11,37 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         :root {
-            --brand-primary: #4f46e5;
-            --brand-dark: #1e1b4b;
-            --brand-mid: #6366f1;
-            --brand-light: #e0e7ff;
-            --accent-emerald: #059669;
-            --accent-rose: #e11d48;
+            --brand-primary: #0071e3;
+            --brand-dark: #1d1d1f;
+            --brand-mid: #147ce5;
+            --brand-light: #eef4fc;
+            --accent-emerald: #1f9d55;
+            --accent-rose: #ff3b30;
             --surface: #ffffff;
             --surface-2: #f8fafc;
             --border: #e2e8f0;
             --text-primary: #0f172a;
             --text-secondary: #475569;
             --text-muted: #94a3b8;
-            --shadow-sm: 0 1px 3px rgba(79,70,229,0.08), 0 1px 2px rgba(79,70,229,0.06);
-            --shadow-md: 0 4px 16px rgba(79,70,229,0.12), 0 2px 6px rgba(79,70,229,0.08);
-            --shadow-lg: 0 20px 40px rgba(79,70,229,0.15), 0 8px 16px rgba(79,70,229,0.10);
-            --shadow-3d: 0 8px 0 #3730a3, 0 12px 20px rgba(55,48,163,0.35);
-            --shadow-3d-sm: 0 4px 0 #3730a3, 0 6px 12px rgba(55,48,163,0.3);
-            --shadow-3d-emerald: 0 4px 0 #047857, 0 6px 12px rgba(4,120,87,0.3);
-            --shadow-3d-rose: 0 4px 0 #be123c, 0 6px 12px rgba(190,18,60,0.3);
-            --shadow-3d-slate: 0 4px 0 #334155, 0 6px 12px rgba(51,65,85,0.3);
+            --shadow-sm: 0 1px 3px rgba(0,113,227,0.08), 0 1px 2px rgba(0,113,227,0.06);
+            --shadow-md: 0 4px 16px rgba(0,113,227,0.12), 0 2px 6px rgba(0,113,227,0.08);
+            --shadow-lg: 0 20px 40px rgba(0,113,227,0.15), 0 8px 16px rgba(0,113,227,0.10);
         }
 
         * { box-sizing: border-box; }
 
         body {
-            font-family: 'DM Sans', sans-serif;
-            background-color: #eef2ff;
-            background-image: 
-                radial-gradient(ellipse at 20% 50%, rgba(99,102,241,0.06) 0%, transparent 60%),
-                radial-gradient(ellipse at 80% 20%, rgba(79,70,229,0.05) 0%, transparent 50%),
-                url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%234f46e5' fill-opacity='0.02'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Inter', sans-serif;
+            background-color: #f5f5f7;
             min-height: 100vh;
+            -webkit-font-smoothing: antialiased;
         }
 
         /* ─── Typography ─────────────────────────── */
-        h1, h2, h3, h4, .font-bold { font-family: 'Syne', sans-serif; }
+        h1, h2, h3, h4, .font-bold { font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Inter', sans-serif; }
 
         /* ─── Section animation ───────────────────── */
         .section-container {
@@ -58,128 +50,76 @@
         }
         .section-container.active { display: block; }
         @keyframes sectionReveal {
-            from { opacity: 0; transform: translateY(24px) scale(0.98); }
-            to   { opacity: 1; transform: translateY(0) scale(1); }
+            from { opacity: 0; transform: translateY(8px); }
+            to   { opacity: 1; transform: translateY(0); }
         }
 
-        /* ─── 3D Button System ───────────────────── */
+        /* ─── Button System (flat, Apple-style) ──── */
         .animated-btn, button[type="submit"], button[type="button"],
         #main-nav .nav-btn, header button, .popup-window-header button {
             position: relative;
-            transition: all 0.12s cubic-bezier(0.34, 1.56, 0.64, 1);
-            transform-style: preserve-3d;
+            transition: background-color 0.15s ease, box-shadow 0.15s ease, transform 0.1s ease, opacity 0.15s ease;
         }
 
-        /* Generic 3D lift on all indigo/primary buttons */
         .bg-indigo-600, .bg-indigo-700 {
-            box-shadow: var(--shadow-3d-sm);
+            background-color: #0071e3 !important;
+            box-shadow: var(--shadow-sm);
+            border: none;
         }
-        .bg-indigo-600:hover {
-            transform: translateY(-3px) scale(1.02);
-            box-shadow: 0 7px 0 #3730a3, 0 10px 20px rgba(55,48,163,0.4);
+        .bg-indigo-600:hover, .bg-indigo-700:hover {
+            background-color: #0077ed !important;
+            box-shadow: var(--shadow-md);
         }
-        .bg-indigo-600:active {
-            transform: translateY(2px) scale(0.98);
-            box-shadow: 0 1px 0 #3730a3, 0 2px 6px rgba(55,48,163,0.3);
-        }
-
-        .bg-emerald-600 { box-shadow: var(--shadow-3d-emerald); }
-        .bg-emerald-600:hover {
-            transform: translateY(-3px) scale(1.02);
-            box-shadow: 0 7px 0 #047857, 0 10px 20px rgba(4,120,87,0.4);
-        }
-        .bg-emerald-600:active {
-            transform: translateY(2px) scale(0.98);
-            box-shadow: 0 1px 0 #047857, 0 2px 6px rgba(4,120,87,0.3);
+        .bg-indigo-600:active, .bg-indigo-700:active {
+            background-color: #005bb5 !important;
+            transform: scale(0.98);
+            box-shadow: var(--shadow-sm);
         }
 
-        .bg-rose-600 { box-shadow: var(--shadow-3d-rose); }
-        .bg-rose-600:hover {
-            transform: translateY(-3px) scale(1.02);
-            box-shadow: 0 7px 0 #be123c, 0 10px 20px rgba(190,18,60,0.4);
-        }
-        .bg-rose-600:active {
-            transform: translateY(2px) scale(0.98);
-            box-shadow: 0 1px 0 #be123c, 0 2px 6px rgba(190,18,60,0.3);
-        }
+        .bg-emerald-600 { background-color: #1f9d55 !important; box-shadow: var(--shadow-sm); }
+        .bg-emerald-600:hover { background-color: #1c8a4b !important; box-shadow: var(--shadow-md); }
+        .bg-emerald-600:active { transform: scale(0.98); box-shadow: var(--shadow-sm); }
 
-        .bg-slate-700, .bg-slate-500 { box-shadow: var(--shadow-3d-slate); }
-        .bg-slate-700:hover, .bg-slate-500:hover {
-            transform: translateY(-3px) scale(1.02);
-            box-shadow: 0 7px 0 #1e293b, 0 10px 20px rgba(30,41,59,0.35);
-        }
-        .bg-slate-700:active, .bg-slate-500:active {
-            transform: translateY(2px) scale(0.98);
-            box-shadow: 0 1px 0 #1e293b;
-        }
+        .bg-rose-600 { background-color: #ff3b30 !important; box-shadow: var(--shadow-sm); }
+        .bg-rose-600:hover { background-color: #e0332a !important; box-shadow: var(--shadow-md); }
+        .bg-rose-600:active { transform: scale(0.98); box-shadow: var(--shadow-sm); }
 
-        /* Muted/Cancel buttons get subtle 3D */
-        .bg-slate-300 {
-            box-shadow: 0 4px 0 #94a3b8, 0 6px 12px rgba(148,163,184,0.25);
-        }
-        .bg-slate-300:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 0 #94a3b8, 0 8px 16px rgba(148,163,184,0.3);
-        }
-        .bg-slate-300:active {
-            transform: translateY(1px);
-            box-shadow: 0 2px 0 #94a3b8;
-        }
+        .bg-slate-700, .bg-slate-500 { box-shadow: var(--shadow-sm); }
+        .bg-slate-700:hover, .bg-slate-500:hover { box-shadow: var(--shadow-md); }
+        .bg-slate-700:active, .bg-slate-500:active { transform: scale(0.98); }
+
+        .bg-slate-300 { box-shadow: var(--shadow-sm); }
+        .bg-slate-300:hover { box-shadow: var(--shadow-md); }
+        .bg-slate-300:active { transform: scale(0.98); }
 
         /* ─── Card Design ────────────────────────── */
         .card {
             background: var(--surface);
-            border-radius: 16px;
-            border: 1px solid rgba(99,102,241,0.1);
+            border-radius: 14px;
+            border: 1px solid var(--border);
             box-shadow: var(--shadow-sm);
-            transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1),
-                        box-shadow 0.25s ease,
-                        border-color 0.25s ease;
+            transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
         }
         .card:hover {
-            transform: translateY(-5px) rotateX(1deg);
+            transform: translateY(-2px);
             box-shadow: var(--shadow-md);
-            border-color: rgba(99,102,241,0.2);
+            border-color: #d2d2d7;
         }
 
         /* ─── Dashboard Stat Cards ───────────────── */
         .stat-card {
             background: var(--surface);
-            border-radius: 20px;
-            border: 1px solid rgba(99,102,241,0.12);
+            border-radius: 16px;
+            border: 1px solid var(--border);
             padding: 1.25rem;
             position: relative;
             overflow: hidden;
-            transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1),
-                        box-shadow 0.3s ease;
-            box-shadow: 0 2px 8px rgba(79,70,229,0.08),
-                        0 0 0 1px rgba(99,102,241,0.05);
-            transform-style: preserve-3d;
-            perspective: 800px;
-        }
-        .stat-card::before {
-            content: '';
-            position: absolute;
-            inset: 0;
-            background: linear-gradient(135deg, rgba(99,102,241,0.05) 0%, transparent 60%);
-            pointer-events: none;
-        }
-        .stat-card::after {
-            content: '';
-            position: absolute;
-            top: -40%;
-            right: -20%;
-            width: 120px;
-            height: 120px;
-            border-radius: 50%;
-            background: radial-gradient(circle, rgba(99,102,241,0.12), transparent 70%);
-            pointer-events: none;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            box-shadow: var(--shadow-sm);
         }
         .stat-card:hover {
-            transform: translateY(-8px) rotateX(4deg) rotateY(-2deg);
-            box-shadow: 0 20px 40px rgba(79,70,229,0.18),
-                        0 0 0 1px rgba(99,102,241,0.15),
-                        inset 0 1px 0 rgba(255,255,255,0.9);
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-md);
         }
         .stat-card .stat-icon {
             width: 44px; height: 44px;
@@ -187,14 +127,13 @@
             display: flex; align-items: center; justify-content: center;
             font-size: 1.2rem;
             margin-bottom: 0.75rem;
-            box-shadow: 0 4px 12px rgba(99,102,241,0.25);
         }
 
         /* ─── Sidebar ────────────────────────────── */
         aside#sidebar {
-            background: linear-gradient(160deg, #1e1b4b 0%, #312e81 60%, #4f46e5 100%) !important;
-            border-right: none !important;
-            box-shadow: 4px 0 32px rgba(30,27,75,0.35);
+            background: linear-gradient(180deg, #1d1d1f 0%, #232325 100%) !important;
+            border-right: 1px solid rgba(255,255,255,0.06) !important;
+            box-shadow: 1px 0 0 rgba(0,0,0,0.1);
             display: flex !important;
             flex-direction: column !important;
             height: 100vh !important;
@@ -236,12 +175,12 @@
             padding: 0.7rem 1.1rem;
             border-radius: 10px;
             font-weight: 500;
-            font-family: 'Syne', sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Inter', sans-serif;
             font-size: 0.875rem;
             color: rgba(255,255,255,0.65) !important;
             background: transparent !important;
             border: 1px solid transparent;
-            transition: all 0.18s cubic-bezier(0.34, 1.4, 0.64, 1);
+            transition: background-color 0.15s ease, color 0.15s ease;
             box-shadow: none !important;
             transform: none !important;
             letter-spacing: 0.01em;
@@ -250,19 +189,19 @@
         }
         #main-nav .nav-btn:hover {
             color: #fff !important;
-            background: rgba(255,255,255,0.1) !important;
-            border-color: rgba(255,255,255,0.12);
-            transform: translateX(5px) !important;
+            background: rgba(255,255,255,0.08) !important;
+            border-color: transparent;
+            transform: none !important;
             box-shadow: none !important;
         }
         #main-nav .nav-btn:active {
-            transform: translateX(2px) scale(0.98) !important;
+            transform: none !important;
         }
         #main-nav .nav-btn.bg-indigo-600 {
-            background: rgba(255,255,255,0.18) !important;
+            background: rgba(10,132,255,0.22) !important;
             color: #fff !important;
-            border-color: rgba(255,255,255,0.22);
-            box-shadow: 0 2px 10px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.15) !important;
+            border-color: transparent;
+            box-shadow: none !important;
             transform: none !important;
         }
         #main-nav .nav-btn.bg-indigo-600::after {
@@ -273,18 +212,18 @@
             transform: translateY(-50%);
             width: 3px;
             height: 60%;
-            background: rgba(255,255,255,0.8);
+            background: #0a84ff;
             border-radius: 0 3px 3px 0;
         }
         #main-nav .nav-btn.bg-indigo-600:hover {
-            background: rgba(255,255,255,0.24) !important;
-            transform: translateX(5px) !important;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.2) !important;
+            background: rgba(10,132,255,0.28) !important;
+            transform: none !important;
+            box-shadow: none !important;
         }
 
         /* Nav section divider label */
         .nav-section-label {
-            font-family: 'DM Sans', sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Inter', sans-serif;
             font-size: 0.62rem;
             font-weight: 600;
             letter-spacing: 0.12em;
@@ -327,20 +266,20 @@
             background: rgba(255,255,255,0.92) !important;
             backdrop-filter: blur(12px);
             -webkit-backdrop-filter: blur(12px);
-            border-bottom: 1px solid rgba(99,102,241,0.1) !important;
-            box-shadow: 0 2px 12px rgba(79,70,229,0.06);
+            border-bottom: 1px solid rgba(20,124,229,0.1) !important;
+            box-shadow: 0 2px 12px rgba(0,113,227,0.06);
         }
         #header-title {
-            font-family: 'Syne', sans-serif;
-            font-weight: 700;
-            color: var(--brand-dark) !important;
+            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Inter', sans-serif;
+            font-weight: 600;
+            color: #1d1d1f !important;
             font-size: 1.1rem;
             letter-spacing: -0.3px;
         }
 
         /* ─── Auth section ───────────────────────── */
         #auth-section {
-            background: linear-gradient(135deg, #1e1b4b 0%, #312e81 40%, #4338ca 100%);
+            background: linear-gradient(180deg, #1d1d1f 0%, #2c2c2e 100%);
             min-height: 100vh;
             position: relative;
             overflow: hidden;
@@ -350,47 +289,34 @@
             position: absolute;
             width: 600px; height: 600px;
             border-radius: 50%;
-            background: radial-gradient(circle, rgba(99,102,241,0.25) 0%, transparent 70%);
+            background: radial-gradient(circle, rgba(20,124,229,0.12) 0%, transparent 70%);
             top: -200px; right: -200px;
-            animation: orb1 8s ease-in-out infinite alternate;
         }
         #auth-section::after {
             content: '';
             position: absolute;
             width: 400px; height: 400px;
             border-radius: 50%;
-            background: radial-gradient(circle, rgba(165,180,252,0.15) 0%, transparent 70%);
+            background: radial-gradient(circle, rgba(156,198,251,0.1) 0%, transparent 70%);
             bottom: -100px; left: -100px;
-            animation: orb2 10s ease-in-out infinite alternate;
-        }
-        @keyframes orb1 {
-            from { transform: translate(0,0) scale(1); }
-            to   { transform: translate(40px, 30px) scale(1.1); }
-        }
-        @keyframes orb2 {
-            from { transform: translate(0,0) scale(1); }
-            to   { transform: translate(-30px, -20px) scale(1.15); }
         }
 
         #auth-section > .bg-white, #auth-section > div {
-            background: rgba(255,255,255,0.95) !important;
+            background: rgba(255,255,255,0.97) !important;
             backdrop-filter: blur(20px);
             border: 1px solid rgba(255,255,255,0.5);
-            border-radius: 24px !important;
-            box-shadow: 0 24px 64px rgba(30,27,75,0.4), 0 0 0 1px rgba(255,255,255,0.2);
+            border-radius: 20px !important;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.35);
             position: relative;
             z-index: 1;
-            animation: authCardIn 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+            animation: authCardIn 0.4s ease-out;
         }
         @keyframes authCardIn {
-            from { opacity:0; transform: translateY(40px) scale(0.95) rotateX(8deg); }
-            to   { opacity:1; transform: translateY(0) scale(1) rotateX(0deg); }
+            from { opacity:0; transform: translateY(12px); }
+            to   { opacity:1; transform: translateY(0); }
         }
         #auth-section h2 {
-            background: linear-gradient(135deg, var(--brand-primary), var(--brand-mid));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
+            color: #1d1d1f;
         }
 
         /* ─── Modals ─────────────────────────────── */
@@ -414,13 +340,13 @@
             max-width: 500px;
             width: 90%;
             text-align: center;
-            animation: modalIn 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
-            box-shadow: 0 32px 80px rgba(30,27,75,0.3), 0 0 0 1px rgba(99,102,241,0.1);
-            border: 1px solid rgba(255,255,255,0.8);
+            animation: modalIn 0.2s ease-out;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.25);
+            border: 1px solid var(--border);
         }
         @keyframes modalIn {
-            from { transform: scale(0.85) translateY(-20px) rotateX(12deg); opacity: 0; }
-            to   { transform: scale(1) translateY(0) rotateX(0deg); opacity: 1; }
+            from { transform: translateY(-10px); opacity: 0; }
+            to   { transform: translateY(0); opacity: 1; }
         }
         @keyframes slideIn {
             from { transform: translateY(-50px); opacity: 0; }
@@ -445,7 +371,7 @@
             top: 0; right: -100%;
             width: 100%; height: 100%;
             background-color: #f8fafc;
-            box-shadow: -8px 0 40px rgba(30,27,75,0.2);
+            box-shadow: -8px 0 40px rgba(29,29,31,0.2);
             transition: right 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
             display: flex; flex-direction: column;
         }
@@ -458,14 +384,14 @@
             justify-content: space-between;
             align-items: center;
             padding: 1rem 1.5rem;
-            background: linear-gradient(90deg, #1e1b4b, #312e81);
+            background: linear-gradient(90deg, #1d1d1f, #2c2c2e);
             border-bottom: none;
             flex-shrink: 0;
         }
         .popup-window-header h2,
         .popup-window-header h3 {
             color: #fff !important;
-            font-family: 'Syne', sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Inter', sans-serif;
         }
         .popup-window-header button {
             background: rgba(255,255,255,0.15) !important;
@@ -489,9 +415,79 @@
 
         /* ─── Loading Spinner ────────────────────── */
         #loading {
-            background: rgba(15,23,42,0.6) !important;
+            background: rgba(0,0,0,0.35) !important;
             backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
         }
+        #loading-card {
+            background: rgba(255,255,255,0.98);
+            border-radius: 18px;
+            padding: 28px 36px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 14px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.25);
+            min-width: 180px;
+            animation: loadingCardIn 0.2s ease-out;
+        }
+        @keyframes loadingCardIn {
+            from { opacity: 0; transform: scale(0.95); }
+            to   { opacity: 1; transform: scale(1); }
+        }
+        #loading-spinner {
+            width: 34px; height: 34px;
+            border-radius: 50%;
+            border: 3px solid rgba(0,113,227,0.15);
+            border-top-color: #0071e3;
+            animation: loadingSpin 0.8s linear infinite;
+        }
+        @keyframes loadingSpin { to { transform: rotate(360deg); } }
+        #loading-text {
+            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Inter', sans-serif;
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: #1d1d1f;
+            text-align: center;
+        }
+
+        /* ─── Network Status Banner ──────────────── */
+        #network-status-banner {
+            position: fixed;
+            top: 0; left: 0; right: 0;
+            z-index: 9999;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            padding: 10px 16px;
+            background: #ff3b30;
+            color: #fff;
+            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Inter', sans-serif;
+            font-size: 0.85rem;
+            font-weight: 500;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.15);
+            animation: bannerSlideDown 0.25s ease-out;
+        }
+        #network-status-banner.visible { display: flex; }
+        #network-status-banner.reconnected { background: #1f9d55; }
+        @keyframes bannerSlideDown {
+            from { transform: translateY(-100%); }
+            to   { transform: translateY(0); }
+        }
+        #network-status-banner i { font-size: 0.85rem; }
+        #network-refresh-btn {
+            background: rgba(255,255,255,0.22);
+            color: #fff;
+            border: none;
+            border-radius: 99px;
+            padding: 4px 14px;
+            font-size: 0.78rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color .15s;
+        }
+        #network-refresh-btn:hover { background: rgba(255,255,255,0.32); }
 
         /* ─── Form Controls ──────────────────────── */
         input[type="text"], input[type="email"], input[type="password"],
@@ -500,25 +496,22 @@
         }
         input:focus, textarea:focus, select:focus {
             border-color: var(--brand-primary) !important;
-            box-shadow: 0 0 0 3px rgba(99,102,241,0.15), 0 2px 8px rgba(99,102,241,0.1);
+            box-shadow: 0 0 0 3px rgba(20,124,229,0.15), 0 2px 8px rgba(20,124,229,0.1);
             outline: none;
         }
 
         /* ─── Section Headings ───────────────────── */
         section > h2.text-3xl {
-            font-family: 'Syne', sans-serif;
-            font-weight: 800;
-            background: linear-gradient(135deg, var(--brand-dark) 0%, var(--brand-primary) 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
+            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Inter', sans-serif;
+            font-weight: 700;
+            color: var(--text-primary);
             letter-spacing: -0.5px;
             margin-bottom: 1.5rem;
         }
 
         /* ─── Hamburger Button ───────────────────── */
         #hamburger-btn {
-            background: rgba(99,102,241,0.08) !important;
+            background: rgba(20,124,229,0.08) !important;
             border-radius: 10px;
             padding: 8px;
             color: var(--brand-primary) !important;
@@ -527,16 +520,16 @@
             transform: none !important;
         }
         #hamburger-btn:hover {
-            background: rgba(99,102,241,0.15) !important;
+            background: rgba(20,124,229,0.15) !important;
             transform: scale(1.05) !important;
             box-shadow: none !important;
         }
 
         /* ─── Table Styling ──────────────────────── */
-        table thead tr { background: linear-gradient(90deg, #f0f4ff, #e8edff); }
-        table thead th { color: var(--brand-dark) !important; font-family: 'Syne', sans-serif; font-size: 0.75rem; }
+        table thead tr { background: #f5f5f7; }
+        table thead th { color: var(--text-primary) !important; font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Inter', sans-serif; font-size: 0.75rem; }
         table tbody tr { transition: background 0.15s ease; }
-        table tbody tr:hover { background: #f5f3ff; }
+        table tbody tr:hover { background: #f5f5f7; }
 
         /* ─── Password verification modal ─────────── */
         #password-verification-modal { z-index: 2000; }
@@ -544,15 +537,15 @@
         /* ─── Scrollbar Styling ──────────────────── */
         ::-webkit-scrollbar { width: 6px; height: 6px; }
         ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: rgba(99,102,241,0.3); border-radius: 3px; }
-        ::-webkit-scrollbar-thumb:hover { background: rgba(99,102,241,0.5); }
+        ::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.2); border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: rgba(0,0,0,0.35); }
 
         /* ─── Floating badge on sidebar ──────────── */
         #sidebar-footer-badge {
             flex-shrink: 0;
             padding: 0.75rem 1.5rem;
             border-top: 1px solid rgba(255,255,255,0.08);
-            font-family: 'Syne', sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Inter', sans-serif;
             font-size: 0.62rem;
             font-weight: 700;
             letter-spacing: 0.1em;
@@ -564,7 +557,7 @@
 
         /* ─── Share / Copy button small ─────────── */
         #copy-share-link-btn {
-            box-shadow: var(--shadow-3d-sm) !important;
+            box-shadow: var(--shadow-sm) !important;
         }
 
         /* ─── Border radius improvements ─────────── */
@@ -620,24 +613,29 @@
         }
 
         /* ─── Phone Directory Section ────────────── */
+        #phone-directory { max-width: 100%; overflow-x: hidden; }
         #phone-directory .pd-layout {
             display: grid;
-            grid-template-columns: 320px 1fr;
+            grid-template-columns: 320px minmax(0, 1fr);
             gap: 24px;
             align-items: start;
+            max-width: 100%;
+        }
+        #phone-directory .pd-layout > div {
+            min-width: 0;
         }
         @media (max-width: 900px) {
-            #phone-directory .pd-layout { grid-template-columns: 1fr; }
+            #phone-directory .pd-layout { grid-template-columns: minmax(0, 1fr); }
         }
         #phone-directory .pd-card {
             background: #fff;
             border-radius: 16px;
-            border: 1px solid rgba(99,102,241,0.1);
-            box-shadow: 0 1px 3px rgba(79,70,229,0.08);
+            border: 1px solid rgba(20,124,229,0.1);
+            box-shadow: 0 1px 3px rgba(0,113,227,0.08);
             overflow: hidden;
         }
         #phone-directory .pd-card-header {
-            background: linear-gradient(90deg, #1e1b4b, #312e81);
+            background: linear-gradient(90deg, #1d1d1f, #2c2c2e);
             padding: 14px 20px;
             display: flex;
             align-items: center;
@@ -645,7 +643,7 @@
         }
         #phone-directory .pd-card-header .pd-icon { font-size: 1rem; }
         #phone-directory .pd-card-header h3 {
-            font-family: 'Syne', sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Inter', sans-serif;
             font-size: 0.95rem;
             color: #fff;
             font-weight: 600;
@@ -653,7 +651,7 @@
         }
         #phone-directory .pd-card-header .pd-sub {
             font-size: 0.68rem;
-            color: #a5b4fc;
+            color: #9cc6fb;
             font-weight: 500;
             letter-spacing: 0.05em;
             text-transform: uppercase;
@@ -661,7 +659,7 @@
         #phone-directory .pd-card-body { padding: 20px; }
         #phone-directory .pd-tab-bar {
             display: flex;
-            background: #eef2ff;
+            background: #f2f6fb;
             border-radius: 8px;
             padding: 3px;
             margin-bottom: 18px;
@@ -673,7 +671,7 @@
             border: none;
             background: transparent;
             border-radius: 6px;
-            font-family: 'DM Sans', sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Inter', sans-serif;
             font-size: 0.78rem;
             font-weight: 500;
             color: #94a3b8;
@@ -682,11 +680,11 @@
             display: flex; align-items: center; justify-content: center; gap: 5px;
         }
         #phone-directory .pd-tab-btn.active {
-            background: #1e1b4b;
+            background: #1d1d1f;
             color: #fff;
-            box-shadow: 0 2px 8px rgba(79,70,229,0.15);
+            box-shadow: 0 2px 8px rgba(0,113,227,0.15);
         }
-        #phone-directory .pd-tab-btn:hover:not(.active) { color: #1e1b4b; background: #e0e7ff; }
+        #phone-directory .pd-tab-btn:hover:not(.active) { color: #1d1d1f; background: #eef4fc; }
         #phone-directory .pd-tab-panel { display: none; }
         #phone-directory .pd-tab-panel.active { display: block; }
         #phone-directory .pd-field-group { margin-bottom: 13px; }
@@ -694,7 +692,7 @@
             display: block;
             font-size: 0.72rem;
             font-weight: 600;
-            color: #1e1b4b;
+            color: #1d1d1f;
             margin-bottom: 4px;
             letter-spacing: 0.03em;
             text-transform: uppercase;
@@ -704,7 +702,7 @@
             padding: 9px 12px;
             border: 1.5px solid #e2e8f0;
             border-radius: 8px;
-            font-family: 'DM Sans', sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Inter', sans-serif;
             font-size: 0.875rem;
             color: #0f172a;
             background: #fff;
@@ -712,42 +710,40 @@
             outline: none;
         }
         #phone-directory .pd-field-group input:focus {
-            border-color: #4f46e5;
-            box-shadow: 0 0 0 3px rgba(99,102,241,0.15);
+            border-color: #0071e3;
+            box-shadow: 0 0 0 3px rgba(20,124,229,0.15);
         }
         #phone-directory .pd-field-group input::placeholder { color: #94a3b8; }
         #phone-directory .pd-btn-primary {
             display: flex; align-items: center; justify-content: center; gap: 6px;
             width: 100%;
             padding: 11px;
-            background: #4f46e5;
+            background: #0071e3;
             color: #fff;
             border: none;
             border-radius: 8px;
-            font-family: 'Syne', sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Inter', sans-serif;
             font-size: 0.88rem;
             font-weight: 600;
             cursor: pointer;
-            transition: all .18s;
-            box-shadow: 0 4px 0 #3730a3;
+            transition: background-color .15s, box-shadow .15s;
+            box-shadow: var(--shadow-sm);
         }
         #phone-directory .pd-btn-primary:hover {
-            background: #4338ca;
-            transform: translateY(-2px);
-            box-shadow: 0 6px 0 #3730a3, 0 8px 16px rgba(55,48,163,0.3);
+            background: #0077ed;
+            box-shadow: var(--shadow-md);
         }
         #phone-directory .pd-btn-primary:active {
-            transform: translateY(1px);
-            box-shadow: 0 2px 0 #3730a3;
+            background: #005bb5;
         }
         #phone-directory .pd-btn-secondary {
             display: inline-flex; align-items: center; gap: 5px;
             padding: 7px 13px;
             background: #f8fafc;
-            color: #1e1b4b;
+            color: #1d1d1f;
             border: 1.5px solid #e2e8f0;
             border-radius: 8px;
-            font-family: 'DM Sans', sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Inter', sans-serif;
             font-size: 0.78rem;
             font-weight: 500;
             cursor: pointer;
@@ -755,27 +751,27 @@
         }
         #phone-directory .pd-btn-secondary:hover { background: #e2e8f0; }
         #phone-directory .pd-btn-danger {
-            background: transparent; color: #e11d48;
-            border: 1.5px solid #e11d48;
+            background: transparent; color: #ff3b30;
+            border: 1.5px solid #ff3b30;
             border-radius: 6px;
             padding: 4px 10px;
             font-size: 0.73rem;
-            font-family: 'DM Sans', sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Inter', sans-serif;
             cursor: pointer;
             transition: all .15s;
         }
-        #phone-directory .pd-btn-danger:hover { background: #e11d48; color: #fff; }
+        #phone-directory .pd-btn-danger:hover { background: #ff3b30; color: #fff; }
         #phone-directory .pd-btn-edit {
-            background: transparent; color: #4338ca;
-            border: 1.5px solid #4f46e5;
+            background: transparent; color: #0077ed;
+            border: 1.5px solid #0071e3;
             border-radius: 6px;
             padding: 4px 10px;
             font-size: 0.73rem;
-            font-family: 'DM Sans', sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Inter', sans-serif;
             cursor: pointer;
             transition: all .15s;
         }
-        #phone-directory .pd-btn-edit:hover { background: #4f46e5; color: #fff; }
+        #phone-directory .pd-btn-edit:hover { background: #0071e3; color: #fff; }
         #phone-directory .pd-upload-zone {
             border: 2px dashed #e2e8f0;
             border-radius: 10px;
@@ -788,8 +784,8 @@
         }
         #phone-directory .pd-upload-zone:hover,
         #phone-directory .pd-upload-zone.drag-over {
-            border-color: #4f46e5;
-            background: rgba(99,102,241,0.04);
+            border-color: #0071e3;
+            background: rgba(20,124,229,0.04);
         }
         #phone-directory .pd-upload-zone input[type="file"] {
             position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer;
@@ -797,34 +793,35 @@
         #phone-directory .pd-upload-progress {
             display: none;
             margin-top: 12px;
-            background: #eef2ff;
+            background: #f2f6fb;
             border-radius: 6px;
             padding: 9px 13px;
             font-size: 0.78rem;
-            color: #1e1b4b;
+            color: #1d1d1f;
         }
         #phone-directory .pd-progress-bar-wrap {
             height: 4px; background: #e2e8f0; border-radius: 99px; margin-top: 7px; overflow: hidden;
         }
         #phone-directory .pd-progress-bar {
-            height: 100%; background: #4f46e5; border-radius: 99px;
+            height: 100%; background: #0071e3; border-radius: 99px;
             animation: pdProgressAnim 1s ease-in-out;
         }
         @keyframes pdProgressAnim { from { width: 0; } to { width: 100%; } }
         #phone-directory .pd-info-note {
-            background: rgba(99,102,241,0.07);
-            border-left: 3px solid #4f46e5;
+            background: rgba(20,124,229,0.07);
+            border-left: 3px solid #0071e3;
             border-radius: 0 6px 6px 0;
             padding: 9px 13px;
             font-size: 0.76rem;
-            color: #1e1b4b;
+            color: #1d1d1f;
             margin-top: 11px;
         }
         #phone-directory .pd-search-row {
             display: grid;
-            grid-template-columns: 1fr 1fr 1fr auto;
+            grid-template-columns: minmax(0,1fr) minmax(0,1fr) minmax(0,1fr) auto;
             gap: 10px;
             align-items: end;
+            max-width: 100%;
         }
         @media (max-width: 700px) {
             #phone-directory .pd-search-row { grid-template-columns: 1fr 1fr; }
@@ -844,22 +841,22 @@
             width: 100%; padding: 8px 12px 8px 30px;
             border: 1.5px solid #e2e8f0;
             border-radius: 8px;
-            font-family: 'DM Sans', sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Inter', sans-serif;
             font-size: 0.83rem;
             color: #0f172a;
             outline: none;
             transition: border-color .15s;
         }
-        #phone-directory .pd-search-wrap input:focus { border-color: #4f46e5; }
+        #phone-directory .pd-search-wrap input:focus { border-color: #0071e3; }
         #phone-directory .pd-search-wrap input::placeholder { color: #94a3b8; }
-        #phone-directory .pd-table-wrap { overflow-x: auto; }
+        #phone-directory .pd-table-wrap { overflow-x: auto; max-width: 100%; }
         #phone-directory .pd-table {
             width: 100%;
             border-collapse: collapse;
             font-size: 0.83rem;
         }
         #phone-directory .pd-table thead th {
-            background: linear-gradient(90deg, #312e81, #4f46e5) !important;
+            background: linear-gradient(90deg, #2c2c2e, #0071e3) !important;
             color: #ffffff !important;
             text-transform: uppercase;
             font-size: 0.7rem;
@@ -868,9 +865,9 @@
             padding: 13px 13px;
             text-align: left;
             white-space: nowrap;
-            font-family: 'Syne', sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Inter', sans-serif;
             text-shadow: 0 1px 2px rgba(0,0,0,0.3);
-            border-bottom: 2px solid #6366f1;
+            border-bottom: 2px solid #147ce5;
         }
         #phone-directory .pd-table tbody tr {
             border-bottom: 1px solid #e2e8f0;
@@ -887,8 +884,8 @@
         #phone-directory .pd-name-cell { font-weight: 600; }
         #phone-directory .pd-ext-badge {
             display: inline-block;
-            background: #1e1b4b;
-            color: #a5b4fc;
+            background: #1d1d1f;
+            color: #9cc6fb;
             font-size: 0.7rem;
             font-weight: 700;
             padding: 2px 8px;
@@ -896,12 +893,12 @@
             font-family: monospace;
             letter-spacing: 0.04em;
         }
-        #phone-directory .pd-phone-cell { font-family: monospace; font-size: 0.8rem; color: #312e81; }
+        #phone-directory .pd-phone-cell { font-family: monospace; font-size: 0.8rem; color: #2c2c2e; }
         #phone-directory .pd-no-direct { color: #94a3b8; font-size: 0.74rem; font-style: italic; }
         #phone-directory .pd-dept-badge {
             display: inline-block;
-            background: rgba(99,102,241,0.1);
-            color: #4338ca;
+            background: rgba(20,124,229,0.1);
+            color: #0077ed;
             font-size: 0.68rem;
             font-weight: 600;
             padding: 2px 8px;
@@ -928,7 +925,7 @@
             border: 1.5px solid #e2e8f0;
             background: #fff;
             border-radius: 6px;
-            font-family: 'DM Sans', sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Inter', sans-serif;
             font-size: 0.76rem;
             color: #0f172a;
             cursor: pointer;
@@ -936,16 +933,16 @@
             box-shadow: none !important;
             transform: none !important;
         }
-        #phone-directory .pd-page-btn:hover { background: #4f46e5; color: #fff; border-color: #4f46e5; transform: none !important; }
-        #phone-directory .pd-page-btn.active { background: #1e1b4b; color: #fff; border-color: #1e1b4b; }
+        #phone-directory .pd-page-btn:hover { background: #0071e3; color: #fff; border-color: #0071e3; transform: none !important; }
+        #phone-directory .pd-page-btn.active { background: #1d1d1f; color: #fff; border-color: #1d1d1f; }
         #phone-directory .pd-page-btn:disabled { opacity: .4; cursor: not-allowed; }
         #phone-directory .pd-divider { border: none; border-top: 1px solid #e2e8f0; margin: 16px 0; }
         #phone-directory .pd-stats-row { display: flex; gap: 20px; }
         #phone-directory .pd-stat-pill { text-align: center; }
         #phone-directory .pd-stat-pill .pd-stat-num {
-            font-family: 'Syne', sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Inter', sans-serif;
             font-size: 1.4rem;
-            color: #4f46e5;
+            color: #0071e3;
             font-weight: 700;
             line-height: 1;
         }
@@ -969,20 +966,20 @@
         #pd-edit-modal .pd-modal-box {
             background: #fff;
             border-radius: 20px;
-            box-shadow: 0 32px 80px rgba(30,27,75,0.3), 0 0 0 1px rgba(99,102,241,0.1);
+            box-shadow: 0 32px 80px rgba(29,29,31,0.3), 0 0 0 1px rgba(20,124,229,0.1);
             padding: 28px;
             width: 90%;
             max-width: 480px;
-            animation: pdModalIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            animation: pdModalIn 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
         @keyframes pdModalIn {
             from { transform: scale(0.88) translateY(-20px); opacity: 0; }
             to { transform: scale(1) translateY(0); opacity: 1; }
         }
         #pd-edit-modal h3 {
-            font-family: 'Syne', sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Inter', sans-serif;
             font-size: 1.15rem;
-            color: #1e1b4b;
+            color: #1d1d1f;
             margin-bottom: 18px;
             padding-bottom: 12px;
             border-bottom: 1px solid #e2e8f0;
@@ -997,7 +994,7 @@
             display: flex; flex-direction: column; gap: 7px;
         }
         .pd-toast {
-            background: #1e1b4b;
+            background: #1d1d1f;
             color: #fff;
             padding: 11px 18px;
             border-radius: 10px;
@@ -1007,29 +1004,29 @@
             display: flex; align-items: center; gap: 7px;
             animation: pdSlideIn .25s ease;
             max-width: 320px;
-            border-left: 4px solid #4f46e5;
+            border-left: 4px solid #0071e3;
         }
-        .pd-toast.error { border-left-color: #e11d48; }
+        .pd-toast.error { border-left-color: #ff3b30; }
         @keyframes pdSlideIn { from { transform: translateX(60px); opacity: 0; } to { transform: none; opacity: 1; } }
 
         /* ─── Settings Panel ─────────────────────── */
         #settings .settings-card {
             background: var(--surface);
             border-radius: 16px;
-            border: 1px solid rgba(99,102,241,0.1);
+            border: 1px solid rgba(20,124,229,0.1);
             box-shadow: var(--shadow-sm);
             overflow: hidden;
             margin-bottom: 24px;
         }
         #settings .settings-card-header {
-            background: linear-gradient(90deg, #1e1b4b, #312e81);
+            background: linear-gradient(90deg, #1d1d1f, #2c2c2e);
             padding: 14px 22px;
             display: flex;
             align-items: center;
             gap: 10px;
         }
         #settings .settings-card-header h3 {
-            font-family: 'Syne', sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Inter', sans-serif;
             font-size: 0.95rem;
             color: #fff;
             font-weight: 600;
@@ -1048,10 +1045,10 @@
         }
         #settings .settings-row:last-child { border-bottom: none; }
         #settings .settings-label {
-            font-family: 'Syne', sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Inter', sans-serif;
             font-size: 0.85rem;
             font-weight: 600;
-            color: #1e1b4b;
+            color: #1d1d1f;
         }
         #settings .settings-desc {
             font-size: 0.75rem;
@@ -1069,13 +1066,13 @@
         }
         #settings input[type="range"] {
             width: 120px;
-            accent-color: #4f46e5;
+            accent-color: #0071e3;
         }
         #settings select.settings-select {
             padding: 7px 12px;
             border: 1.5px solid #e2e8f0;
             border-radius: 8px;
-            font-family: 'DM Sans', sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Inter', sans-serif;
             font-size: 0.83rem;
             color: #0f172a;
             background: #fff;
@@ -1086,7 +1083,7 @@
         #settings .settings-value-badge {
             font-size: 0.75rem;
             font-weight: 600;
-            color: #4f46e5;
+            color: #0071e3;
             min-width: 36px;
             text-align: right;
         }
@@ -1096,10 +1093,10 @@
             gap: 6px;
             padding: 9px 18px;
             background: #f1f5f9;
-            color: #1e1b4b;
+            color: #1d1d1f;
             border: 1.5px solid #e2e8f0;
             border-radius: 8px;
-            font-family: 'Syne', sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Inter', sans-serif;
             font-size: 0.82rem;
             font-weight: 600;
             cursor: pointer;
@@ -1121,10 +1118,10 @@
             transition: all .18s;
             font-size: 0.72rem;
             font-weight: 600;
-            font-family: 'Syne', sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Inter', sans-serif;
         }
         #settings .theme-swatch:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.12); }
-        #settings .theme-swatch.active { border-color: #4f46e5; box-shadow: 0 0 0 3px rgba(99,102,241,0.2); }
+        #settings .theme-swatch.active { border-color: #0071e3; box-shadow: 0 0 0 3px rgba(20,124,229,0.2); }
 
         /* ─── Shared Visibility Settings ─────────── */
         .sv-grid {
@@ -1146,25 +1143,25 @@
             gap: 10px;
         }
         .sv-toggle-item:hover {
-            border-color: #a5b4fc;
-            background: #eef2ff;
+            border-color: #9cc6fb;
+            background: #f2f6fb;
         }
         .sv-toggle-item.sv-enabled {
-            border-color: #6366f1;
-            background: #eef2ff;
+            border-color: #147ce5;
+            background: #f2f6fb;
         }
         .sv-item-label {
             display: flex;
             align-items: center;
             gap: 8px;
-            font-family: 'Syne', sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Inter', sans-serif;
             font-size: 0.82rem;
             font-weight: 600;
-            color: #1e1b4b;
+            color: #1d1d1f;
         }
         .sv-item-label i {
             font-size: 0.75rem;
-            color: #6366f1;
+            color: #147ce5;
             width: 14px;
             text-align: center;
         }
@@ -1195,7 +1192,7 @@
             box-shadow: 0 1px 4px rgba(0,0,0,0.18);
         }
         .sv-switch input:checked + .sv-switch-track {
-            background: #4f46e5;
+            background: #0071e3;
         }
         .sv-switch input:checked + .sv-switch-track::after {
             transform: translateX(16px);
@@ -1205,26 +1202,24 @@
             align-items: center;
             gap: 8px;
             padding: 10px 22px;
-            background: #4f46e5;
+            background: #0071e3;
             color: #fff;
             border: none;
             border-radius: 10px;
-            font-family: 'Syne', sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Inter', sans-serif;
             font-size: 0.875rem;
             font-weight: 700;
             cursor: pointer;
-            transition: all .18s;
-            box-shadow: 0 4px 0 #3730a3;
+            transition: background-color .15s, box-shadow .15s;
+            box-shadow: var(--shadow-sm);
             margin-top: 14px;
         }
         .sv-save-btn:hover {
-            background: #4338ca;
-            transform: translateY(-2px);
-            box-shadow: 0 6px 0 #3730a3, 0 8px 20px rgba(55,48,163,0.28);
+            background: #0077ed;
+            box-shadow: var(--shadow-md);
         }
         .sv-save-btn:active {
-            transform: translateY(1px);
-            box-shadow: 0 2px 0 #3730a3;
+            background: #005bb5;
         }
         .sv-status-badge {
             display: inline-flex;
@@ -1234,23 +1229,23 @@
             border-radius: 99px;
             font-size: 0.72rem;
             font-weight: 600;
-            font-family: 'DM Sans', sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Inter', sans-serif;
         }
         .sv-status-badge.saved {
             background: #d1fae5;
             color: #065f46;
         }
         .sv-status-badge.saving {
-            background: #e0e7ff;
-            color: #3730a3;
+            background: #eef4fc;
+            color: #005bb5;
         }
         .sv-note {
-            background: rgba(99,102,241,0.07);
-            border-left: 3px solid #4f46e5;
+            background: rgba(20,124,229,0.07);
+            border-left: 3px solid #0071e3;
             border-radius: 0 8px 8px 0;
             padding: 10px 14px;
             font-size: 0.78rem;
-            color: #1e1b4b;
+            color: #1d1d1f;
             margin-bottom: 14px;
             line-height: 1.5;
         }
@@ -1259,8 +1254,18 @@
 <!-- UPDATED: Body background color -->
 <body>
 
+    <!-- Network status banner -->
+    <div id="network-status-banner">
+        <i class="fas fa-wifi"></i>
+        <span id="network-status-text">You're offline — please check your internet connection.</span>
+        <button id="network-refresh-btn" onclick="window.location.reload()">Refresh</button>
+    </div>
+
     <div id="loading" class="fixed inset-0 flex items-center justify-center z-50 hidden">
-        <div class="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-indigo-400" style="filter:drop-shadow(0 0 12px rgba(99,102,241,0.6));"></div>
+        <div id="loading-card">
+            <div id="loading-spinner"></div>
+            <p id="loading-text">Loading…</p>
+        </div>
     </div>
 
     <div id="messageModal" class="modal-overlay">
@@ -1345,7 +1350,7 @@
         <div class="card p-6" style="width:100%;max-width:600px;max-height:90vh;overflow-y:auto;">
             <h3 class="text-lg font-bold mb-1">Bulk Import — Paste &amp; Auto-Parse</h3>
             <p class="text-slate-400 text-xs mb-3">Paste expense lines in any freeform format. Parser will extract category, description and amount.</p>
-            <div class="p-3 rounded-xl text-xs text-slate-500 mb-3" style="background:#f1f5ff;border:1px dashed #a5b4fc;line-height:1.8;">
+            <div class="p-3 rounded-xl text-xs text-slate-500 mb-3" style="background:#f1f5ff;border:1px dashed #9cc6fb;line-height:1.8;">
                 Examples: <code>salary afrasiab 50000</code> | <code>office rent 21500</code> | <code>electricity bill 6028</code> | <code>internet 3449</code>
             </div>
             <textarea id="oe-bulk-text" rows="8" placeholder="Yahan paste karo, jaise:&#10;salary afrasiab 50000&#10;commission rohail 25000&#10;office rent 21500&#10;electricity 6028&#10;internet 3449&#10;petrol 3500"
@@ -1506,26 +1511,26 @@
     <!-- REMOVED: Courier Edit Modal -->
 
     <main id="sys-access-screen" class="flex-grow flex items-center justify-center p-4 min-h-screen">
-        <div style="background:rgba(255,255,255,0.95);padding:2rem 2.5rem;border-radius:24px;width:100%;max-width:26rem;box-shadow:0 24px 64px rgba(30,27,75,0.4);border:1px solid rgba(255,255,255,0.5);text-align:center;">
-            <div style="width:54px;height:54px;border-radius:14px;background:linear-gradient(135deg,#4f46e5,#6366f1);display:flex;align-items:center;justify-content:center;margin:0 auto 1.1rem;box-shadow:0 6px 20px rgba(79,70,229,0.35);">
+        <div style="background:rgba(255,255,255,0.95);padding:2rem 2.5rem;border-radius:24px;width:100%;max-width:26rem;box-shadow:0 24px 64px rgba(29,29,31,0.4);border:1px solid rgba(255,255,255,0.5);text-align:center;">
+            <div style="width:54px;height:54px;border-radius:14px;background:linear-gradient(135deg,#0071e3,#147ce5);display:flex;align-items:center;justify-content:center;margin:0 auto 1.1rem;box-shadow:0 6px 20px rgba(0,113,227,0.35);">
                 <i class="fas fa-shield-alt" style="color:#fff;font-size:1.3rem;"></i>
             </div>
-            <h2 style="font-family:'Syne',sans-serif;font-size:1.35rem;font-weight:700;background:linear-gradient(135deg,#4f46e5,#6366f1);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:0.3rem;">Darson Sargodha</h2>
+            <h2 style="font-family:-apple-system,BlinkMacSystemFont,'Inter',sans-serif;font-size:1.35rem;font-weight:700;background:linear-gradient(135deg,#0071e3,#147ce5);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:0.3rem;">Darson Sargodha</h2>
             <p style="font-size:0.78rem;color:#94a3b8;margin-bottom:1.5rem;letter-spacing:0.04em;text-transform:uppercase;font-weight:500;">System Access Required</p>
             <input type="password" id="sys-access-input" placeholder="Enter access code"
-                style="width:100%;padding:10px 18px;border:1.5px solid #e2e8f0;border-radius:99px;font-size:0.95rem;outline:none;text-align:center;letter-spacing:0.15em;margin-bottom:0.85rem;font-family:'DM Sans',sans-serif;"
+                style="width:100%;padding:10px 18px;border:1.5px solid #e2e8f0;border-radius:99px;font-size:0.95rem;outline:none;text-align:center;letter-spacing:0.15em;margin-bottom:0.85rem;font-family:-apple-system,BlinkMacSystemFont,'Inter',sans-serif;"
                 onkeydown="if(event.key==='Enter')sysAccessVerify()">
             <button onclick="sysAccessVerify()"
-                style="width:100%;padding:10px;border-radius:99px;border:none;background:linear-gradient(135deg,#4f46e5,#6366f1);color:#fff;font-weight:600;font-size:0.95rem;cursor:pointer;box-shadow:0 4px 0 #3730a3;font-family:'Syne',sans-serif;">
+                style="width:100%;padding:10px;border-radius:99px;border:none;background:#0071e3;color:#fff;font-weight:600;font-size:0.95rem;cursor:pointer;box-shadow:0 1px 3px rgba(0,0,0,0.15);font-family:-apple-system,BlinkMacSystemFont,'Inter',sans-serif;">
                 <i class="fas fa-unlock-alt" style="margin-right:6px;"></i>Continue
             </button>
-            <p id="sys-access-err" style="display:none;color:#e11d48;font-size:0.8rem;margin-top:0.8rem;font-weight:500;"></p>
+            <p id="sys-access-err" style="display:none;color:#ff3b30;font-size:0.8rem;margin-top:0.8rem;font-weight:500;"></p>
         </div>
     </main>
 
     <main id="auth-section" class="flex-grow flex items-center justify-center p-4 min-h-screen" style="display:none!important;">
-        <div style="background:rgba(255,255,255,0.95);padding:2rem 2.5rem;border-radius:24px;width:100%;max-width:28rem;box-shadow:0 24px 64px rgba(30,27,75,0.4);border:1px solid rgba(255,255,255,0.5);">
-            <h2 class="text-2xl font-bold text-center mb-6" style="background:linear-gradient(135deg,#4f46e5,#6366f1);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">Darson Sargodha</h2>
+        <div style="background:rgba(255,255,255,0.95);padding:2rem 2.5rem;border-radius:24px;width:100%;max-width:28rem;box-shadow:0 24px 64px rgba(29,29,31,0.4);border:1px solid rgba(255,255,255,0.5);">
+            <h2 class="text-2xl font-bold text-center mb-6" style="background:linear-gradient(135deg,#0071e3,#147ce5);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">Darson Sargodha</h2>
             <div id="auth-forms">
                 <form id="login-form" class="space-y-4">
                     <h3 class="text-xl font-semibold mb-4 text-center">Login to your account</h3>
@@ -1547,7 +1552,7 @@
     </main>
 
     <div id="main-app" class="hidden min-h-screen">
-        <aside id="sidebar" class="w-64 fixed top-0 left-0 z-50 transform -translate-x-full md:translate-x-0 transition-transform duration-300 ease-in-out" style="background:linear-gradient(160deg,#1e1b4b 0%,#312e81 60%,#4f46e5 100%);box-shadow:4px 0 32px rgba(30,27,75,0.35);height:100vh;display:flex;flex-direction:column;">
+        <aside id="sidebar" class="w-64 fixed top-0 left-0 z-50 transform -translate-x-full md:translate-x-0 transition-transform duration-300 ease-in-out" style="background:linear-gradient(160deg,#1d1d1f 0%,#2c2c2e 60%,#0071e3 100%);box-shadow:4px 0 32px rgba(29,29,31,0.35);height:100vh;display:flex;flex-direction:column;">
             <!-- Brand Header -->
             <div class="flex items-center gap-3 flex-shrink-0" style="padding:1.1rem 1.25rem;border-bottom:1px solid rgba(255,255,255,0.1);background:rgba(0,0,0,0.18);">
                 <div style="width:36px;height:36px;border-radius:10px;background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.2);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
@@ -1555,7 +1560,7 @@
                 </div>
                 <div>
                     <h1 class="text-lg font-bold" style="color:#ffffff;letter-spacing:-0.3px;line-height:1.1;">Darson Sargodha</h1>
-                    <p style="font-size:0.6rem;color:rgba(255,255,255,0.4);font-family:'DM Sans',sans-serif;letter-spacing:0.05em;text-transform:uppercase;font-weight:500;">Brokerage System</p>
+                    <p style="font-size:0.6rem;color:rgba(255,255,255,0.4);font-family:-apple-system,BlinkMacSystemFont,'Inter',sans-serif;letter-spacing:0.05em;text-transform:uppercase;font-weight:500;">Brokerage System</p>
                 </div>
             </div>
             <!-- Scrollable Nav Area -->
@@ -1588,12 +1593,12 @@
 
         <!-- Main Content: Margin-left is applied on medium screens and up to make space for the sidebar -->
         <div id="main-content-wrapper" class="flex-1 flex flex-col md:ml-64">
-            <header class="border-b sticky top-0 z-40 flex items-center justify-between h-16 px-4" style="background:rgba(255,255,255,0.92);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-color:rgba(99,102,241,0.1);box-shadow:0 2px 12px rgba(79,70,229,0.06);">
+            <header class="border-b sticky top-0 z-40 flex items-center justify-between h-16 px-4" style="background:rgba(255,255,255,0.92);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-color:rgba(20,124,229,0.1);box-shadow:0 2px 12px rgba(0,113,227,0.06);">
                 <div class="flex items-center">
-                    <button id="hamburger-btn" class="md:hidden focus:outline-none mr-4" style="background:rgba(99,102,241,0.08);border-radius:10px;padding:8px;color:#4f46e5;">
+                    <button id="hamburger-btn" class="md:hidden focus:outline-none mr-4" style="background:rgba(20,124,229,0.08);border-radius:10px;padding:8px;color:#0071e3;">
                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
                     </button>
-                    <h2 id="header-title" class="text-xl font-semibold" style="font-family:'Syne',sans-serif;font-weight:700;color:#1e1b4b;letter-spacing:-0.3px;">Dashboard</h2>
+                    <h2 id="header-title" class="text-xl font-semibold" style="font-family:-apple-system,BlinkMacSystemFont,'Inter',sans-serif;font-weight:700;color:#1d1d1f;letter-spacing:-0.3px;">Dashboard</h2>
                 </div>
                 <div class="flex items-center space-x-2 sm:space-x-4">
                     <!-- UPDATED: Button colors -->
@@ -1618,31 +1623,31 @@
                         <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-6 mb-4">
                             <div id="dashboard-complaints-card" class="stat-card cursor-pointer">
                                 <div class="stat-icon" style="background:linear-gradient(135deg,#fde8e8,#fca5a5);">
-                                    <i class="fas fa-exclamation-circle" style="color:#e11d48;"></i>
+                                    <i class="fas fa-exclamation-circle" style="color:#ff3b30;"></i>
                                 </div>
                                 <h3 style="color:#94a3b8;font-size:0.7rem;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:4px;">Complaints</h3>
                                 <p id="total-complaints" class="text-2xl xl:text-3xl font-bold" style="color:#0f172a;">0</p>
                             </div>
                             <div id="total-clients-card" class="stat-card cursor-pointer">
-                                <div class="stat-icon" style="background:linear-gradient(135deg,#e0e7ff,#a5b4fc);">
-                                    <i class="fas fa-users" style="color:#4f46e5;"></i>
+                                <div class="stat-icon" style="background:linear-gradient(135deg,#eef4fc,#9cc6fb);">
+                                    <i class="fas fa-users" style="color:#0071e3;"></i>
                                 </div>
                                 <h3 style="color:#94a3b8;font-size:0.7rem;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:4px;">Total Clients</h3>
                                 <p id="total-clients" class="text-2xl xl:text-3xl font-bold" style="color:#0f172a;">0</p>
                             </div>
                             <div id="active-clients-card" class="stat-card cursor-pointer">
                                 <div class="stat-icon" style="background:linear-gradient(135deg,#d1fae5,#6ee7b7);">
-                                    <i class="fas fa-user-check" style="color:#059669;"></i>
+                                    <i class="fas fa-user-check" style="color:#1f9d55;"></i>
                                 </div>
                                 <h3 style="color:#94a3b8;font-size:0.7rem;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:4px;">Active Clients (Last 2 Mo)</h3>
                                 <p id="active-clients" class="text-2xl xl:text-3xl font-bold" style="color:#0f172a;">0</p>
                             </div>
                             <div id="dashboard-revenue-card" class="stat-card cursor-pointer">
                                 <div class="stat-icon" style="background:linear-gradient(135deg,#d1fae5,#6ee7b7);">
-                                    <i class="fas fa-coins" style="color:#059669;"></i>
+                                    <i class="fas fa-coins" style="color:#1f9d55;"></i>
                                 </div>
                                 <h3 style="color:#94a3b8;font-size:0.7rem;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:4px;">Commission Balance</h3>
-                                <p id="monthly-revenue" class="text-2xl xl:text-3xl font-bold" style="color:#059669;">PKR 0</p>
+                                <p id="monthly-revenue" class="text-2xl xl:text-3xl font-bold" style="color:#1f9d55;">PKR 0</p>
                             </div>
                             <div id="dashboard-employees-card" class="stat-card cursor-pointer">
                                 <div class="stat-icon" style="background:linear-gradient(135deg,#fef3c7,#fde68a);">
@@ -2360,9 +2365,9 @@
 
                         <!-- ── REPORT PREVIEW MODAL ── -->
                         <div id="oe-report-preview-modal" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(15,23,42,0.7);backdrop-filter:blur(6px);z-index:2000;justify-content:center;align-items:center;padding:20px;">
-                            <div style="background:#fff;border-radius:16px;width:100%;max-width:920px;height:90vh;display:flex;flex-direction:column;box-shadow:0 32px 80px rgba(30,27,75,0.35);overflow:hidden;">
-                                <div style="display:flex;justify-content:space-between;align-items:center;padding:1rem 1.5rem;background:linear-gradient(90deg,#1e1b4b,#312e81);flex-shrink:0;">
-                                    <span id="oe-report-preview-title" style="color:#fff;font-family:Syne,sans-serif;font-weight:700;font-size:1rem;"></span>
+                            <div style="background:#fff;border-radius:16px;width:100%;max-width:920px;height:90vh;display:flex;flex-direction:column;box-shadow:0 32px 80px rgba(29,29,31,0.35);overflow:hidden;">
+                                <div style="display:flex;justify-content:space-between;align-items:center;padding:1rem 1.5rem;background:linear-gradient(90deg,#1d1d1f,#2c2c2e);flex-shrink:0;">
+                                    <span id="oe-report-preview-title" style="color:#fff;font-family:-apple-system,BlinkMacSystemFont,'Inter',sans-serif;font-weight:700;font-size:1rem;"></span>
                                     <button onclick="document.getElementById('oe-report-preview-modal').style.display='none';document.getElementById('oe-report-preview-frame').src='about:blank';"
                                         style="background:rgba(255,255,255,0.15);color:#fff;border:1px solid rgba(255,255,255,0.2);border-radius:8px;padding:6px 16px;font-weight:600;cursor:pointer;font-size:0.85rem;">
                                         <i class="fas fa-times" style="margin-right:6px;"></i>Close
@@ -2866,20 +2871,20 @@
                         <h2 class="text-3xl font-bold text-slate-800 mb-6">Disclaimer</h2>
                         <div class="card p-8 max-w-4xl mx-auto">
                             <!-- Icon header -->
-                            <div class="flex items-center gap-4 mb-8 pb-6" style="border-bottom:2px solid rgba(99,102,241,0.15);">
-                                <div class="w-14 h-14 rounded-2xl flex items-center justify-center flex-shrink-0" style="background:linear-gradient(135deg,#e0e7ff,#c7d2fe);">
-                                    <i class="fas fa-shield-alt text-2xl" style="color:#4f46e5;"></i>
+                            <div class="flex items-center gap-4 mb-8 pb-6" style="border-bottom:2px solid rgba(20,124,229,0.15);">
+                                <div class="w-14 h-14 rounded-2xl flex items-center justify-center flex-shrink-0" style="background:linear-gradient(135deg,#eef4fc,#c7d2fe);">
+                                    <i class="fas fa-shield-alt text-2xl" style="color:#0071e3;"></i>
                                 </div>
                                 <div>
-                                    <h3 class="text-xl font-bold" style="color:#1e1b4b;">Internal Use Only</h3>
+                                    <h3 class="text-xl font-bold" style="color:#1d1d1f;">Internal Use Only</h3>
                                     <p class="text-sm text-slate-500 mt-0.5">Darson Securities (Pvt.) Limited — Sargodha Branch</p>
                                 </div>
                             </div>
 
                             <!-- Paragraph 1 -->
                             <div class="flex gap-4 mb-6">
-                                <div class="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5" style="background:linear-gradient(135deg,#e0e7ff,#a5b4fc);">
-                                    <span class="text-xs font-bold" style="color:#4f46e5;">1</span>
+                                <div class="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5" style="background:linear-gradient(135deg,#eef4fc,#9cc6fb);">
+                                    <span class="text-xs font-bold" style="color:#0071e3;">1</span>
                                 </div>
                                 <div>
                                     <h4 class="font-semibold text-slate-800 mb-1">Purpose of This Software</h4>
@@ -2890,7 +2895,7 @@
                             <!-- Paragraph 2 -->
                             <div class="flex gap-4 mb-6">
                                 <div class="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5" style="background:linear-gradient(135deg,#d1fae5,#6ee7b7);">
-                                    <span class="text-xs font-bold" style="color:#059669;">2</span>
+                                    <span class="text-xs font-bold" style="color:#1f9d55;">2</span>
                                 </div>
                                 <div>
                                     <h4 class="font-semibold text-slate-800 mb-1">Nature of Data</h4>
@@ -2912,7 +2917,7 @@
                             <!-- Paragraph 4 -->
                             <div class="flex gap-4 mb-8">
                                 <div class="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5" style="background:linear-gradient(135deg,#fde8e8,#fca5a5);">
-                                    <span class="text-xs font-bold" style="color:#e11d48;">4</span>
+                                    <span class="text-xs font-bold" style="color:#ff3b30;">4</span>
                                 </div>
                                 <div>
                                     <h4 class="font-semibold text-slate-800 mb-1">Limitation of Liability</h4>
@@ -2921,8 +2926,8 @@
                             </div>
 
                             <!-- Footer note -->
-                            <div class="rounded-xl p-4 text-center" style="background:linear-gradient(135deg,rgba(79,70,229,0.06),rgba(99,102,241,0.04));border:1px solid rgba(99,102,241,0.12);">
-                                <i class="fas fa-info-circle mr-2" style="color:#6366f1;"></i>
+                            <div class="rounded-xl p-4 text-center" style="background:linear-gradient(135deg,rgba(0,113,227,0.06),rgba(20,124,229,0.04));border:1px solid rgba(20,124,229,0.12);">
+                                <i class="fas fa-info-circle mr-2" style="color:#147ce5;"></i>
                                 <span class="text-sm text-slate-600">This disclaimer is displayed for informational purposes and applies to all data within this system.</span>
                             </div>
                         </div>
@@ -2936,7 +2941,7 @@
                         <!-- Color Scheme -->
                         <div class="settings-card">
                             <div class="settings-card-header">
-                                <i class="fas fa-palette" style="color:#a5b4fc;"></i>
+                                <i class="fas fa-palette" style="color:#9cc6fb;"></i>
                                 <h3>Color Scheme</h3>
                             </div>
                             <div class="settings-card-body">
@@ -2946,7 +2951,7 @@
                                         <div class="settings-desc">Main accent color used across the app</div>
                                     </div>
                                     <div class="settings-control">
-                                        <input type="color" id="set-brand-primary" value="#4f46e5" oninput="applyAppearance()">
+                                        <input type="color" id="set-brand-primary" value="#0071e3" oninput="applyAppearance()">
                                     </div>
                                 </div>
                                 <div class="settings-row">
@@ -2955,7 +2960,7 @@
                                         <div class="settings-desc">Background color of the left sidebar</div>
                                     </div>
                                     <div class="settings-control">
-                                        <input type="color" id="set-sidebar-color" value="#1e1b4b" oninput="applyAppearance()">
+                                        <input type="color" id="set-sidebar-color" value="#1d1d1f" oninput="applyAppearance()">
                                     </div>
                                 </div>
                                 <div class="settings-row">
@@ -2964,7 +2969,7 @@
                                         <div class="settings-desc">Main content area background</div>
                                     </div>
                                     <div class="settings-control">
-                                        <input type="color" id="set-bg-color" value="#eef2ff" oninput="applyAppearance()">
+                                        <input type="color" id="set-bg-color" value="#f2f6fb" oninput="applyAppearance()">
                                     </div>
                                 </div>
                                 <div class="settings-row">
@@ -2982,7 +2987,7 @@
                         <!-- Text Settings -->
                         <div class="settings-card">
                             <div class="settings-card-header">
-                                <i class="fas fa-font" style="color:#a5b4fc;"></i>
+                                <i class="fas fa-font" style="color:#9cc6fb;"></i>
                                 <h3>Text Settings</h3>
                             </div>
                             <div class="settings-card-body">
@@ -3035,7 +3040,7 @@
                         <!-- Button Settings -->
                         <div class="settings-card">
                             <div class="settings-card-header">
-                                <i class="fas fa-mouse-pointer" style="color:#a5b4fc;"></i>
+                                <i class="fas fa-mouse-pointer" style="color:#9cc6fb;"></i>
                                 <h3>Button Colors</h3>
                             </div>
                             <div class="settings-card-body">
@@ -3045,7 +3050,7 @@
                                         <div class="settings-desc">Color of main action buttons (Save, Submit, etc.)</div>
                                     </div>
                                     <div class="settings-control">
-                                        <input type="color" id="set-btn-primary" value="#4f46e5" oninput="applyAppearance()">
+                                        <input type="color" id="set-btn-primary" value="#0071e3" oninput="applyAppearance()">
                                     </div>
                                 </div>
                                 <div class="settings-row">
@@ -3054,7 +3059,7 @@
                                         <div class="settings-desc">Color of positive action buttons (Share, Confirm)</div>
                                     </div>
                                     <div class="settings-control">
-                                        <input type="color" id="set-btn-success" value="#059669" oninput="applyAppearance()">
+                                        <input type="color" id="set-btn-success" value="#1f9d55" oninput="applyAppearance()">
                                     </div>
                                 </div>
                                 <div class="settings-row">
@@ -3063,7 +3068,7 @@
                                         <div class="settings-desc">Color of destructive action buttons (Delete, Sign Out)</div>
                                     </div>
                                     <div class="settings-control">
-                                        <input type="color" id="set-btn-danger" value="#e11d48" oninput="applyAppearance()">
+                                        <input type="color" id="set-btn-danger" value="#ff3b30" oninput="applyAppearance()">
                                     </div>
                                 </div>
                             </div>
@@ -3072,19 +3077,19 @@
                         <!-- Theme Presets -->
                         <div class="settings-card">
                             <div class="settings-card-header">
-                                <i class="fas fa-magic" style="color:#a5b4fc;"></i>
+                                <i class="fas fa-magic" style="color:#9cc6fb;"></i>
                                 <h3>Theme Presets</h3>
                             </div>
                             <div class="settings-card-body">
                                 <div class="settings-desc" style="margin-bottom:14px;">Click a theme to apply a complete color preset instantly.</div>
                                 <div class="settings-theme-grid">
-                                    <div class="theme-swatch active" id="theme-indigo" onclick="applyTheme('indigo')" style="background:linear-gradient(135deg,#1e1b4b,#4f46e5);color:#fff;">
+                                    <div class="theme-swatch active" id="theme-indigo" onclick="applyTheme('indigo')" style="background:linear-gradient(135deg,#1d1d1f,#0071e3);color:#fff;">
                                         <i class="fas fa-star" style="font-size:1.2rem;margin-bottom:4px;display:block;"></i>Indigo
                                     </div>
-                                    <div class="theme-swatch" id="theme-emerald" onclick="applyTheme('emerald')" style="background:linear-gradient(135deg,#064e3b,#059669);color:#fff;">
+                                    <div class="theme-swatch" id="theme-emerald" onclick="applyTheme('emerald')" style="background:linear-gradient(135deg,#064e3b,#1f9d55);color:#fff;">
                                         <i class="fas fa-leaf" style="font-size:1.2rem;margin-bottom:4px;display:block;"></i>Emerald
                                     </div>
-                                    <div class="theme-swatch" id="theme-rose" onclick="applyTheme('rose')" style="background:linear-gradient(135deg,#881337,#e11d48);color:#fff;">
+                                    <div class="theme-swatch" id="theme-rose" onclick="applyTheme('rose')" style="background:linear-gradient(135deg,#881337,#ff3b30);color:#fff;">
                                         <i class="fas fa-heart" style="font-size:1.2rem;margin-bottom:4px;display:block;"></i>Rose
                                     </div>
                                     <div class="theme-swatch" id="theme-ocean" onclick="applyTheme('ocean')" style="background:linear-gradient(135deg,#0c4a6e,#0ea5e9);color:#fff;">
@@ -3103,7 +3108,7 @@
                         <!-- Border Radius -->
                         <div class="settings-card">
                             <div class="settings-card-header">
-                                <i class="fas fa-vector-square" style="color:#a5b4fc;"></i>
+                                <i class="fas fa-vector-square" style="color:#9cc6fb;"></i>
                                 <h3>Layout & Shape</h3>
                             </div>
                             <div class="settings-card-body">
@@ -3143,14 +3148,14 @@
                         <!-- Shared Frontend Visibility -->
                         <div class="settings-card" style="margin-top:24px;">
                             <div class="settings-card-header">
-                                <i class="fas fa-eye" style="color:#a5b4fc;"></i>
+                                <i class="fas fa-eye" style="color:#9cc6fb;"></i>
                                 <h3>Shared Frontend Visibility</h3>
                             </div>
                             <div class="settings-card-body">
                                 <div class="sv-note">
                                     <strong>Shared Frontend</strong> jab aap "Share Frontend" button se share kartay hain to ek read-only link generate hota hai. Yahan aap choose kar saktay hain ke us link mein kaun kaun se sections dikhain. Sab kuch sirf <strong>read-only</strong> hoga — koi bhi add/edit/delete nahi kar sakta.
                                 </div>
-                                <p style="font-size:0.78rem;color:#64748b;margin-bottom:12px;font-family:'DM Sans',sans-serif;">Jo sections <strong>ON</strong> hain woh shared link mein dikhenge (read-only). Jo <strong>OFF</strong> hain woh bilkul nahi dikhenge.</p>
+                                <p style="font-size:0.78rem;color:#64748b;margin-bottom:12px;font-family:-apple-system,BlinkMacSystemFont,'Inter',sans-serif;">Jo sections <strong>ON</strong> hain woh shared link mein dikhenge (read-only). Jo <strong>OFF</strong> hain woh bilkul nahi dikhenge.</p>
                                 <div class="sv-grid" id="sv-sections-grid">
                                     <!-- Rendered by JS -->
                                 </div>
@@ -3166,13 +3171,13 @@
                         <!-- Backup & Restore (quick access from Settings) -->
                         <div class="settings-card" style="margin-top:24px;">
                             <div class="settings-card-header">
-                                <i class="fas fa-database" style="color:#a5b4fc;"></i>
+                                <i class="fas fa-database" style="color:#9cc6fb;"></i>
                                 <h3>Backup &amp; Restore</h3>
                             </div>
                             <div class="settings-card-body">
-                                <p style="font-size:0.78rem;color:#64748b;margin-bottom:14px;font-family:'DM Sans',sans-serif;">Apna poora system data export (download) karen ya pehle se downloaded backup se restore karen. Full backup section ke liye sidebar mein <strong>Backup &amp; Restore</strong> par click karen.</p>
+                                <p style="font-size:0.78rem;color:#64748b;margin-bottom:14px;font-family:-apple-system,BlinkMacSystemFont,'Inter',sans-serif;">Apna poora system data export (download) karen ya pehle se downloaded backup se restore karen. Full backup section ke liye sidebar mein <strong>Backup &amp; Restore</strong> par click karen.</p>
                                 <div style="display:flex;gap:12px;flex-wrap:wrap;">
-                                    <button onclick="backupRequestPassword(()=>showSection('backup'))" class="sv-save-btn" style="background:#059669;box-shadow:0 4px 0 #047857;">
+                                    <button onclick="backupRequestPassword(()=>showSection('backup'))" class="sv-save-btn" style="background:#1f9d55;box-shadow:0 1px 3px rgba(0,0,0,0.15);">
                                         <i class="fas fa-download"></i> Go to Backup Section
                                     </button>
                                 </div>
@@ -3185,8 +3190,8 @@
                         <h2 class="text-3xl font-bold text-slate-800 mb-6">Backup &amp; Restore</h2>
 
                         <!-- Info note -->
-                        <div style="background:rgba(99,102,241,0.07);border-left:4px solid #4f46e5;border-radius:0 12px 12px 0;padding:14px 18px;margin-bottom:24px;font-size:0.85rem;color:#1e1b4b;font-family:'DM Sans',sans-serif;line-height:1.6;">
-                            <strong><i class="fas fa-shield-alt mr-2" style="color:#4f46e5;"></i>Backup kya hai?</strong><br>
+                        <div style="background:rgba(20,124,229,0.07);border-left:4px solid #0071e3;border-radius:0 12px 12px 0;padding:14px 18px;margin-bottom:24px;font-size:0.85rem;color:#1d1d1f;font-family:-apple-system,BlinkMacSystemFont,'Inter',sans-serif;line-height:1.6;">
+                            <strong><i class="fas fa-shield-alt mr-2" style="color:#0071e3;"></i>Backup kya hai?</strong><br>
                             Yahan se aap apna poora system data (complaints, commission, expenses, clients, employees, couriers) ek JSON file ke tor par download (export) kar saktay hain. Agar kabhi system crash ho ya data kharab ho jaye to usi JSON file ko yahan upload (import) kar ke system wahan se continue kar saktay hain jahan chhora tha.
                         </div>
 
@@ -3195,46 +3200,46 @@
                             <!-- Export Card -->
                             <div class="settings-card">
                                 <div class="settings-card-header">
-                                    <i class="fas fa-file-export" style="color:#a5b4fc;"></i>
+                                    <i class="fas fa-file-export" style="color:#9cc6fb;"></i>
                                     <h3>Export Data (Download Backup)</h3>
                                 </div>
                                 <div class="settings-card-body">
-                                    <p style="font-size:0.8rem;color:#64748b;margin-bottom:16px;font-family:'DM Sans',sans-serif;">Apna poora Firestore data ek JSON file mein download karen. Yeh file safe jagah rakhein.</p>
-                                    <div id="backup-export-collections" style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:18px;font-size:0.78rem;color:#1e1b4b;font-family:'DM Sans',sans-serif;">
-                                        <span><i class="fas fa-check-circle mr-1" style="color:#059669;"></i> Complaints</span>
-                                        <span><i class="fas fa-check-circle mr-1" style="color:#059669;"></i> Daily Commissions</span>
-                                        <span><i class="fas fa-check-circle mr-1" style="color:#059669;"></i> Commission Received</span>
-                                        <span><i class="fas fa-check-circle mr-1" style="color:#059669;"></i> Expenses</span>
-                                        <span><i class="fas fa-check-circle mr-1" style="color:#059669;"></i> Client Profiles</span>
-                                        <span><i class="fas fa-check-circle mr-1" style="color:#059669;"></i> Client Payments</span>
-                                        <span><i class="fas fa-check-circle mr-1" style="color:#059669;"></i> Employees</span>
-                                        <span><i class="fas fa-check-circle mr-1" style="color:#059669;"></i> Couriers</span>
-                                        <span><i class="fas fa-check-circle mr-1" style="color:#059669;"></i> Petty Cash</span>
-                                        <span><i class="fas fa-check-circle mr-1" style="color:#059669;"></i> Trade Log</span>
-                                        <span><i class="fas fa-check-circle mr-1" style="color:#059669;"></i> Utility Bills</span>
+                                    <p style="font-size:0.8rem;color:#64748b;margin-bottom:16px;font-family:-apple-system,BlinkMacSystemFont,'Inter',sans-serif;">Apna poora Firestore data ek JSON file mein download karen. Yeh file safe jagah rakhein.</p>
+                                    <div id="backup-export-collections" style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:18px;font-size:0.78rem;color:#1d1d1f;font-family:-apple-system,BlinkMacSystemFont,'Inter',sans-serif;">
+                                        <span><i class="fas fa-check-circle mr-1" style="color:#1f9d55;"></i> Complaints</span>
+                                        <span><i class="fas fa-check-circle mr-1" style="color:#1f9d55;"></i> Daily Commissions</span>
+                                        <span><i class="fas fa-check-circle mr-1" style="color:#1f9d55;"></i> Commission Received</span>
+                                        <span><i class="fas fa-check-circle mr-1" style="color:#1f9d55;"></i> Expenses</span>
+                                        <span><i class="fas fa-check-circle mr-1" style="color:#1f9d55;"></i> Client Profiles</span>
+                                        <span><i class="fas fa-check-circle mr-1" style="color:#1f9d55;"></i> Client Payments</span>
+                                        <span><i class="fas fa-check-circle mr-1" style="color:#1f9d55;"></i> Employees</span>
+                                        <span><i class="fas fa-check-circle mr-1" style="color:#1f9d55;"></i> Couriers</span>
+                                        <span><i class="fas fa-check-circle mr-1" style="color:#1f9d55;"></i> Petty Cash</span>
+                                        <span><i class="fas fa-check-circle mr-1" style="color:#1f9d55;"></i> Trade Log</span>
+                                        <span><i class="fas fa-check-circle mr-1" style="color:#1f9d55;"></i> Utility Bills</span>
                                     </div>
-                                    <button id="backup-export-btn" onclick="backupExportData()" class="sv-save-btn" style="width:100%;justify-content:center;background:#059669;box-shadow:0 4px 0 #047857;">
+                                    <button id="backup-export-btn" onclick="backupExportData()" class="sv-save-btn" style="width:100%;justify-content:center;background:#1f9d55;box-shadow:0 1px 3px rgba(0,0,0,0.15);">
                                         <i class="fas fa-download"></i> Download Backup (JSON)
                                     </button>
-                                    <div id="backup-export-status" style="display:none;margin-top:12px;padding:10px 14px;border-radius:8px;font-size:0.8rem;font-family:'DM Sans',sans-serif;"></div>
+                                    <div id="backup-export-status" style="display:none;margin-top:12px;padding:10px 14px;border-radius:8px;font-size:0.8rem;font-family:-apple-system,BlinkMacSystemFont,'Inter',sans-serif;"></div>
                                 </div>
                             </div>
 
                             <!-- Import Card -->
                             <div class="settings-card">
                                 <div class="settings-card-header">
-                                    <i class="fas fa-file-import" style="color:#a5b4fc;"></i>
+                                    <i class="fas fa-file-import" style="color:#9cc6fb;"></i>
                                     <h3>Import Data (Restore Backup)</h3>
                                 </div>
                                 <div class="settings-card-body">
-                                    <p style="font-size:0.8rem;color:#64748b;margin-bottom:8px;font-family:'DM Sans',sans-serif;">Pehle se downloaded JSON backup file upload karen. <strong style="color:#e11d48;">Warning: yeh action existing data ke sath merge karega — duplicate entries ho sakti hain agar same data pehle se exist karta ho.</strong></p>
+                                    <p style="font-size:0.8rem;color:#64748b;margin-bottom:8px;font-family:-apple-system,BlinkMacSystemFont,'Inter',sans-serif;">Pehle se downloaded JSON backup file upload karen. <strong style="color:#ff3b30;">Warning: yeh action existing data ke sath merge karega — duplicate entries ho sakti hain agar same data pehle se exist karta ho.</strong></p>
                                     <div style="border:2px dashed #e2e8f0;border-radius:10px;padding:22px 16px;text-align:center;background:#f8fafc;margin-bottom:14px;cursor:pointer;transition:all .2s;" id="backup-drop-zone"
-                                        ondragover="event.preventDefault();this.style.borderColor='#4f46e5';this.style.background='rgba(99,102,241,0.05)'"
+                                        ondragover="event.preventDefault();this.style.borderColor='#0071e3';this.style.background='rgba(20,124,229,0.05)'"
                                         ondragleave="this.style.borderColor='';this.style.background=''"
                                         ondrop="backupHandleDrop(event)">
                                         <i class="fas fa-cloud-upload-alt" style="font-size:2rem;color:#94a3b8;margin-bottom:8px;display:block;"></i>
-                                        <p style="font-size:0.82rem;color:#94a3b8;font-family:'DM Sans',sans-serif;margin-bottom:8px;">JSON backup file yahan drag karo ya neeche se select karo</p>
-                                        <label style="display:inline-flex;align-items:center;gap:6px;padding:8px 18px;background:#4f46e5;color:#fff;border-radius:8px;font-size:0.8rem;font-weight:600;cursor:pointer;font-family:'Syne',sans-serif;">
+                                        <p style="font-size:0.82rem;color:#94a3b8;font-family:-apple-system,BlinkMacSystemFont,'Inter',sans-serif;margin-bottom:8px;">JSON backup file yahan drag karo ya neeche se select karo</p>
+                                        <label style="display:inline-flex;align-items:center;gap:6px;padding:8px 18px;background:#0071e3;color:#fff;border-radius:8px;font-size:0.8rem;font-weight:600;cursor:pointer;font-family:-apple-system,BlinkMacSystemFont,'Inter',sans-serif;">
                                             <i class="fas fa-folder-open"></i> File Choose Karo
                                             <input type="file" id="backup-import-file" accept=".json" style="display:none;" onchange="backupHandleFileSelect(this)">
                                         </label>
@@ -3243,7 +3248,7 @@
                                     <button id="backup-import-btn" onclick="backupImportData()" style="display:none;width:100%;justify-content:center;" class="sv-save-btn">
                                         <i class="fas fa-upload"></i> Restore Backup
                                     </button>
-                                    <div id="backup-import-status" style="display:none;margin-top:12px;padding:10px 14px;border-radius:8px;font-size:0.8rem;font-family:'DM Sans',sans-serif;"></div>
+                                    <div id="backup-import-status" style="display:none;margin-top:12px;padding:10px 14px;border-radius:8px;font-size:0.8rem;font-family:-apple-system,BlinkMacSystemFont,'Inter',sans-serif;"></div>
                                 </div>
                             </div>
 
@@ -3252,17 +3257,17 @@
                         <!-- Weekly Reminder Settings -->
                         <div class="settings-card" style="margin-top:24px;">
                             <div class="settings-card-header">
-                                <i class="fas fa-bell" style="color:#a5b4fc;"></i>
+                                <i class="fas fa-bell" style="color:#9cc6fb;"></i>
                                 <h3>Weekly Backup Reminder</h3>
                             </div>
                             <div class="settings-card-body">
-                                <p style="font-size:0.8rem;color:#64748b;margin-bottom:14px;font-family:'DM Sans',sans-serif;">Har 6-7 din baad ek reminder notification show hogi ke backup download kar lein. Reminder last backup download ki date se count hota hai.</p>
+                                <p style="font-size:0.8rem;color:#64748b;margin-bottom:14px;font-family:-apple-system,BlinkMacSystemFont,'Inter',sans-serif;">Har 6-7 din baad ek reminder notification show hogi ke backup download kar lein. Reminder last backup download ki date se count hota hai.</p>
                                 <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;">
                                     <div>
                                         <div class="settings-label">Last Backup Download</div>
                                         <div class="settings-desc" id="backup-last-date-display">Koi backup abhi tak download nahi kiya gaya</div>
                                     </div>
-                                    <button onclick="backupMarkDownloaded()" class="sv-save-btn" style="background:#6366f1;box-shadow:0 4px 0 #4338ca;margin-top:0;">
+                                    <button onclick="backupMarkDownloaded()" class="sv-save-btn" style="background:#147ce5;box-shadow:0 1px 3px rgba(0,0,0,0.15);margin-top:0;">
                                         <i class="fas fa-check"></i> Mark as Downloaded Today
                                     </button>
                                 </div>
@@ -3353,14 +3358,14 @@
 
                     <!-- Bill Preview Modal -->
                     <div id="bill-preview-modal" style="display:none;position:fixed;inset:0;background:rgba(15,23,42,0.72);backdrop-filter:blur(6px);z-index:1000;align-items:center;justify-content:center;">
-                        <div style="background:#fff;border-radius:20px;width:92%;max-width:860px;max-height:90vh;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 24px 64px rgba(30,27,75,0.35);">
+                        <div style="background:#fff;border-radius:20px;width:92%;max-width:860px;max-height:90vh;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 24px 64px rgba(29,29,31,0.35);">
                             <div style="display:flex;align-items:center;justify-content:space-between;padding:16px 24px;border-bottom:1px solid #e2e8f0;">
-                                <h3 id="bill-preview-title" style="font-family:'Syne',sans-serif;font-size:1.1rem;font-weight:700;color:#1e1b4b;">Bill Preview</h3>
+                                <h3 id="bill-preview-title" style="font-family:-apple-system,BlinkMacSystemFont,'Inter',sans-serif;font-size:1.1rem;font-weight:700;color:#1d1d1f;">Bill Preview</h3>
                                 <div style="display:flex;gap:10px;align-items:center;">
-                                    <a id="bill-preview-open-link" href="#" target="_blank" style="display:inline-flex;align-items:center;gap:6px;padding:7px 16px;background:#4f46e5;color:#fff;border-radius:99px;font-size:0.8rem;font-weight:600;text-decoration:none;font-family:'Syne',sans-serif;">
+                                    <a id="bill-preview-open-link" href="#" target="_blank" style="display:inline-flex;align-items:center;gap:6px;padding:7px 16px;background:#0071e3;color:#fff;border-radius:99px;font-size:0.8rem;font-weight:600;text-decoration:none;font-family:-apple-system,BlinkMacSystemFont,'Inter',sans-serif;">
                                         <i class="fas fa-external-link-alt"></i> Open in Drive
                                     </a>
-                                    <button onclick="document.getElementById('bill-preview-modal').style.display='none';document.getElementById('bill-preview-frame').src='';" style="background:#f1f5f9;border:none;border-radius:99px;padding:7px 16px;font-size:0.8rem;font-weight:600;cursor:pointer;color:#475569;font-family:'DM Sans',sans-serif;">Close</button>
+                                    <button onclick="document.getElementById('bill-preview-modal').style.display='none';document.getElementById('bill-preview-frame').src='';" style="background:#f1f5f9;border:none;border-radius:99px;padding:7px 16px;font-size:0.8rem;font-weight:600;cursor:pointer;color:#475569;font-family:-apple-system,BlinkMacSystemFont,'Inter',sans-serif;">Close</button>
                                 </div>
                             </div>
                             <div style="flex:1;overflow:hidden;background:#f8fafc;position:relative;min-height:400px;">
@@ -3372,45 +3377,45 @@
                     <!-- ─── ANALYTICS SECTION ─── -->
                     <section id="analytics" class="section-container">
                         <h2 class="text-3xl font-bold text-slate-800 mb-2">Analytics</h2>
-                        <p class="text-slate-500 mb-6" style="font-family:'DM Sans',sans-serif;font-size:0.9rem;">Session activity and access timestamps for this application.</p>
+                        <p class="text-slate-500 mb-6" style="font-family:-apple-system,BlinkMacSystemFont,'Inter',sans-serif;font-size:0.9rem;">Session activity and access timestamps for this application.</p>
 
                         <!-- Summary Stat Row -->
                         <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;margin-bottom:24px;">
                             <div class="stat-card">
-                                <div class="stat-icon" style="background:linear-gradient(135deg,#4f46e5,#6366f1);">
+                                <div class="stat-icon" style="background:linear-gradient(135deg,#0071e3,#147ce5);">
                                     <i class="fas fa-desktop" style="color:#fff;"></i>
                                 </div>
-                                <div style="font-size:0.73rem;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:#94a3b8;margin-bottom:4px;font-family:'DM Sans',sans-serif;">Frontend Last Seen</div>
-                                <div id="analytics-fe-last-seen" style="font-size:1rem;font-weight:700;color:#0f172a;font-family:'Syne',sans-serif;word-break:break-word;">—</div>
+                                <div style="font-size:0.73rem;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:#94a3b8;margin-bottom:4px;font-family:-apple-system,BlinkMacSystemFont,'Inter',sans-serif;">Frontend Last Seen</div>
+                                <div id="analytics-fe-last-seen" style="font-size:1rem;font-weight:700;color:#0f172a;font-family:-apple-system,BlinkMacSystemFont,'Inter',sans-serif;word-break:break-word;">—</div>
                             </div>
 
                             <div class="stat-card">
                                 <div class="stat-icon" style="background:linear-gradient(135deg,#d97706,#fbbf24);">
                                     <i class="fas fa-clock" style="color:#fff;"></i>
                                 </div>
-                                <div style="font-size:0.73rem;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:#94a3b8;margin-bottom:4px;font-family:'DM Sans',sans-serif;">Current Session Duration</div>
-                                <div id="analytics-session-dur" style="font-size:1rem;font-weight:700;color:#0f172a;font-family:'Syne',sans-serif;">—</div>
+                                <div style="font-size:0.73rem;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:#94a3b8;margin-bottom:4px;font-family:-apple-system,BlinkMacSystemFont,'Inter',sans-serif;">Current Session Duration</div>
+                                <div id="analytics-session-dur" style="font-size:1rem;font-weight:700;color:#0f172a;font-family:-apple-system,BlinkMacSystemFont,'Inter',sans-serif;">—</div>
                             </div>
                             <div class="stat-card">
                                 <div class="stat-icon" style="background:linear-gradient(135deg,#7c3aed,#a78bfa);">
                                     <i class="fas fa-sign-in-alt" style="color:#fff;"></i>
                                 </div>
-                                <div style="font-size:0.73rem;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:#94a3b8;margin-bottom:4px;font-family:'DM Sans',sans-serif;">Session Started</div>
-                                <div id="analytics-session-start" style="font-size:1rem;font-weight:700;color:#0f172a;font-family:'Syne',sans-serif;word-break:break-word;">—</div>
+                                <div style="font-size:0.73rem;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:#94a3b8;margin-bottom:4px;font-family:-apple-system,BlinkMacSystemFont,'Inter',sans-serif;">Session Started</div>
+                                <div id="analytics-session-start" style="font-size:1rem;font-weight:700;color:#0f172a;font-family:-apple-system,BlinkMacSystemFont,'Inter',sans-serif;word-break:break-word;">—</div>
                             </div>
                         </div>
 
                         <!-- Session History Table -->
                         <div class="settings-card">
                             <div class="settings-card-header">
-                                <i class="fas fa-history" style="color:#a5b4fc;"></i>
+                                <i class="fas fa-history" style="color:#9cc6fb;"></i>
                                 <h3>Login Session History</h3>
                             </div>
                             <div class="settings-card-body" style="padding:0;">
                                 <div style="overflow-x:auto;">
-                                    <table style="width:100%;border-collapse:collapse;font-family:'DM Sans',sans-serif;font-size:0.82rem;">
+                                    <table style="width:100%;border-collapse:collapse;font-family:-apple-system,BlinkMacSystemFont,'Inter',sans-serif;font-size:0.82rem;">
                                         <thead>
-                                            <tr style="background:linear-gradient(90deg,#f8fafc,#eef2ff);border-bottom:2px solid #e0e7ff;">
+                                            <tr style="background:linear-gradient(90deg,#f8fafc,#f2f6fb);border-bottom:2px solid #eef4fc;">
                                                 <th style="padding:10px 16px;text-align:left;font-weight:700;color:#475569;letter-spacing:0.04em;text-transform:uppercase;font-size:0.72rem;">#</th>
                                                 <th style="padding:10px 16px;text-align:left;font-weight:700;color:#475569;letter-spacing:0.04em;text-transform:uppercase;font-size:0.72rem;">Login Time</th>
                                                 <th style="padding:10px 16px;text-align:left;font-weight:700;color:#475569;letter-spacing:0.04em;text-transform:uppercase;font-size:0.72rem;">Logout / Last Active</th>
@@ -3429,19 +3434,19 @@
                         <!-- Frontend Activity -->
                         <div class="settings-card" style="margin-top:20px;">
                             <div class="settings-card-header">
-                                <i class="fas fa-desktop" style="color:#a5b4fc;"></i>
+                                <i class="fas fa-desktop" style="color:#9cc6fb;"></i>
                                 <h3>Frontend Activity</h3>
                             </div>
                             <div class="settings-card-body">
-                                <div style="background:#f8fafc;border-radius:12px;padding:16px;border:1px solid #e0e7ff;max-width:400px;">
+                                <div style="background:#f8fafc;border-radius:12px;padding:16px;border:1px solid #eef4fc;max-width:400px;">
                                     <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;">
-                                        <div style="width:10px;height:10px;border-radius:50%;background:#4f46e5;flex-shrink:0;"></div>
-                                        <span style="font-weight:700;font-family:'Syne',sans-serif;font-size:0.9rem;color:#1e1b4b;">Frontend</span>
+                                        <div style="width:10px;height:10px;border-radius:50%;background:#0071e3;flex-shrink:0;"></div>
+                                        <span style="font-weight:700;font-family:-apple-system,BlinkMacSystemFont,'Inter',sans-serif;font-size:0.9rem;color:#1d1d1f;">Frontend</span>
                                     </div>
-                                    <div style="font-size:0.78rem;color:#64748b;margin-bottom:6px;font-family:'DM Sans',sans-serif;">Browser client activity</div>
-                                    <div style="font-size:0.78rem;color:#475569;font-family:'DM Sans',sans-serif;"><span style="color:#94a3b8;">First Visit:</span> <span id="analytics-fe-first">—</span></div>
-                                    <div style="font-size:0.78rem;color:#475569;font-family:'DM Sans',sans-serif;margin-top:4px;"><span style="color:#94a3b8;">Last Seen:</span> <span id="analytics-fe-last2">—</span></div>
-                                    <div style="font-size:0.78rem;color:#475569;font-family:'DM Sans',sans-serif;margin-top:4px;"><span style="color:#94a3b8;">Total Visits:</span> <span id="analytics-fe-visits">—</span></div>
+                                    <div style="font-size:0.78rem;color:#64748b;margin-bottom:6px;font-family:-apple-system,BlinkMacSystemFont,'Inter',sans-serif;">Browser client activity</div>
+                                    <div style="font-size:0.78rem;color:#475569;font-family:-apple-system,BlinkMacSystemFont,'Inter',sans-serif;"><span style="color:#94a3b8;">First Visit:</span> <span id="analytics-fe-first">—</span></div>
+                                    <div style="font-size:0.78rem;color:#475569;font-family:-apple-system,BlinkMacSystemFont,'Inter',sans-serif;margin-top:4px;"><span style="color:#94a3b8;">Last Seen:</span> <span id="analytics-fe-last2">—</span></div>
+                                    <div style="font-size:0.78rem;color:#475569;font-family:-apple-system,BlinkMacSystemFont,'Inter',sans-serif;margin-top:4px;"><span style="color:#94a3b8;">Total Visits:</span> <span id="analytics-fe-visits">—</span></div>
                                 </div>
                             </div>
                         </div>
@@ -3449,14 +3454,14 @@
                         <!-- Pages Spent Most Time -->
                         <div class="settings-card" style="margin-top:20px;">
                             <div class="settings-card-header">
-                                <i class="fas fa-hourglass-half" style="color:#a5b4fc;"></i>
+                                <i class="fas fa-hourglass-half" style="color:#9cc6fb;"></i>
                                 <h3>Pages Spent Most Time On</h3>
                             </div>
                             <div class="settings-card-body" style="padding:0;">
                                 <div style="overflow-x:auto;">
-                                    <table style="width:100%;border-collapse:collapse;font-family:'DM Sans',sans-serif;font-size:0.82rem;">
+                                    <table style="width:100%;border-collapse:collapse;font-family:-apple-system,BlinkMacSystemFont,'Inter',sans-serif;font-size:0.82rem;">
                                         <thead>
-                                            <tr style="background:linear-gradient(90deg,#f8fafc,#eef2ff);border-bottom:2px solid #e0e7ff;">
+                                            <tr style="background:linear-gradient(90deg,#f8fafc,#f2f6fb);border-bottom:2px solid #eef4fc;">
                                                 <th style="padding:10px 16px;text-align:left;font-weight:700;color:#475569;letter-spacing:0.04em;text-transform:uppercase;font-size:0.72rem;">#</th>
                                                 <th style="padding:10px 16px;text-align:left;font-weight:700;color:#475569;letter-spacing:0.04em;text-transform:uppercase;font-size:0.72rem;">Page</th>
                                                 <th style="padding:10px 16px;text-align:left;font-weight:700;color:#475569;letter-spacing:0.04em;text-transform:uppercase;font-size:0.72rem;">Total Time Spent</th>
@@ -3474,17 +3479,17 @@
                         <!-- Shared Frontend Visitors -->
                         <div class="settings-card" style="margin-top:20px;">
                             <div class="settings-card-header">
-                                <i class="fas fa-share-alt" style="color:#a5b4fc;"></i>
+                                <i class="fas fa-share-alt" style="color:#9cc6fb;"></i>
                                 <h3>Shared Frontend Visitors</h3>
                             </div>
                             <div class="settings-card-body" style="padding:0;">
-                                <div id="analytics-shared-visitors-summary" style="padding:14px 20px 10px;font-family:'DM Sans',sans-serif;font-size:0.83rem;color:#475569;border-bottom:1px solid #f1f5f9;">
+                                <div id="analytics-shared-visitors-summary" style="padding:14px 20px 10px;font-family:-apple-system,BlinkMacSystemFont,'Inter',sans-serif;font-size:0.83rem;color:#475569;border-bottom:1px solid #f1f5f9;">
                                     Loading visitor data…
                                 </div>
                                 <div style="overflow-x:auto;">
-                                    <table style="width:100%;border-collapse:collapse;font-family:'DM Sans',sans-serif;font-size:0.82rem;">
+                                    <table style="width:100%;border-collapse:collapse;font-family:-apple-system,BlinkMacSystemFont,'Inter',sans-serif;font-size:0.82rem;">
                                         <thead>
-                                            <tr style="background:linear-gradient(90deg,#f8fafc,#eef2ff);border-bottom:2px solid #e0e7ff;">
+                                            <tr style="background:linear-gradient(90deg,#f8fafc,#f2f6fb);border-bottom:2px solid #eef4fc;">
                                                 <th style="padding:10px 16px;text-align:left;font-weight:700;color:#475569;letter-spacing:0.04em;text-transform:uppercase;font-size:0.72rem;">#</th>
                                                 <th style="padding:10px 16px;text-align:left;font-weight:700;color:#475569;letter-spacing:0.04em;text-transform:uppercase;font-size:0.72rem;">Visited At</th>
                                                 <th style="padding:10px 16px;text-align:left;font-weight:700;color:#475569;letter-spacing:0.04em;text-transform:uppercase;font-size:0.72rem;">Time Elapsed Since Visit</th>
@@ -3797,7 +3802,7 @@
                                             <hr class="pd-divider">
                                             <div style="display:flex;gap:10px;flex-wrap:wrap;">
                                                 <button class="pd-btn-secondary" onclick="pdDownloadTemplate()">⬇ Download Template</button>
-                                                <button class="pd-btn-secondary" style="color:#e11d48;border-color:#e11d48;" onclick="pdConfirmClearAll()">🗑 Clear All Data</button>
+                                                <button class="pd-btn-secondary" style="color:#ff3b30;border-color:#ff3b30;" onclick="pdConfirmClearAll()">🗑 Clear All Data</button>
                                             </div>
                                         </div>
                                     </div>
@@ -3943,9 +3948,9 @@
             </main>
             
             <!-- UPDATED: Footer theme -->
-            <footer class="bg-slate-800 text-slate-300 p-4 mt-auto">
+            <footer class="text-slate-300 p-4 mt-auto" style="background: linear-gradient(180deg, #1d1d1f 0%, #232325 100%);">
                 <div class="container mx-auto text-center text-sm">
-                    Developed by Next Gen Sites | Developer Afrasiab Asghar | Contact: +923060406003 | www.nextgensites.org
+                    Developed by Weblora| Developer Afrasiab Asghar | Contact: +923060406003 | https://www.webloraa.com/
                 </div>
             </footer>
         </div>
@@ -4295,8 +4300,38 @@
         const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 
         // --- UTILITY FUNCTIONS ---
-        function showLoading() { loading.classList.remove('hidden'); }
+        function showLoading(message) {
+            const loadingTextEl = document.getElementById('loading-text');
+            if (loadingTextEl) loadingTextEl.textContent = message || 'Loading…';
+            loading.classList.remove('hidden');
+        }
         function hideLoading() { loading.classList.add('hidden'); }
+
+        // --- NETWORK STATUS MONITOR ---
+        (function () {
+            const banner = document.getElementById('network-status-banner');
+            const bannerText = document.getElementById('network-status-text');
+            const refreshBtn = document.getElementById('network-refresh-btn');
+            if (!banner) return;
+            let reconnectTimer = null;
+            function showOffline() {
+                clearTimeout(reconnectTimer);
+                banner.classList.remove('reconnected');
+                bannerText.textContent = "You're offline — please check your internet connection.";
+                refreshBtn.style.display = 'inline-block';
+                banner.classList.add('visible');
+            }
+            function showBackOnline() {
+                banner.classList.add('reconnected');
+                bannerText.textContent = "Back online.";
+                refreshBtn.style.display = 'none';
+                banner.classList.add('visible');
+                reconnectTimer = setTimeout(() => { banner.classList.remove('visible'); }, 2500);
+            }
+            window.addEventListener('offline', showOffline);
+            window.addEventListener('online', showBackOnline);
+            if (!navigator.onLine) showOffline();
+        })();
 
         function showMessage(title, message) {
             modalTitle.textContent = title;
@@ -4559,7 +4594,7 @@
 
         loginForm.addEventListener('submit', async (e) => {
             e.preventDefault();
-            showLoading();
+            showLoading('Signing in…');
             try {
                 await auth.signInWithEmailAndPassword(loginForm['login-email'].value, loginForm['login-password'].value);
             } catch (error) {
