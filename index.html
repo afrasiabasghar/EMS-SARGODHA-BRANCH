@@ -2434,6 +2434,30 @@
                                 </button>
                             </form>
                         </div>
+                        <div class="card p-6 mb-6">
+                            <h3 class="text-xl font-semibold mb-1"><i class="fas fa-file-invoice-dollar mr-2 text-indigo-500"></i>Commission Report</h3>
+                            <p class="text-sm text-slate-500 mb-4">Client aur time period select karein — us client ki har stock trade entry commission ke saath report mein show hogi, aakhir mein Total Commission, Company (Head Office) Commission, Tax aur Final House Commission ke sath.</p>
+                            <div class="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
+                                <div class="md:col-span-2 relative">
+                                    <label for="commission-report-client-search" class="block text-sm font-medium text-slate-700 mb-1">Client (Search by Name or Account Number)</label>
+                                    <input type="text" id="commission-report-client-search" autocomplete="off" placeholder="Type client name or account number..."
+                                           class="w-full px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                                    <input type="hidden" id="commission-report-client-id" value="">
+                                    <div id="commission-report-client-suggestions" class="hidden absolute z-20 left-0 right-0 mt-1 bg-white border border-slate-200 rounded-xl shadow-lg max-h-56 overflow-y-auto"></div>
+                                </div>
+                                <div>
+                                    <label for="commission-report-start-date" class="block text-sm font-medium text-slate-700 mb-1">Start Date</label>
+                                    <input type="date" id="commission-report-start-date" class="w-full px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                                </div>
+                                <div>
+                                    <label for="commission-report-end-date" class="block text-sm font-medium text-slate-700 mb-1">End Date</label>
+                                    <input type="date" id="commission-report-end-date" class="w-full px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                                </div>
+                            </div>
+                            <button id="generate-commission-report-btn" class="mt-4 bg-indigo-600 text-white px-6 py-2 rounded-full font-semibold hover:bg-indigo-700 animated-btn">
+                                <i class="fas fa-download mr-2"></i>Download Commission Report
+                            </button>
+                        </div>
                         <div class="card p-6">
                             <h3 class="text-xl font-semibold mb-4">View Client Profiles</h3>
                             <!-- UPDATED: Added justify-between and the new Download Report button -->
@@ -3952,6 +3976,24 @@
                                 <canvas id="clientCommissionChart"></canvas>
                             </div>
                         </div>
+                        <!-- Commission earned per month, auto-derived from trade log uploads -->
+                        <div class="bg-white p-4 rounded-lg shadow-sm lg:col-span-2">
+                            <h4 class="font-semibold text-lg mb-2">Commission Earned (Auto, from Trade Logs)</h4>
+                            <div class="relative h-64">
+                                <canvas id="clientEarnedCommissionChart"></canvas>
+                            </div>
+                            <div class="mt-4 overflow-x-auto">
+                                <table class="w-full text-left text-sm">
+                                    <thead>
+                                        <tr class="text-slate-500 uppercase text-xs border-b">
+                                            <th class="p-2">Month</th>
+                                            <th class="p-2 text-right">Commission (PKR)</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="clientEarnedCommissionTbody"></tbody>
+                                </table>
+                            </div>
+                        </div>
                         <!-- REMOVED: Financial History Section -->
                     </div>
                 </div>
@@ -4247,7 +4289,7 @@
         let onPasswordVerified = null; 
         
         // Chart instances
-        let complaintStatusChart, commissionChart, clientCommissionChart;
+        let complaintStatusChart, commissionChart, clientCommissionChart, clientEarnedCommissionChart;
         let monthlyCommissionChart, newClientsChart, monthlyExpensesChart;
         
         const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
@@ -4357,6 +4399,57 @@
                 return { grossCommission, hoDeduction, taxDeduction, finalHouseCommission };
             }
         };
+
+        // --- AUTO CLIENT/COMMISSION EXTRACTION FROM TRADE LOGS ---
+        // Derives active clients and per-client, per-month commission figures
+        // directly from `trade_log_entries` (already populated automatically by
+        // the CGS Calculator / Vtrade Trade Log upload flow). No manual entry
+        // is required, and since trade_log_entries already holds all historical
+        // documents from June 1, 2026 onward, this naturally covers historical
+        // backfill as well as new daily uploads in real time.
+        const TRADE_LOG_COMMISSION_START_DATE = '2026-06-01';
+
+        function computeTradeLogClientCommissions() {
+            const byClient = {};       // { clientId: { total, byMonth: { 'YYYY-MM': amount } } }
+            const activeClientIds = new Set();
+
+            Object.keys(allTradeLogEntries).forEach(date => {
+                if (date < TRADE_LOG_COMMISSION_START_DATE) return;
+                const entry = allTradeLogEntries[date];
+                const trades = (entry && Array.isArray(entry.trades)) ? entry.trades : [];
+                if (trades.length === 0) return;
+                const monthKey = date.slice(0, 7); // 'YYYY-MM'
+
+                trades.forEach(t => {
+                    if (!t) return;
+                    const qty = parseFloat(t.quantity) || 0;
+                    const rate = parseFloat(t.rate) || 0;
+                    if (qty <= 0 || rate <= 0) return;
+
+                    // Match the trade to a client profile (by clientName first, then trading account)
+                    const acctRaw = String(t.account || '').trim().toUpperCase();
+                    const client = allClients.find(c => {
+                        if (t.clientName && c.name === t.clientName) return true;
+                        if (!acctRaw) return false;
+                        const acct = String(c.tradingAccount || '').trim().toUpperCase();
+                        if (!acct) return false;
+                        const codePart = acctRaw.includes('-') ? acctRaw.split('-')[0] : acctRaw;
+                        return acct === codePart || acct === acctRaw;
+                    });
+                    if (!client) return; // house/unmatched trade — skip
+
+                    const { totalStockCommission } = CommissionService.calculateCommission(rate, qty);
+                    if (!totalStockCommission) return;
+
+                    activeClientIds.add(client.id);
+                    if (!byClient[client.id]) byClient[client.id] = { total: 0, byMonth: {} };
+                    byClient[client.id].total += totalStockCommission;
+                    byClient[client.id].byMonth[monthKey] = (byClient[client.id].byMonth[monthKey] || 0) + totalStockCommission;
+                });
+            });
+
+            return { activeClientIds, byClient };
+        }
 
         // --- SIDEBAR NAVIGATION ---
         mainNavButtons.forEach(btn => {
@@ -4556,6 +4649,13 @@
                     if (document.getElementById('trade-log').classList.contains('active')) {
                         renderTradeLogForCurrentDate();
                     }
+                    // Active clients & per-client commissions are derived from trade logs,
+                    // so refresh the dashboard and any open client profile automatically.
+                    updateDashboard();
+                    const currentlyOpenClientIdTl = document.getElementById('add-client-payment-form').dataset.clientId;
+                    if (profileDetailModal.classList.contains('active') && currentlyOpenClientIdTl) {
+                        showClientProfile(currentlyOpenClientIdTl);
+                    }
                 },
                 utility_bills: data => { allUtilityBills = data; renderUtilityBills(); },
             };
@@ -4620,11 +4720,18 @@
             const previousYear = previousMonthDate.getFullYear();
             const previousMonth = previousMonthDate.getMonth();
 
-            const relevantPayments = allClientPayments.filter(p =>
-                (p.year === currentYear && p.month === currentMonth) ||
-                (p.year === previousYear && p.month === previousMonth)
+            // Active clients are now derived automatically from trade log uploads
+            // (Commission Generator / Vtrade Trade Log) rather than from manual
+            // monthly client_payments entries.
+            const currentMonthKey = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}`;
+            const previousMonthKey = `${previousYear}-${String(previousMonth + 1).padStart(2, '0')}`;
+            const { byClient: tlByClient } = computeTradeLogClientCommissions();
+            const activeClientIds = new Set(
+                Object.keys(tlByClient).filter(clientId => {
+                    const byMonth = tlByClient[clientId].byMonth;
+                    return (byMonth[currentMonthKey] || 0) > 0 || (byMonth[previousMonthKey] || 0) > 0;
+                })
             );
-            const activeClientIds = new Set(relevantPayments.map(p => p.clientId));
 
             const totalHouseCommission = allDailyCommissions.reduce((sum, c) => sum + (c.houseCommission || 0), 0);
             const totalCommissionReceived = allCommissionReceived.reduce((sum, r) => sum + (r.amount || 0), 0);
@@ -4760,11 +4867,14 @@
             const previousYear = previousMonthDate.getFullYear();
             const previousMonth = previousMonthDate.getMonth();
 
-            const relevantPayments = allClientPayments.filter(p => (p.year === currentYear && p.month === currentMonth) || (p.year === previousYear && p.month === previousMonth));
+            const currentMonthKey = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}`;
+            const previousMonthKey = `${previousYear}-${String(previousMonth + 1).padStart(2, '0')}`;
+            const { byClient: tlByClient2 } = computeTradeLogClientCommissions();
             const clientCommissions = {};
-            relevantPayments.forEach(payment => {
-                if (!clientCommissions[payment.clientId]) clientCommissions[payment.clientId] = 0;
-                clientCommissions[payment.clientId] += payment.amount;
+            Object.keys(tlByClient2).forEach(clientId => {
+                const byMonth = tlByClient2[clientId].byMonth;
+                const amount = (byMonth[currentMonthKey] || 0) + (byMonth[previousMonthKey] || 0);
+                if (amount > 0) clientCommissions[clientId] = amount;
             });
 
             const activeClientIds = Object.keys(clientCommissions);
@@ -7160,6 +7270,229 @@
             profilesList.querySelectorAll('.card').forEach(card => card.addEventListener('click', (e) => showClientProfile(e.currentTarget.dataset.id)));
         }
 
+        // ─── COMMISSION REPORT (Client Profiles) ─────────────────────────────────
+        function renderCommissionReportClientSuggestions(term) {
+            const box = document.getElementById('commission-report-client-suggestions');
+            if (!box) return;
+            const searchTerm = (term || '').trim().toLowerCase();
+            if (!searchTerm) { box.classList.add('hidden'); box.innerHTML = ''; return; }
+
+            const matches = allClients
+                .filter(c => (c.name || '').toLowerCase().includes(searchTerm) || (c.tradingAccount || '').toLowerCase().includes(searchTerm))
+                .sort((a, b) => (a.name || '').localeCompare(b.name || ''))
+                .slice(0, 20);
+
+            if (matches.length === 0) {
+                box.innerHTML = '<div class="px-4 py-3 text-sm text-slate-400">No matching client found.</div>';
+                box.classList.remove('hidden');
+                return;
+            }
+
+            box.innerHTML = matches.map(c => `
+                <div class="commission-report-suggestion-item px-4 py-2 text-sm cursor-pointer hover:bg-indigo-50 border-b border-slate-100 last:border-b-0" data-id="${c.id}" data-label="${c.name} (${c.tradingAccount || 'N/A'})">
+                    <span class="font-semibold text-slate-800">${c.name}</span>
+                    <span class="text-slate-400 text-xs ml-1">${c.tradingAccount || 'N/A'}</span>
+                </div>
+            `).join('');
+            box.classList.remove('hidden');
+
+            box.querySelectorAll('.commission-report-suggestion-item').forEach(item => {
+                item.addEventListener('click', () => {
+                    document.getElementById('commission-report-client-id').value = item.dataset.id;
+                    document.getElementById('commission-report-client-search').value = item.dataset.label;
+                    box.classList.add('hidden');
+                    box.innerHTML = '';
+                });
+            });
+        }
+
+        (function initCommissionReportClientSearch() {
+            const searchInput = document.getElementById('commission-report-client-search');
+            const suggestionsBox = document.getElementById('commission-report-client-suggestions');
+            if (!searchInput || !suggestionsBox) return;
+
+            searchInput.addEventListener('input', () => {
+                // Typing invalidates any previously selected client until a suggestion is clicked again
+                document.getElementById('commission-report-client-id').value = '';
+                renderCommissionReportClientSuggestions(searchInput.value);
+            });
+            searchInput.addEventListener('focus', () => {
+                if (searchInput.value.trim()) renderCommissionReportClientSuggestions(searchInput.value);
+            });
+            document.addEventListener('click', (e) => {
+                if (e.target !== searchInput && !suggestionsBox.contains(e.target)) {
+                    suggestionsBox.classList.add('hidden');
+                }
+            });
+        })();
+
+        function generateClientCommissionReport() {
+            const clientId = document.getElementById('commission-report-client-id').value;
+            const startDate = document.getElementById('commission-report-start-date').value;
+            const endDate = document.getElementById('commission-report-end-date').value;
+
+            if (!clientId) { showMessage('Info', 'Pehle client search karein aur list mein se select karein.'); return; }
+            if (!startDate || !endDate) { showMessage('Info', 'Start aur End date dono select karein.'); return; }
+            if (startDate > endDate) { showMessage('Info', 'Start Date, End Date se pehle honi chahiye.'); return; }
+
+            const client = allClients.find(c => c.id === clientId);
+            if (!client) { showMessage('Error', 'Client nahi mila.'); return; }
+
+            // Collect this client's individual stock trade entries (with commission) within the date range
+            const reportRows = [];
+            Object.keys(allTradeLogEntries).sort().forEach(date => {
+                if (date < startDate || date > endDate) return;
+                const entry = allTradeLogEntries[date];
+                const trades = (entry && Array.isArray(entry.trades)) ? entry.trades : [];
+
+                trades.forEach(t => {
+                    if (!t) return;
+                    const qty = parseFloat(t.quantity) || 0;
+                    const rate = parseFloat(t.rate) || 0;
+                    if (qty <= 0 || rate <= 0) return;
+
+                    const acctRaw = String(t.account || '').trim().toUpperCase();
+                    const isMatch = (t.clientName && t.clientName === client.name) || (
+                        acctRaw && String(client.tradingAccount || '').trim().toUpperCase() &&
+                        (() => {
+                            const acct = String(client.tradingAccount).trim().toUpperCase();
+                            const codePart = acctRaw.includes('-') ? acctRaw.split('-')[0] : acctRaw;
+                            return acct === codePart || acct === acctRaw;
+                        })()
+                    );
+                    if (!isMatch) return;
+
+                    const { totalStockCommission } = CommissionService.calculateCommission(rate, qty);
+                    if (!totalStockCommission) return;
+
+                    reportRows.push({
+                        date,
+                        stockName: t.stockName || 'N/A',
+                        side: t.side || 'both',
+                        quantity: qty,
+                        rate,
+                        totalValue: qty * rate,
+                        commission: totalStockCommission
+                    });
+                });
+            });
+
+            if (reportRows.length === 0) {
+                showMessage('Info', `${client.name} ki koi commission entry is date range mein nahi mili.`);
+                return;
+            }
+
+            const grossCommission = reportRows.reduce((sum, r) => sum + r.commission, 0);
+            const { hoDeduction, taxDeduction, finalHouseCommission } = CommissionService.calculateDeductions(grossCommission);
+
+            _downloadClientCommissionReportPDF(client, reportRows, startDate, endDate, grossCommission, hoDeduction, taxDeduction, finalHouseCommission);
+        }
+
+        function _downloadClientCommissionReportPDF(client, rows, startDate, endDate, grossCommission, hoDeduction, taxDeduction, finalHouseCommission) {
+            const fmt = (n) => `PKR ${Number(n).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+            const fmtDate = (d) => new Date(d + 'T00:00:00').toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+
+            const tableRows = rows.map((r, i) => {
+                const bg = i % 2 === 0 ? '#ffffff' : '#f8fafc';
+                const sideLabel = r.side === 'buy' ? 'Buy' : r.side === 'sell' ? 'Sell' : 'Both';
+                return `<tr style="background:${bg};">
+                    <td style="padding:8px 10px;border-bottom:1px solid #e2e8f0;">${i + 1}</td>
+                    <td style="padding:8px 10px;border-bottom:1px solid #e2e8f0;">${fmtDate(r.date)}</td>
+                    <td style="padding:8px 10px;border-bottom:1px solid #e2e8f0;font-weight:600;">${r.stockName}</td>
+                    <td style="padding:8px 10px;border-bottom:1px solid #e2e8f0;">${sideLabel}</td>
+                    <td style="padding:8px 10px;border-bottom:1px solid #e2e8f0;text-align:right;">${r.quantity.toLocaleString()}</td>
+                    <td style="padding:8px 10px;border-bottom:1px solid #e2e8f0;text-align:right;">${r.rate.toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2})}</td>
+                    <td style="padding:8px 10px;border-bottom:1px solid #e2e8f0;text-align:right;">${r.totalValue.toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2})}</td>
+                    <td style="padding:8px 10px;border-bottom:1px solid #e2e8f0;text-align:right;font-weight:600;color:#4f46e5;">${r.commission.toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2})}</td>
+                </tr>`;
+            }).join('');
+
+            const now = new Date();
+            const dateStr = now.toLocaleDateString('en-PK', { day: '2-digit', month: 'long', year: 'numeric' });
+
+            const html = `<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Commission Report — ${client.name} — ${fmtDate(startDate)} to ${fmtDate(endDate)}</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: Arial, sans-serif; font-size: 12px; color: #1e293b; background: #fff; padding: 28px; }
+  .letterhead { display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 3px solid #4f46e5; padding-bottom: 14px; margin-bottom: 6px; }
+  .letterhead h1 { font-size: 20px; font-weight: 700; color: #4f46e5; }
+  .letterhead p { font-size: 11px; color: #64748b; margin-top: 2px; }
+  .report-title { text-align: center; font-size: 14px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.07em; color: #1e293b; margin: 10px 0; padding: 7px; background: #eef2ff; border-radius: 6px; }
+  .meta-bar { display: flex; flex-wrap: wrap; gap: 20px; margin-bottom: 14px; font-size: 11px; color: #475569; }
+  .meta-bar span { background: #f1f5f9; padding: 3px 10px; border-radius: 20px; }
+  table { width: 100%; border-collapse: collapse; font-size: 11px; }
+  thead { background: #4f46e5; }
+  thead th { color: #fff; padding: 9px 10px; text-align: left; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; }
+  tbody tr:hover { background: #f0f4ff !important; }
+  .summary-box { margin-top: 18px; width: 320px; margin-left: auto; border: 1px solid #e2e8f0; border-radius: 8px; overflow: hidden; }
+  .summary-row { display: flex; justify-content: space-between; padding: 9px 14px; font-size: 12px; border-bottom: 1px solid #e2e8f0; }
+  .summary-row:last-child { border-bottom: none; }
+  .summary-row.total { background: #eef2ff; font-weight: 700; }
+  .summary-row.final { background: #4f46e5; color: #fff; font-weight: 700; font-size: 13px; }
+  .footer { margin-top: 22px; text-align: center; font-size: 10px; color: #94a3b8; border-top: 1px solid #e2e8f0; padding-top: 10px; }
+  @media print {
+    body { padding: 14px; }
+    thead { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .summary-row.final { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  }
+</style>
+</head>
+<body>
+<div class="letterhead">
+  <div>
+    <h1>Darson Securities Pvt Limited</h1>
+    <p>Sargodha Branch &mdash; Client Commission Report</p>
+  </div>
+  <div style="text-align:right;">
+    <p style="font-size:11px;color:#64748b;">Date: ${dateStr}</p>
+    <p style="font-size:11px;color:#64748b;">Printed: ${now.toLocaleString('en-PK')}</p>
+  </div>
+</div>
+<div class="report-title">Commission Report &mdash; ${client.name}</div>
+<div class="meta-bar">
+  <span>Client: <strong>${client.name}</strong></span>
+  <span>Trading Account: <strong>${client.tradingAccount || 'N/A'}</strong></span>
+  <span>Period: <strong>${fmtDate(startDate)} &ndash; ${fmtDate(endDate)}</strong></span>
+  <span>Total Entries: <strong>${rows.length}</strong></span>
+</div>
+<table>
+  <thead>
+    <tr>
+      <th style="width:32px;">#</th>
+      <th>Date</th>
+      <th>Stock</th>
+      <th>Side</th>
+      <th style="text-align:right;">Quantity</th>
+      <th style="text-align:right;">Rate</th>
+      <th style="text-align:right;">Total Value</th>
+      <th style="text-align:right;">Commission</th>
+    </tr>
+  </thead>
+  <tbody>${tableRows}</tbody>
+</table>
+<div class="summary-box">
+  <div class="summary-row total"><span>Total Commission</span><span>${fmt(grossCommission)}</span></div>
+  <div class="summary-row"><span>Company (Head Office) Commission</span><span>${fmt(hoDeduction)}</span></div>
+  <div class="summary-row"><span>Tax</span><span>${fmt(taxDeduction)}</span></div>
+  <div class="summary-row final"><span>Final House Commission</span><span>${fmt(finalHouseCommission)}</span></div>
+</div>
+<div class="footer">Darson Securities Pvt Limited, Sargodha Branch &mdash; Confidential Commission Report &mdash; Generated by Darson Brokerage System</div>
+</body>
+</html>`;
+
+            const win = window.open('', '_blank', 'width=1100,height=750');
+            win.document.write(html);
+            win.document.close();
+            win.focus();
+            setTimeout(() => win.print(), 500);
+        }
+
+        document.getElementById('generate-commission-report-btn').addEventListener('click', generateClientCommissionReport);
+
         // ─── ENHANCED DOWNLOAD CLIENT REPORT MODULE ──────────────────────────────
 
         // Helper: get the set of clientIds that have commission added this current month
@@ -7463,6 +7796,27 @@
                     sortKey: new Date(p.year, p.month, 1)
                 };
             });
+
+            // FIX: Merge in commissions auto-derived from trade logs so months that
+            // never had a manual client_payments entry (e.g. June 2026) still show up
+            // in Client Payment History instead of appearing blank.
+            const { byClient: tlByClientProfile } = computeTradeLogClientCommissions();
+            const clientMonthlyCommission = (tlByClientProfile[clientId] && tlByClientProfile[clientId].byMonth) || {};
+            Object.keys(clientMonthlyCommission).forEach(monthKey => {
+                const [y, m] = monthKey.split('-');
+                const year = parseInt(y, 10);
+                const monthIdx = parseInt(m, 10) - 1; // convert 'YYYY-MM' (1-indexed) to JS 0-indexed month
+                const key = `${year}-${monthIdx}`;
+                if (!clientPaymentData[key]) {
+                    clientPaymentData[key] = {
+                        label: `${months[monthIdx]} '${String(year).slice(-2)}`,
+                        value: 0,
+                        sortKey: new Date(year, monthIdx, 1)
+                    };
+                }
+                clientPaymentData[key].value += clientMonthlyCommission[monthKey];
+            });
+
             const sortedPaymentData = Object.values(clientPaymentData).sort((a, b) => a.sortKey - b.sortKey);
 
             if (clientCommissionChart) clientCommissionChart.destroy();
@@ -7475,6 +7829,46 @@
                 },
                 options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true } } }
             });
+
+            // Commission earned per month — auto-derived from trade log uploads (no manual entry)
+            const sortedEarnedData = Object.keys(clientMonthlyCommission)
+                .sort()
+                .map(monthKey => {
+                    const [y, m] = monthKey.split('-');
+                    return {
+                        label: `${months[parseInt(m, 10) - 1]} '${y.slice(-2)}`,
+                        value: clientMonthlyCommission[monthKey]
+                    };
+                });
+
+            if (clientEarnedCommissionChart) clientEarnedCommissionChart.destroy();
+            clientEarnedCommissionChart = new Chart('clientEarnedCommissionChart', {
+                type: 'bar',
+                data: {
+                    labels: sortedEarnedData.map(d => d.label),
+                    datasets: [{ label: 'Commission Earned (PKR)', data: sortedEarnedData.map(d => d.value), backgroundColor: '#6366f1' }] // indigo-500
+                },
+                options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true } } }
+            });
+
+            // Month-wise breakdown table (most recent month first)
+            const earnedTbody = document.getElementById('clientEarnedCommissionTbody');
+            if (sortedEarnedData.length > 0) {
+                const totalEarnedCommission = sortedEarnedData.reduce((sum, d) => sum + d.value, 0);
+                earnedTbody.innerHTML = sortedEarnedData.slice().reverse().map(d => `
+                    <tr class="border-b">
+                        <td class="p-2 text-slate-700">${d.label}</td>
+                        <td class="p-2 text-right font-mono text-indigo-700">PKR ${d.value.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+                    </tr>
+                `).join('') + `
+                    <tr>
+                        <td class="p-2 font-semibold text-slate-800">Total</td>
+                        <td class="p-2 text-right font-mono font-bold text-indigo-800">PKR ${totalEarnedCommission.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+                    </tr>
+                `;
+            } else {
+                earnedTbody.innerHTML = '<tr><td colspan="2" class="p-3 text-center text-slate-400">Is client ki koi commission trade logs se abhi tak record nahi hui.</td></tr>';
+            }
 
             document.getElementById('close-account-btn').dataset.id = client.id;
             
