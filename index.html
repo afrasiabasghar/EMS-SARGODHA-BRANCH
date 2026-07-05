@@ -2434,7 +2434,7 @@
                                 </button>
                             </form>
                         </div>
-                        <div class="card p-6 mb-6">
+                        <div id="commission-report-wrapper" class="card p-6 mb-6">
                             <h3 class="text-xl font-semibold mb-1"><i class="fas fa-file-invoice-dollar mr-2 text-indigo-500"></i>Commission Report</h3>
                             <p class="text-sm text-slate-500 mb-4">Client aur time period select karein — us client ki har stock trade entry commission ke saath report mein show hogi, aakhir mein Total Commission, Company (Head Office) Commission, Tax aur Final House Commission ke sath.</p>
                             <div class="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
@@ -7243,6 +7243,7 @@
         
         function renderProfiles() {
             document.getElementById('add-client-wrapper').style.display = isSharedView ? 'none' : 'block';
+            document.getElementById('commission-report-wrapper').style.display = isSharedView ? 'none' : 'block';
 
             const now = new Date();
             const currentMonth = now.getMonth();
