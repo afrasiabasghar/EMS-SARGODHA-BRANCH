@@ -128,6 +128,24 @@
             font-size: 1.2rem;
             margin-bottom: 0.75rem;
         }
+        .dash-value-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+        .dash-trend {
+            font-size: 0.7rem;
+            font-weight: 700;
+            display: inline-flex;
+            align-items: center;
+            gap: 3px;
+            padding: 2px 8px;
+            border-radius: 99px;
+            white-space: nowrap;
+        }
+        .dash-trend.dash-trend-up { color: var(--accent-emerald); background: rgba(31,157,85,0.1); }
+        .dash-trend.dash-trend-down { color: var(--accent-rose); background: rgba(255,59,48,0.1); }
 
         /* ─── Sidebar ────────────────────────────── */
         aside#sidebar {
@@ -1857,14 +1875,20 @@
                                     <i class="fas fa-user-check" style="color:#1f9d55;"></i>
                                 </div>
                                 <h3 style="color:#94a3b8;font-size:0.7rem;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:4px;">Active Clients (Last 2 Mo)</h3>
-                                <p id="active-clients" class="text-2xl xl:text-3xl font-bold" style="color:#0f172a;">0</p>
+                                <div class="dash-value-row">
+                                    <p id="active-clients" class="text-2xl xl:text-3xl font-bold" style="color:#0f172a;">0</p>
+                                    <span id="active-clients-trend" class="dash-trend"></span>
+                                </div>
                             </div>
                             <div id="dashboard-revenue-card" class="stat-card cursor-pointer">
                                 <div class="stat-icon" style="background:linear-gradient(135deg,#d1fae5,#6ee7b7);">
                                     <i class="fas fa-coins" style="color:#1f9d55;"></i>
                                 </div>
                                 <h3 style="color:#94a3b8;font-size:0.7rem;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:4px;">Commission Balance</h3>
-                                <p id="monthly-revenue" class="text-2xl xl:text-3xl font-bold" style="color:#1f9d55;">PKR 0</p>
+                                <div class="dash-value-row">
+                                    <p id="monthly-revenue" class="text-2xl xl:text-3xl font-bold" style="color:#1f9d55;">PKR 0</p>
+                                    <span id="commission-balance-trend" class="dash-trend"></span>
+                                </div>
                             </div>
                             <div id="dashboard-employees-card" class="stat-card cursor-pointer">
                                 <div class="stat-icon" style="background:linear-gradient(135deg,#fef3c7,#fde68a);">
@@ -1878,21 +1902,30 @@
                                     <i class="fas fa-chart-line" style="color:#7c3aed;"></i>
                                 </div>
                                 <h3 style="color:#94a3b8;font-size:0.7rem;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:4px;">Total Commission (This Month)</h3>
-                                <p id="dashboard-total-commission" class="text-2xl xl:text-3xl font-bold" style="color:#7c3aed;">PKR 0</p>
+                                <div class="dash-value-row">
+                                    <p id="dashboard-total-commission" class="text-2xl xl:text-3xl font-bold" style="color:#7c3aed;">PKR 0</p>
+                                    <span id="total-commission-trend" class="dash-trend"></span>
+                                </div>
                             </div>
                             <div id="dashboard-ho-deduction-card" class="stat-card">
                                 <div class="stat-icon" style="background:linear-gradient(135deg,#fce7f3,#f9a8d4);">
                                     <i class="fas fa-building" style="color:#be185d;"></i>
                                 </div>
                                 <h3 style="color:#94a3b8;font-size:0.7rem;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:4px;">Head Office Deduction (This Month)</h3>
-                                <p id="dashboard-ho-deduction" class="text-2xl xl:text-3xl font-bold" style="color:#be185d;">PKR 0</p>
+                                <div class="dash-value-row">
+                                    <p id="dashboard-ho-deduction" class="text-2xl xl:text-3xl font-bold" style="color:#be185d;">PKR 0</p>
+                                    <span id="ho-deduction-trend" class="dash-trend"></span>
+                                </div>
                             </div>
                             <div id="dashboard-total-tax-card" class="stat-card">
                                 <div class="stat-icon" style="background:linear-gradient(135deg,#ffedd5,#fed7aa);">
                                     <i class="fas fa-receipt" style="color:#c2410c;"></i>
                                 </div>
                                 <h3 style="color:#94a3b8;font-size:0.7rem;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:4px;">Total Tax (This Month)</h3>
-                                <p id="dashboard-total-tax" class="text-2xl xl:text-3xl font-bold" style="color:#c2410c;">PKR 0</p>
+                                <div class="dash-value-row">
+                                    <p id="dashboard-total-tax" class="text-2xl xl:text-3xl font-bold" style="color:#c2410c;">PKR 0</p>
+                                    <span id="total-tax-trend" class="dash-trend"></span>
+                                </div>
                             </div>
                         </div>
                         
@@ -4987,6 +5020,16 @@
                 })
             );
 
+            // Rolling 2-month window shifted back by one month, for the Active Clients trend comparison
+            const priorWindowMonthDate = new Date(now.getFullYear(), now.getMonth() - 2, 1);
+            const priorWindowYear = priorWindowMonthDate.getFullYear();
+            const priorWindowMonth = priorWindowMonthDate.getMonth();
+            const priorWindowMonthKey = `${priorWindowYear}-${String(priorWindowMonth + 1).padStart(2, '0')}`;
+            const previousActiveClientCount = Object.keys(tlByClient).filter(clientId => {
+                const byMonth = tlByClient[clientId].byMonth;
+                return (byMonth[previousMonthKey] || 0) > 0 || (byMonth[priorWindowMonthKey] || 0) > 0;
+            }).length;
+
             const totalHouseCommission = allDailyCommissions.reduce((sum, c) => sum + (c.houseCommission || 0), 0);
             const totalCommissionReceived = allCommissionReceived.reduce((sum, r) => sum + (r.amount || 0), 0);
             const commissionClosingBalance = totalHouseCommission - totalCommissionReceived;
@@ -5005,6 +5048,62 @@
             // Tax deduction = 12% of Branch share (60% of gross), from stored tax field
             const monthTaxDeduction = currentMonthCommissions.reduce((sum, c) => sum + (c.tax || 0), 0);
 
+            // Previous-month totals, matched to the same number of working days elapsed this month,
+            // for an apples-to-apples trend comparison (e.g. this month's first 5 working days vs last month's first 5)
+            const previousMonthCommissions = allDailyCommissions.filter(c => {
+                const d = new Date(c.date);
+                return d.getMonth() === previousMonth && d.getFullYear() === previousYear;
+            });
+
+            function sumByField(rows, field) {
+                const byDate = {};
+                rows.forEach(c => { byDate[c.date] = (byDate[c.date] || 0) + (c[field] || 0); });
+                return byDate;
+            }
+
+            const currentWorkingDaysCount = new Set(currentMonthCommissions.map(c => c.date)).size;
+            const prevGrossByDate = sumByField(previousMonthCommissions, 'totalCommission');
+            const prevHOByDate = sumByField(previousMonthCommissions, 'headofficeCommission');
+            const prevTaxByDate = sumByField(previousMonthCommissions, 'tax');
+            const matchedPrevDates = Object.keys(prevGrossByDate).sort().slice(0, currentWorkingDaysCount);
+
+            const prevMonthGrossCommission = matchedPrevDates.reduce((sum, d) => sum + (prevGrossByDate[d] || 0), 0);
+            const prevMonthHODeduction = matchedPrevDates.reduce((sum, d) => sum + (prevHOByDate[d] || 0), 0);
+            const prevMonthTaxDeduction = matchedPrevDates.reduce((sum, d) => sum + (prevTaxByDate[d] || 0), 0);
+
+            // Commission Balance trend: cumulative balance as of the Nth working day of last month
+            // (same working-day count as this month so far), so it updates day-by-day just like the others
+            let previousCommissionClosingBalance = 0;
+            if (matchedPrevDates.length > 0) {
+                const cutoffDate = new Date(matchedPrevDates[matchedPrevDates.length - 1]);
+                cutoffDate.setHours(23, 59, 59, 999);
+                const prevHouseCommission = allDailyCommissions
+                    .filter(c => new Date(c.date) <= cutoffDate)
+                    .reduce((sum, c) => sum + (c.houseCommission || 0), 0);
+                const prevCommissionReceived = allCommissionReceived
+                    .filter(r => new Date(r.date) <= cutoffDate)
+                    .reduce((sum, r) => sum + (r.amount || 0), 0);
+                previousCommissionClosingBalance = prevHouseCommission - prevCommissionReceived;
+            }
+
+
+            // Renders an up/down arrow + percentage-change badge comparing current vs previous period
+            function renderDashTrend(elId, current, previous) {
+                const el = document.getElementById(elId);
+                if (!el) return;
+                if (!previous) {
+                    if (!current) { el.innerHTML = ''; return; }
+                    el.className = 'dash-trend dash-trend-up';
+                    el.innerHTML = '<i class="fas fa-arrow-up"></i> 100%';
+                    return;
+                }
+                const pct = ((current - previous) / previous) * 100;
+                const isUp = pct >= 0;
+                el.className = 'dash-trend ' + (isUp ? 'dash-trend-up' : 'dash-trend-down');
+                el.innerHTML = `<i class="fas fa-arrow-${isUp ? 'up' : 'down'}"></i> ${Math.abs(pct).toFixed(1)}%`;
+            }
+
+
             const activeComplaints = allComplaints.filter(c => c.status !== 'Closed');
             document.getElementById('total-complaints').textContent = activeComplaints.length;
 
@@ -5020,6 +5119,13 @@
             document.getElementById('dashboard-total-commission').textContent = `PKR ${monthGrossCommission.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`;
             document.getElementById('dashboard-ho-deduction').textContent = `PKR ${monthHODeduction.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`;
             document.getElementById('dashboard-total-tax').textContent = `PKR ${monthTaxDeduction.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`;
+
+            // Trend badges: current period vs last month
+            renderDashTrend('active-clients-trend', activeClientIds.size, previousActiveClientCount);
+            renderDashTrend('commission-balance-trend', commissionClosingBalance, previousCommissionClosingBalance);
+            renderDashTrend('total-commission-trend', monthGrossCommission, prevMonthGrossCommission);
+            renderDashTrend('ho-deduction-trend', monthHODeduction, prevMonthHODeduction);
+            renderDashTrend('total-tax-trend', monthTaxDeduction, prevMonthTaxDeduction);
 
             const complaintStatusData = { Pending: 0, Done: 0 };
             activeComplaints.forEach(c => {
@@ -7751,7 +7857,7 @@
         // ─── ENHANCED DOWNLOAD CLIENT REPORT MODULE ──────────────────────────────
 
         // Helper: get the set of clientIds that have commission added this current month
-        // Helper: get active client IDs — same logic as "Active Clients (Last Two Months)" modal
+        // Helper: get active client IDs — same logic as "Active Clients (Last Two Months)" modal and Dashboard card
         function getActiveClientIdsLastTwoMonths() {
             const now = new Date();
             const currentMonth = now.getMonth();
@@ -7759,13 +7865,15 @@
             const prevDate = new Date(now.getFullYear(), now.getMonth() - 1, 1);
             const previousMonth = prevDate.getMonth();
             const previousYear = prevDate.getFullYear();
+            const currentMonthKey = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}`;
+            const previousMonthKey = `${previousYear}-${String(previousMonth + 1).padStart(2, '0')}`;
+
+            const { byClient: tlByClient } = computeTradeLogClientCommissions();
             return new Set(
-                allClientPayments
-                    .filter(p =>
-                        (p.month === currentMonth && p.year === currentYear) ||
-                        (p.month === previousMonth && p.year === previousYear)
-                    )
-                    .map(p => p.clientId)
+                Object.keys(tlByClient).filter(clientId => {
+                    const byMonth = tlByClient[clientId].byMonth;
+                    return (byMonth[currentMonthKey] || 0) > 0 || (byMonth[previousMonthKey] || 0) > 0;
+                })
             );
         }
 
