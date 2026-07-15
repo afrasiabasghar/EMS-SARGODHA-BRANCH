@@ -146,6 +146,19 @@
         }
         .dash-trend.dash-trend-up { color: var(--accent-emerald); background: rgba(31,157,85,0.1); }
         .dash-trend.dash-trend-down { color: var(--accent-rose); background: rgba(255,59,48,0.1); }
+        .dash-trend-label {
+            font-size: 0.62rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            white-space: nowrap;
+        }
+        .dash-sparkline {
+            width: 100%;
+            height: 26px;
+            margin-top: 8px;
+            line-height: 0;
+        }
+        .dash-sparkline svg { display: block; width: 100%; height: 100%; }
 
         /* ─── Sidebar ────────────────────────────── */
         aside#sidebar {
@@ -1878,7 +1891,9 @@
                                 <div class="dash-value-row">
                                     <p id="active-clients" class="text-2xl xl:text-3xl font-bold" style="color:#0f172a;">0</p>
                                     <span id="active-clients-trend" class="dash-trend"></span>
+                                    <span class="dash-trend-label">vs last month</span>
                                 </div>
+                                <div id="active-clients-spark" class="dash-sparkline"></div>
                             </div>
                             <div id="dashboard-revenue-card" class="stat-card cursor-pointer">
                                 <div class="stat-icon" style="background:linear-gradient(135deg,#d1fae5,#6ee7b7);">
@@ -1888,7 +1903,9 @@
                                 <div class="dash-value-row">
                                     <p id="monthly-revenue" class="text-2xl xl:text-3xl font-bold" style="color:#1f9d55;">PKR 0</p>
                                     <span id="commission-balance-trend" class="dash-trend"></span>
+                                    <span class="dash-trend-label">vs last month</span>
                                 </div>
+                                <div id="commission-balance-spark" class="dash-sparkline"></div>
                             </div>
                             <div id="dashboard-employees-card" class="stat-card cursor-pointer">
                                 <div class="stat-icon" style="background:linear-gradient(135deg,#fef3c7,#fde68a);">
@@ -1905,7 +1922,9 @@
                                 <div class="dash-value-row">
                                     <p id="dashboard-total-commission" class="text-2xl xl:text-3xl font-bold" style="color:#7c3aed;">PKR 0</p>
                                     <span id="total-commission-trend" class="dash-trend"></span>
+                                    <span class="dash-trend-label">vs last month</span>
                                 </div>
+                                <div id="total-commission-spark" class="dash-sparkline"></div>
                             </div>
                             <div id="dashboard-ho-deduction-card" class="stat-card">
                                 <div class="stat-icon" style="background:linear-gradient(135deg,#fce7f3,#f9a8d4);">
@@ -1915,7 +1934,9 @@
                                 <div class="dash-value-row">
                                     <p id="dashboard-ho-deduction" class="text-2xl xl:text-3xl font-bold" style="color:#be185d;">PKR 0</p>
                                     <span id="ho-deduction-trend" class="dash-trend"></span>
+                                    <span class="dash-trend-label">vs last month</span>
                                 </div>
+                                <div id="ho-deduction-spark" class="dash-sparkline"></div>
                             </div>
                             <div id="dashboard-total-tax-card" class="stat-card">
                                 <div class="stat-icon" style="background:linear-gradient(135deg,#ffedd5,#fed7aa);">
@@ -1925,7 +1946,9 @@
                                 <div class="dash-value-row">
                                     <p id="dashboard-total-tax" class="text-2xl xl:text-3xl font-bold" style="color:#c2410c;">PKR 0</p>
                                     <span id="total-tax-trend" class="dash-trend"></span>
+                                    <span class="dash-trend-label">vs last month</span>
                                 </div>
+                                <div id="total-tax-spark" class="dash-sparkline"></div>
                             </div>
                         </div>
                         
@@ -5087,22 +5110,99 @@
             }
 
 
-            // Renders an up/down arrow + percentage-change badge comparing current vs previous period
-            function renderDashTrend(elId, current, previous) {
+            // Draws a small smooth sparkline (line + soft area fill) into the given container from a numeric series
+            function renderSparkline(elId, values, isUp) {
                 const el = document.getElementById(elId);
                 if (!el) return;
-                if (!previous) {
-                    if (!current) { el.innerHTML = ''; return; }
-                    el.className = 'dash-trend dash-trend-up';
-                    el.innerHTML = '<i class="fas fa-arrow-up"></i> 100%';
-                    return;
+                if (!values || values.length < 2) { el.innerHTML = ''; return; }
+                const w = 100, h = 26, pad = 2;
+                const min = Math.min(...values), max = Math.max(...values);
+                const range = (max - min) || 1;
+                const stepX = (w - pad * 2) / (values.length - 1);
+                const pts = values.map((v, i) => [pad + i * stepX, pad + (h - pad * 2) - ((v - min) / range) * (h - pad * 2)]);
+                let d = `M ${pts[0][0]},${pts[0][1]}`;
+                for (let i = 0; i < pts.length - 1; i++) {
+                    const [x0, y0] = pts[i], [x1, y1] = pts[i + 1];
+                    d += ` Q ${x0},${y0} ${(x0 + x1) / 2},${(y0 + y1) / 2}`;
                 }
-                const pct = ((current - previous) / previous) * 100;
-                const isUp = pct >= 0;
-                el.className = 'dash-trend ' + (isUp ? 'dash-trend-up' : 'dash-trend-down');
-                el.innerHTML = `<i class="fas fa-arrow-${isUp ? 'up' : 'down'}"></i> ${Math.abs(pct).toFixed(1)}%`;
+                d += ` L ${pts[pts.length - 1][0]},${pts[pts.length - 1][1]}`;
+                const areaD = `${d} L ${pts[pts.length - 1][0]},${h} L ${pts[0][0]},${h} Z`;
+                const color = isUp ? '#1f9d55' : '#ff3b30';
+                const gid = 'grad-' + elId;
+                el.innerHTML = `<svg viewBox="0 0 ${w} ${h}" preserveAspectRatio="none">
+                    <defs><linearGradient id="${gid}" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="0%" stop-color="${color}" stop-opacity="0.3"/>
+                        <stop offset="100%" stop-color="${color}" stop-opacity="0"/>
+                    </linearGradient></defs>
+                    <path d="${areaD}" fill="url(#${gid})" stroke="none"/>
+                    <path d="${d}" fill="none" stroke="${color}" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>`;
             }
 
+            // Renders an up/down arrow + percentage-change badge comparing current vs previous period,
+            // plus (optionally) a mini trend-line sparkline fed by a monthly history series
+            function renderDashTrend(elId, current, previous, sparkId, series) {
+                const el = document.getElementById(elId);
+                if (!el) return;
+                let isUp = true;
+                if (!previous) {
+                    if (!current) { el.innerHTML = ''; }
+                    else {
+                        el.className = 'dash-trend dash-trend-up';
+                        el.innerHTML = '<i class="fas fa-arrow-up"></i> 100%';
+                    }
+                } else {
+                    const pct = ((current - previous) / previous) * 100;
+                    isUp = pct >= 0;
+                    el.className = 'dash-trend ' + (isUp ? 'dash-trend-up' : 'dash-trend-down');
+                    el.innerHTML = `<i class="fas fa-arrow-${isUp ? 'up' : 'down'}"></i> ${Math.abs(pct).toFixed(1)}%`;
+                }
+                if (sparkId) renderSparkline(sparkId, series, isUp);
+            }
+
+            // Last 6 month keys (oldest -> current), used to build the trend-line series for each stat card
+            function monthKeysBack(n) {
+                const arr = [];
+                for (let i = n - 1; i >= 0; i--) {
+                    const d = new Date(currentYear, currentMonth - i, 1);
+                    arr.push(`${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`);
+                }
+                return arr;
+            }
+            function sumFieldByMonth(rows, field) {
+                const map = {};
+                rows.forEach(c => {
+                    const d = new Date(c.date);
+                    const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+                    map[key] = (map[key] || 0) + (c[field] || 0);
+                });
+                return map;
+            }
+            const sparkMonthKeys = monthKeysBack(6);
+            const grossByMonthMap = sumFieldByMonth(allDailyCommissions, 'totalCommission');
+            const hoByMonthMap = sumFieldByMonth(allDailyCommissions, 'headofficeCommission');
+            const taxByMonthMap = sumFieldByMonth(allDailyCommissions, 'tax');
+            const totalCommissionSeries = sparkMonthKeys.map(k => grossByMonthMap[k] || 0);
+            const hoDeductionSeries = sparkMonthKeys.map(k => hoByMonthMap[k] || 0);
+            const totalTaxSeries = sparkMonthKeys.map(k => taxByMonthMap[k] || 0);
+            // Commission Balance is cumulative, so its series is the running balance as of each month-end
+            const commissionBalanceSeries = sparkMonthKeys.map(k => {
+                const [y, m] = k.split('-').map(Number);
+                const end = new Date(y, m, 0, 23, 59, 59, 999);
+                const hc = allDailyCommissions.filter(c => new Date(c.date) <= end).reduce((s, c) => s + (c.houseCommission || 0), 0);
+                const cr = allCommissionReceived.filter(r => new Date(r.date) <= end).reduce((s, r) => s + (r.amount || 0), 0);
+                return hc - cr;
+            });
+            // Active Clients uses the same rolling 2-month window definition as the main metric above
+            const activeClientsSeries = sparkMonthKeys.map(k => {
+                const [y, m] = k.split('-').map(Number);
+                const prevD = new Date(y, m - 2, 1);
+                const prevKey = `${prevD.getFullYear()}-${String(prevD.getMonth() + 1).padStart(2, '0')}`;
+                return Object.keys(tlByClient).filter(id => {
+                    const byMonth = tlByClient[id].byMonth;
+                    return (byMonth[k] || 0) > 0 || (byMonth[prevKey] || 0) > 0;
+                }).length;
+            });
 
             const activeComplaints = allComplaints.filter(c => c.status !== 'Closed');
             document.getElementById('total-complaints').textContent = activeComplaints.length;
@@ -5120,12 +5220,12 @@
             document.getElementById('dashboard-ho-deduction').textContent = `PKR ${monthHODeduction.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`;
             document.getElementById('dashboard-total-tax').textContent = `PKR ${monthTaxDeduction.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`;
 
-            // Trend badges: current period vs last month
-            renderDashTrend('active-clients-trend', activeClientIds.size, previousActiveClientCount);
-            renderDashTrend('commission-balance-trend', commissionClosingBalance, previousCommissionClosingBalance);
-            renderDashTrend('total-commission-trend', monthGrossCommission, prevMonthGrossCommission);
-            renderDashTrend('ho-deduction-trend', monthHODeduction, prevMonthHODeduction);
-            renderDashTrend('total-tax-trend', monthTaxDeduction, prevMonthTaxDeduction);
+            // Trend badges + mini trend-line sparklines: current period vs last month
+            renderDashTrend('active-clients-trend', activeClientIds.size, previousActiveClientCount, 'active-clients-spark', activeClientsSeries);
+            renderDashTrend('commission-balance-trend', commissionClosingBalance, previousCommissionClosingBalance, 'commission-balance-spark', commissionBalanceSeries);
+            renderDashTrend('total-commission-trend', monthGrossCommission, prevMonthGrossCommission, 'total-commission-spark', totalCommissionSeries);
+            renderDashTrend('ho-deduction-trend', monthHODeduction, prevMonthHODeduction, 'ho-deduction-spark', hoDeductionSeries);
+            renderDashTrend('total-tax-trend', monthTaxDeduction, prevMonthTaxDeduction, 'total-tax-spark', totalTaxSeries);
 
             const complaintStatusData = { Pending: 0, Done: 0 };
             activeComplaints.forEach(c => {
