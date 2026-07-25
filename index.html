@@ -450,6 +450,28 @@
         [data-section="utility-bills"]::before { content: "\f0e7"; }
         [data-section="debts"]::before { content: "\f571"; }
         [data-section="affiliate"]::before { content: "\f2b5"; }
+        [data-section="task-manager"]::before { content: "\f0ae"; }
+
+        /* ─── Task Manager module ─── */
+        #task-manager .tm-subtab-btn { display:inline-flex; align-items:center; gap:7px; padding:10px 18px; border:none; background:transparent; cursor:pointer; font-family:-apple-system,BlinkMacSystemFont,'Inter',sans-serif; font-size:0.83rem; font-weight:600; color:#64748b; border-radius:10px 10px 0 0; position:relative; transition:all .18s; }
+        #task-manager .tm-subtab-btn:hover:not(.active) { color:#0071e3; background:#f8fafc; }
+        #task-manager .tm-subtab-btn.active { color:#0071e3; }
+        #task-manager .tm-subtab-btn.active::after { content:''; position:absolute; left:10px; right:10px; bottom:-1px; height:2px; background:#0071e3; border-radius:2px; }
+        .tm-badge { display:inline-block; padding:3px 11px; border-radius:999px; font-size:0.68rem; font-weight:700; text-transform:uppercase; letter-spacing:0.03em; white-space:nowrap; }
+        .tm-badge-pending { background:#fef3c7; color:#b45309; }
+        .tm-badge-progress { background:#dbeafe; color:#1d4ed8; }
+        .tm-badge-closed { background:#dcfce7; color:#15803d; }
+        .tm-badge-overdue { background:#fee2e2; color:#b91c1c; }
+        .tm-progress-track { width:100%; min-width:90px; height:8px; background:#e2e8f0; border-radius:999px; overflow:hidden; }
+        .tm-progress-fill { height:100%; background:linear-gradient(90deg,#4f46e5,#0071e3); border-radius:999px; transition:width .3s ease; }
+        .tm-followup-entry { padding:8px 10px; border-radius:10px; background:var(--surface-2); margin-bottom:6px; font-size:0.78rem; color:var(--text-secondary); }
+        .tm-followup-entry .tm-fe-date { font-size:0.68rem; font-weight:700; color:#0071e3; margin-bottom:2px; }
+        #task-notif-btn { position:relative; width:40px; height:40px; border-radius:50%; display:flex; align-items:center; justify-content:center; background:rgba(20,124,229,0.08); color:#0071e3; border:none; cursor:pointer; transition:background .2s; flex-shrink:0; }
+        #task-notif-btn:hover { background:rgba(20,124,229,0.16); }
+        #task-notif-badge { position:absolute; top:-2px; right:-2px; min-width:16px; height:16px; padding:0 4px; border-radius:999px; background:#ff3b30; color:#fff; font-size:0.62rem; font-weight:700; display:none; align-items:center; justify-content:center; line-height:1; border:2px solid #fff; }
+        #task-notif-dropdown { position:absolute; top:56px; right:16px; width:320px; max-width:90vw; max-height:420px; overflow-y:auto; background:var(--surface); border:1px solid var(--border); border-radius:16px; box-shadow:var(--shadow-lg); z-index:500; display:none; }
+        #task-notif-dropdown .tm-notif-row { padding:10px 14px; border-bottom:1px solid var(--border); font-size:0.78rem; }
+        #task-notif-dropdown .tm-notif-row:last-child { border-bottom:none; }
 
         /* ─── Sidebar collapse (icons-only) toggle ── */
         #sidebar { transition: width 0.3s ease-in-out, transform 0.3s ease-in-out; }
@@ -1705,6 +1727,42 @@
         </div>
     </div>
 
+    <!-- Task Manager: Progress / Follow-up Modal -->
+    <div id="task-detail-modal" class="modal-overlay">
+        <div class="modal-content card" style="max-width:520px;width:95%;text-align:left;">
+            <div class="flex items-center justify-between mb-3">
+                <h3 id="task-detail-title" class="text-lg font-bold text-slate-800"></h3>
+                <button onclick="tmCloseDetailModal()" style="background:none;border:none;font-size:1.2rem;cursor:pointer;color:#94a3b8;">&times;</button>
+            </div>
+            <p id="task-detail-desc" class="text-sm text-slate-500 mb-4"></p>
+            <p id="task-detail-deadline" class="text-xs font-semibold mb-4"></p>
+
+            <div class="mb-4">
+                <label class="block text-sm font-medium text-slate-700 mb-1">Progress</label>
+                <div class="flex items-center gap-3">
+                    <input type="range" id="task-detail-progress-range" min="0" max="100" step="5" oninput="document.getElementById('task-detail-progress-value').textContent = this.value + '%'" class="flex-1">
+                    <span id="task-detail-progress-value" class="text-sm font-bold" style="width:44px;text-align:right;">0%</span>
+                </div>
+            </div>
+
+            <div class="mb-4">
+                <label class="block text-sm font-medium text-slate-700 mb-1">Follow-up Note (optional)</label>
+                <textarea id="task-detail-note-input" rows="2" placeholder="Progress update ka note likhen..." class="w-full px-4 py-2 border rounded-2xl focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm"></textarea>
+            </div>
+
+            <div class="flex gap-2 flex-wrap mb-4">
+                <button onclick="tmSaveProgress()" class="bg-indigo-600 text-white px-5 py-2 rounded-full font-semibold hover:bg-indigo-700 animated-btn text-sm"><i class="fas fa-save mr-1"></i>Save Update</button>
+                <button id="task-detail-close-task-btn" onclick="tmToggleCloseTask()" class="bg-emerald-600 text-white px-5 py-2 rounded-full font-semibold hover:bg-emerald-700 animated-btn text-sm"><i class="fas fa-check mr-1"></i>Mark Closed</button>
+                <button onclick="tmDeleteTask()" class="bg-rose-600 text-white px-5 py-2 rounded-full font-semibold hover:bg-rose-700 animated-btn text-sm"><i class="fas fa-trash-alt mr-1"></i>Delete</button>
+            </div>
+
+            <div>
+                <h4 class="text-sm font-semibold text-slate-700 mb-2">Follow-up History</h4>
+                <div id="task-detail-history" style="max-height:180px;overflow-y:auto;"></div>
+            </div>
+        </div>
+    </div>
+
     <div id="password-verification-modal" class="modal-overlay">
         <div class="modal-content card">
             <h3 class="text-xl font-bold mb-2">Verify Action</h3>
@@ -2018,6 +2076,7 @@
                     <li><button data-section="expenses" class="nav-btn text-slate-600 hover:bg-indigo-50 hover:text-indigo-600">Expenses</button></li>
                     <li><button data-section="debts" class="nav-btn text-slate-600 hover:bg-indigo-50 hover:text-indigo-600">Debts</button></li>
                     <li><button data-section="affiliate" class="nav-btn text-slate-600 hover:bg-indigo-50 hover:text-indigo-600">Affiliate Program</button></li>
+                    <li><button data-section="task-manager" class="nav-btn text-slate-600 hover:bg-indigo-50 hover:text-indigo-600">Task Manager</button></li>
                     <div class="nav-section-label" style="margin-top:0.5rem;">Management</div>
                     <li><button data-section="profiles" class="nav-btn text-slate-600 hover:bg-indigo-50 hover:text-indigo-600">Client Profiles</button></li>
                     <li><button data-section="employees" class="nav-btn text-slate-600 hover:bg-indigo-50 hover:text-indigo-600">HR &amp; Employees</button></li>
@@ -2047,11 +2106,23 @@
                     <h2 id="header-title" class="text-xl font-semibold" style="font-family:-apple-system,BlinkMacSystemFont,'Inter',sans-serif;font-weight:700;color:#1d1d1f;letter-spacing:-0.3px;">Dashboard</h2>
                 </div>
                 <div class="flex items-center space-x-2 sm:space-x-4">
+                    <!-- Task Manager: pending tasks notification bell (hidden in Shared Frontend view) -->
+                    <button id="task-notif-btn" title="Pending Tasks" aria-label="Pending Tasks">
+                        <i class="fas fa-bell"></i>
+                        <span id="task-notif-badge">0</span>
+                    </button>
                     <!-- UPDATED: Button colors -->
                     <button id="share-dashboard-btn" class="px-2 sm:px-4 py-2 rounded-full text-sm font-medium bg-emerald-600 text-white hover:bg-emerald-700 animated-btn flex-shrink-0">Share Frontend</button>
                     <button id="sign-out-btn" class="px-2 sm:px-4 py-2 rounded-full text-sm font-medium bg-rose-600 text-white hover:bg-rose-700 animated-btn flex-shrink-0">Sign Out</button>
                 </div>
             </header>
+            <div id="task-notif-dropdown">
+                <div style="padding:14px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;">
+                    <h4 style="font-weight:700;font-size:0.9rem;color:var(--text-primary);margin:0;">Pending Tasks</h4>
+                    <button onclick="showSection('task-manager');document.getElementById('task-notif-dropdown').style.display='none';" style="font-size:0.72rem;color:#0071e3;font-weight:700;background:none;border:none;cursor:pointer;">Open Task Manager</button>
+                </div>
+                <div id="task-notif-list"></div>
+            </div>
 
             <!-- UPDATE: Added responsive padding (p-4 on small screens, p-6 on medium and up) -->
             <main class="flex-grow p-4 md:p-6">
@@ -4090,6 +4161,87 @@
                     </section>
                     <!-- ─── END DEBTS SECTION ─── -->
 
+                    <!-- ─── TASK MANAGER SECTION ─── -->
+                    <section id="task-manager" class="section-container">
+                        <h2 class="text-3xl font-bold text-slate-800 mb-2">Task Manager</h2>
+                        <p class="text-sm text-slate-500 mb-6">Apne daily tasks add karen, deadline set karen, progress follow-up karen aur mukammal hone par close karen.</p>
+
+                        <!-- Stats -->
+                        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+                            <div class="stat-card">
+                                <p class="text-xs font-semibold text-slate-500 uppercase mb-1">Total Tasks</p>
+                                <p id="tm-stat-total" class="text-2xl font-bold" style="color:#0071e3;">0</p>
+                            </div>
+                            <div class="stat-card">
+                                <p class="text-xs font-semibold text-slate-500 uppercase mb-1">Pending / In Progress</p>
+                                <p id="tm-stat-open" class="text-2xl font-bold" style="color:#b45309;">0</p>
+                            </div>
+                            <div class="stat-card">
+                                <p class="text-xs font-semibold text-slate-500 uppercase mb-1">Overdue</p>
+                                <p id="tm-stat-overdue" class="text-2xl font-bold" style="color:#b91c1c;">0</p>
+                            </div>
+                            <div class="stat-card">
+                                <p class="text-xs font-semibold text-slate-500 uppercase mb-1">Closed</p>
+                                <p id="tm-stat-closed" class="text-2xl font-bold" style="color:#15803d;">0</p>
+                            </div>
+                        </div>
+
+                        <!-- Add Task -->
+                        <div class="card p-6 mb-6" id="add-task-wrapper">
+                            <h3 class="text-xl font-semibold mb-4"><i class="fas fa-plus-circle mr-2 text-indigo-500"></i>Add New Task</h3>
+                            <form id="add-task-form" class="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
+                                <div class="md:col-span-2">
+                                    <label class="block text-sm font-medium text-slate-700 mb-1">Task Title</label>
+                                    <input type="text" id="task-title-input" placeholder="e.g. Client ka statement bhejna" required class="w-full px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-slate-700 mb-1">Deadline</label>
+                                    <input type="date" id="task-deadline-input" class="w-full px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                                </div>
+                                <button type="submit" class="bg-indigo-600 text-white px-6 py-2 rounded-full font-semibold hover:bg-indigo-700 animated-btn">
+                                    <i class="fas fa-plus mr-2"></i>Add Task
+                                </button>
+                                <div class="md:col-span-4">
+                                    <label class="block text-sm font-medium text-slate-700 mb-1">Description (optional)</label>
+                                    <textarea id="task-desc-input" rows="2" placeholder="Task ki tafseel..." class="w-full px-4 py-2 border rounded-2xl focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm"></textarea>
+                                </div>
+                            </form>
+                        </div>
+
+                        <!-- Task List -->
+                        <div class="card p-6">
+                            <div class="flex items-center justify-between mb-4 flex-wrap gap-3">
+                                <h3 class="text-xl font-semibold">My Tasks</h3>
+                                <input type="text" id="task-search" oninput="tmRenderTasks()" placeholder="Task search karen..." class="w-full md:w-64 px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm">
+                            </div>
+                            <div class="flex flex-wrap" id="task-subtab-nav" style="border-bottom:1px solid #eef4fc;margin-bottom:16px;">
+                                <button class="tm-subtab-btn active" data-tm-filter="all" onclick="tmSwitchFilter('all')"><i class="fas fa-list"></i>All</button>
+                                <button class="tm-subtab-btn" data-tm-filter="pending" onclick="tmSwitchFilter('pending')"><i class="fas fa-hourglass-half"></i>Pending</button>
+                                <button class="tm-subtab-btn" data-tm-filter="progress" onclick="tmSwitchFilter('progress')"><i class="fas fa-spinner"></i>In Progress</button>
+                                <button class="tm-subtab-btn" data-tm-filter="overdue" onclick="tmSwitchFilter('overdue')"><i class="fas fa-exclamation-triangle"></i>Overdue</button>
+                                <button class="tm-subtab-btn" data-tm-filter="closed" onclick="tmSwitchFilter('closed')"><i class="fas fa-check-double"></i>Closed</button>
+                            </div>
+                            <div class="overflow-x-auto">
+                                <table class="w-full text-left table-auto text-sm">
+                                    <thead class="border-b-2">
+                                        <tr class="text-slate-600 uppercase text-xs">
+                                            <th class="p-2">#</th>
+                                            <th class="p-2">Task</th>
+                                            <th class="p-2">Deadline</th>
+                                            <th class="p-2">Progress</th>
+                                            <th class="p-2">Status</th>
+                                            <th class="p-2 actions-header">Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="tasks-list">
+                                        <tr><td colspan="6" class="p-4 text-center text-slate-500">Abhi tak koi task add nahi hua.</td></tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </section>
+                    <!-- ─── END TASK MANAGER SECTION ─── -->
+
                     <!-- ─── AFFILIATE PROGRAM SECTION ─── -->
                     <section id="affiliate" class="section-container">
                         <h2 class="text-3xl font-bold text-slate-800 mb-2">Affiliate Program</h2>
@@ -5346,6 +5498,8 @@
                     headerTitle.textContent = 'HR Module';
                 } else if (sectionId === 'affiliate') {
                     headerTitle.textContent = 'Affiliate Program';
+                } else if (sectionId === 'task-manager') {
+                    headerTitle.textContent = 'Task Manager';
                 } else {
                     headerTitle.textContent = sectionId.charAt(0).toUpperCase() + sectionId.slice(1);
                 }
@@ -12832,6 +12986,17 @@ ${(d.totalDeductions > 0) ? `
             const backupSec = document.getElementById('backup');
             if (backupSec) backupSec.style.display = 'none';
 
+            // Task Manager is a personal/internal tool — always hidden from the Shared Frontend view,
+            // along with its header notification bell icon
+            const taskNav = document.querySelector('button[data-section="task-manager"]');
+            if (taskNav) taskNav.parentElement.style.display = 'none';
+            const taskSec = document.getElementById('task-manager');
+            if (taskSec) taskSec.style.display = 'none';
+            const taskNotifBtn = document.getElementById('task-notif-btn');
+            if (taskNotifBtn) taskNotifBtn.style.display = 'none';
+            const taskNotifDropdown = document.getElementById('task-notif-dropdown');
+            if (taskNotifDropdown) taskNotifDropdown.style.display = 'none';
+
             // Navigate to first visible section
             const firstVisible = SV_SECTIONS.find(s => {
                 const show = settings[s.id] !== undefined ? settings[s.id] : s.defaultOn;
@@ -13337,6 +13502,7 @@ ${(d.totalDeductions > 0) ? `
                     loadAppearanceFromAccount();
                     if (window._pdLoadFromFirebase) window._pdLoadFromFirebase();
                     backupCheckWeeklyReminder();
+                    taskManagerInit();
                 } else {
                     if (currentUserId) analyticsOnLogout();
                     currentUserId = null;
@@ -13602,6 +13768,313 @@ ${(d.totalDeductions > 0) ? `
             // Will be called from initializeAuthentication hook below
         });
         // ─── END BACKUP MODULE ────────────────────────────────────────────────────
+
+        // ─── TASK MANAGER MODULE ──────────────────────────────────────────────────
+        const TASKS_STORAGE_KEY = 'darson_task_manager_v1';
+        const TASK_NOTIF_LAST_KEY = 'darson_task_notif_last_v1';
+        let tmCurrentFilter = 'all';
+        let tmActiveTaskId = null;
+
+        function tmGetTasks() {
+            try { return JSON.parse(localStorage.getItem(TASKS_STORAGE_KEY) || '[]'); } catch(e) { return []; }
+        }
+        function tmSaveTasks(tasks) {
+            try { localStorage.setItem(TASKS_STORAGE_KEY, JSON.stringify(tasks)); } catch(e) {}
+        }
+        function tmTodayStr() {
+            const d = new Date();
+            return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+        }
+        function tmIsOverdue(task) {
+            return task.status !== 'closed' && !!task.deadline && task.deadline < tmTodayStr();
+        }
+        function tmStatusInfo(task) {
+            if (task.status === 'closed') return { key: 'closed', label: 'Closed', cls: 'tm-badge-closed' };
+            if (tmIsOverdue(task)) return { key: 'overdue', label: 'Overdue', cls: 'tm-badge-overdue' };
+            if ((task.progress || 0) > 0) return { key: 'progress', label: 'In Progress', cls: 'tm-badge-progress' };
+            return { key: 'pending', label: 'Pending', cls: 'tm-badge-pending' };
+        }
+        function tmFormatDate(dateStr) {
+            if (!dateStr) return '—';
+            const d = new Date(dateStr + 'T00:00:00');
+            if (isNaN(d.getTime())) return dateStr;
+            return d.toLocaleDateString('en-PK', { day: '2-digit', month: 'short', year: 'numeric' });
+        }
+        function tmEsc(str) {
+            const div = document.createElement('div');
+            div.textContent = str || '';
+            return div.innerHTML;
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const form = document.getElementById('add-task-form');
+            if (form) {
+                form.addEventListener('submit', (e) => {
+                    e.preventDefault();
+                    const title = document.getElementById('task-title-input').value.trim();
+                    if (!title) return;
+                    const deadline = document.getElementById('task-deadline-input').value || '';
+                    const description = document.getElementById('task-desc-input').value.trim();
+                    const tasks = tmGetTasks();
+                    tasks.unshift({
+                        id: 'tsk_' + Date.now() + '_' + Math.random().toString(36).slice(2, 8),
+                        title, description, deadline,
+                        progress: 0,
+                        status: 'open',
+                        followUps: [],
+                        createdAt: new Date().toISOString(),
+                        closedAt: null
+                    });
+                    tmSaveTasks(tasks);
+                    form.reset();
+                    tmRenderTasks();
+                });
+            }
+        });
+
+        function tmSwitchFilter(filter) {
+            tmCurrentFilter = filter;
+            document.querySelectorAll('#task-subtab-nav .tm-subtab-btn').forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.tmFilter === filter);
+            });
+            tmRenderTasks();
+        }
+
+        function tmFilteredTasks() {
+            const tasks = tmGetTasks();
+            const searchEl = document.getElementById('task-search');
+            const search = (searchEl ? searchEl.value : '').trim().toLowerCase();
+            return tasks.filter(t => {
+                if (search && !t.title.toLowerCase().includes(search)) return false;
+                if (tmCurrentFilter === 'all') return true;
+                return tmStatusInfo(t).key === tmCurrentFilter;
+            });
+        }
+
+        function tmRenderTasks() {
+            const tbody = document.getElementById('tasks-list');
+            if (!tbody) return;
+            const tasks = tmFilteredTasks();
+            if (tasks.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="6" class="p-4 text-center text-slate-500">Koi task nahi mila.</td></tr>';
+            } else {
+                tbody.innerHTML = tasks.map((t, i) => {
+                    const info = tmStatusInfo(t);
+                    return `<tr style="border-bottom:1px solid #f1f5f9;">
+                        <td class="p-2 text-slate-400">${i + 1}</td>
+                        <td class="p-2">
+                            <div class="font-semibold text-slate-800">${tmEsc(t.title)}</div>
+                            ${t.description ? `<div class="text-xs text-slate-500 mt-0.5">${tmEsc(t.description)}</div>` : ''}
+                        </td>
+                        <td class="p-2 text-xs ${info.key === 'overdue' ? 'text-rose-600 font-bold' : 'text-slate-600'}">${tmFormatDate(t.deadline)}</td>
+                        <td class="p-2">
+                            <div class="tm-progress-track"><div class="tm-progress-fill" style="width:${t.progress || 0}%;"></div></div>
+                            <div class="text-xs text-slate-500 mt-1">${t.progress || 0}%</div>
+                        </td>
+                        <td class="p-2"><span class="tm-badge ${info.cls}">${info.label}</span></td>
+                        <td class="p-2 actions-header">
+                            <button onclick="tmOpenDetail('${t.id}')" class="bg-indigo-600 text-white px-3 py-1.5 rounded-full text-xs font-semibold hover:bg-indigo-700 animated-btn"><i class="fas fa-edit mr-1"></i>Manage</button>
+                        </td>
+                    </tr>`;
+                }).join('');
+            }
+            tmUpdateStats();
+        }
+
+        function tmUpdateStats() {
+            const tasks = tmGetTasks();
+            let open = 0, overdue = 0, closed = 0;
+            tasks.forEach(t => {
+                const info = tmStatusInfo(t);
+                if (info.key === 'closed') closed++;
+                else { open++; if (info.key === 'overdue') overdue++; }
+            });
+            const setText = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
+            setText('tm-stat-total', tasks.length);
+            setText('tm-stat-open', open);
+            setText('tm-stat-overdue', overdue);
+            setText('tm-stat-closed', closed);
+
+            const badge = document.getElementById('task-notif-badge');
+            if (badge) {
+                if (open > 0) { badge.textContent = open > 99 ? '99+' : String(open); badge.style.display = 'flex'; }
+                else { badge.style.display = 'none'; }
+            }
+            tmRenderNotifDropdown(tasks);
+        }
+
+        function tmRenderNotifDropdown(tasksParam) {
+            const list = document.getElementById('task-notif-list');
+            if (!list) return;
+            const tasks = (tasksParam || tmGetTasks()).filter(t => tmStatusInfo(t).key !== 'closed');
+            if (tasks.length === 0) {
+                list.innerHTML = '<div class="tm-notif-row" style="color:#94a3b8;">Koi pending task nahi hai.</div>';
+                return;
+            }
+            tasks.sort((a, b) => (a.deadline || '9999').localeCompare(b.deadline || '9999'));
+            list.innerHTML = tasks.slice(0, 20).map(t => {
+                const info = tmStatusInfo(t);
+                return `<div class="tm-notif-row">
+                    <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
+                        <span style="font-weight:600;color:var(--text-primary);">${tmEsc(t.title)}</span>
+                        <span class="tm-badge ${info.cls}" style="flex-shrink:0;">${info.label}</span>
+                    </div>
+                    <div style="color:var(--text-muted);margin-top:2px;">Deadline: ${tmFormatDate(t.deadline)}</div>
+                </div>`;
+            }).join('');
+        }
+
+        function tmOpenDetail(taskId) {
+            const tasks = tmGetTasks();
+            const task = tasks.find(t => t.id === taskId);
+            if (!task) return;
+            tmActiveTaskId = taskId;
+            document.getElementById('task-detail-title').textContent = task.title;
+            document.getElementById('task-detail-desc').textContent = task.description || '';
+            document.getElementById('task-detail-deadline').textContent = task.deadline ? ('Deadline: ' + tmFormatDate(task.deadline)) : 'Koi deadline set nahi.';
+            document.getElementById('task-detail-progress-range').value = task.progress || 0;
+            document.getElementById('task-detail-progress-value').textContent = (task.progress || 0) + '%';
+            document.getElementById('task-detail-note-input').value = '';
+            const closeBtn = document.getElementById('task-detail-close-task-btn');
+            if (closeBtn) {
+                if (task.status === 'closed') {
+                    closeBtn.innerHTML = '<i class="fas fa-undo mr-1"></i>Reopen Task';
+                    closeBtn.className = 'bg-amber-500 text-white px-5 py-2 rounded-full font-semibold hover:bg-amber-600 animated-btn text-sm';
+                } else {
+                    closeBtn.innerHTML = '<i class="fas fa-check mr-1"></i>Mark Closed';
+                    closeBtn.className = 'bg-emerald-600 text-white px-5 py-2 rounded-full font-semibold hover:bg-emerald-700 animated-btn text-sm';
+                }
+            }
+            const history = document.getElementById('task-detail-history');
+            if (history) {
+                if (!task.followUps || task.followUps.length === 0) {
+                    history.innerHTML = '<div class="text-xs text-slate-400">Abhi tak koi follow-up nahi.</div>';
+                } else {
+                    history.innerHTML = task.followUps.slice().reverse().map(f => `
+                        <div class="tm-followup-entry">
+                            <div class="tm-fe-date">${tmFormatDate((f.date || '').slice(0, 10))} — ${f.progress}%</div>
+                            <div>${tmEsc(f.note || 'Progress update.')}</div>
+                        </div>`).join('');
+                }
+            }
+            document.getElementById('task-detail-modal').style.display = 'flex';
+        }
+
+        function tmCloseDetailModal() {
+            document.getElementById('task-detail-modal').style.display = 'none';
+            tmActiveTaskId = null;
+        }
+
+        function tmSaveProgress() {
+            if (!tmActiveTaskId) return;
+            const tasks = tmGetTasks();
+            const task = tasks.find(t => t.id === tmActiveTaskId);
+            if (!task) return;
+            const progress = parseInt(document.getElementById('task-detail-progress-range').value, 10) || 0;
+            const note = document.getElementById('task-detail-note-input').value.trim();
+            task.progress = progress;
+            task.followUps = task.followUps || [];
+            task.followUps.push({ date: new Date().toISOString(), note, progress });
+            tmSaveTasks(tasks);
+            tmRenderTasks();
+            tmOpenDetail(task.id);
+        }
+
+        function tmToggleCloseTask() {
+            if (!tmActiveTaskId) return;
+            const tasks = tmGetTasks();
+            const task = tasks.find(t => t.id === tmActiveTaskId);
+            if (!task) return;
+            if (task.status === 'closed') {
+                task.status = 'open';
+                task.closedAt = null;
+            } else {
+                task.status = 'closed';
+                task.closedAt = new Date().toISOString();
+                task.progress = 100;
+            }
+            tmSaveTasks(tasks);
+            tmRenderTasks();
+            tmCloseDetailModal();
+        }
+
+        function tmDeleteTask() {
+            if (!tmActiveTaskId) return;
+            if (!confirm('Kya aap is task ko delete karna chahtay hain?')) return;
+            let tasks = tmGetTasks();
+            tasks = tasks.filter(t => t.id !== tmActiveTaskId);
+            tmSaveTasks(tasks);
+            tmRenderTasks();
+            tmCloseDetailModal();
+        }
+
+        // ── Daily pending-tasks notification (browser Notification API + in-app toast) ──
+        function tmDailyNotificationCheck() {
+            if (typeof isSharedView !== 'undefined' && isSharedView) return;
+            const today = tmTodayStr();
+            const lastNotified = localStorage.getItem(TASK_NOTIF_LAST_KEY);
+            if (lastNotified === today) return; // already notified today
+            const openCount = tmGetTasks().filter(t => tmStatusInfo(t).key !== 'closed').length;
+            if (openCount === 0) { localStorage.setItem(TASK_NOTIF_LAST_KEY, today); return; }
+            const msg = `Aapke ${openCount} pending task${openCount > 1 ? 's' : ''} hain jo abhi close nahi huay.`;
+            if ('Notification' in window) {
+                if (Notification.permission === 'granted') {
+                    new Notification('Task Manager — Pending Tasks', { body: msg });
+                } else if (Notification.permission !== 'denied') {
+                    Notification.requestPermission().then(perm => {
+                        if (perm === 'granted') new Notification('Task Manager — Pending Tasks', { body: msg });
+                    });
+                }
+            }
+            tmShowInAppToast(msg);
+            localStorage.setItem(TASK_NOTIF_LAST_KEY, today);
+        }
+
+        function tmShowInAppToast(msg) {
+            if (document.getElementById('task-reminder-toast')) return;
+            const toast = document.createElement('div');
+            toast.id = 'task-reminder-toast';
+            toast.style.cssText = 'position:fixed;bottom:24px;right:24px;z-index:9999;background:#1e1b4b;color:#fff;border-radius:14px;padding:16px 20px;box-shadow:0 8px 32px rgba(30,27,75,0.35);max-width:340px;font-family:\'DM Sans\',sans-serif;border-left:4px solid #0071e3;animation:pdSlideIn .3s ease;';
+            toast.innerHTML = `
+                <div style="display:flex;align-items:flex-start;gap:12px;">
+                    <i class="fas fa-bell" style="color:#0071e3;font-size:1.3rem;flex-shrink:0;margin-top:2px;"></i>
+                    <div style="flex:1;">
+                        <div style="font-weight:700;font-size:0.88rem;margin-bottom:4px;">Pending Tasks</div>
+                        <div style="font-size:0.78rem;color:rgba(255,255,255,0.8);margin-bottom:10px;">${msg}</div>
+                        <div style="display:flex;gap:8px;">
+                            <button onclick="document.getElementById('task-reminder-toast').remove();showSection('task-manager');" style="padding:6px 14px;background:#0071e3;color:#fff;border:none;border-radius:6px;font-size:0.75rem;font-weight:700;cursor:pointer;">Dekhein</button>
+                            <button onclick="document.getElementById('task-reminder-toast').remove();" style="padding:6px 14px;background:rgba(255,255,255,0.12);color:#fff;border:none;border-radius:6px;font-size:0.75rem;cursor:pointer;">Bad Mein</button>
+                        </div>
+                    </div>
+                </div>`;
+            document.body.appendChild(toast);
+        }
+
+        // Notification bell dropdown toggle + outside click close
+        document.addEventListener('DOMContentLoaded', () => {
+            const notifBtn = document.getElementById('task-notif-btn');
+            const notifDropdown = document.getElementById('task-notif-dropdown');
+            if (notifBtn && notifDropdown) {
+                notifBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    notifDropdown.style.display = notifDropdown.style.display === 'block' ? 'none' : 'block';
+                });
+                document.addEventListener('click', (e) => {
+                    if (notifDropdown.style.display === 'block' && !notifDropdown.contains(e.target) && e.target !== notifBtn) {
+                        notifDropdown.style.display = 'none';
+                    }
+                });
+            }
+        });
+
+        function taskManagerInit() {
+            tmRenderTasks();
+            tmUpdateStats();
+            setTimeout(() => tmDailyNotificationCheck(), 4000);
+            // Re-check periodically in case the tab stays open across midnight
+            setInterval(() => tmDailyNotificationCheck(), 60 * 60 * 1000);
+        }
+        // ─── END TASK MANAGER MODULE ──────────────────────────────────────────────
 
         // ─── UTILITY BILLS MODULE ─────────────────────────────────────────────────
 
