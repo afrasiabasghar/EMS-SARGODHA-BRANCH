@@ -11,7 +11,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=DM+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         :root {
             --brand-primary: #0071e3;
@@ -26,16 +26,173 @@
             --text-primary: #0f172a;
             --text-secondary: #475569;
             --text-muted: #94a3b8;
+            --page-bg: #f5f5f7;
+            --sidebar-text: rgba(255,255,255,0.65);
+            --sidebar-text-active: #ffffff;
             --shadow-sm: 0 1px 3px rgba(0,113,227,0.08), 0 1px 2px rgba(0,113,227,0.06);
             --shadow-md: 0 4px 16px rgba(0,113,227,0.12), 0 2px 6px rgba(0,113,227,0.08);
             --shadow-lg: 0 20px 40px rgba(0,113,227,0.15), 0 8px 16px rgba(0,113,227,0.10);
         }
 
+        /* ─── Dark / Night Mode Palette ───────────── */
+        html[data-theme="dark"] {
+            --surface: #1c1c1e !important;
+            --surface-2: #242426 !important;
+            --border: #34343a !important;
+            --text-primary: #f1f5f9 !important;
+            --text-secondary: #b7bfc9 !important;
+            --text-muted: #7d8590 !important;
+            --page-bg: #0f0f11 !important;
+        }
+        html[data-theme="dark"] body { color: var(--text-primary); }
+        html[data-theme="dark"] #sidebar {
+            background: linear-gradient(160deg, #000000 0%, #17171a 55%, var(--brand-dark, #1d1d1f) 100%) !important;
+        }
+        html[data-theme="dark"] ::-webkit-scrollbar-track { background: var(--surface-2); }
+        html[data-theme="dark"] input[type="text"], html[data-theme="dark"] input[type="number"],
+        html[data-theme="dark"] input[type="date"], html[data-theme="dark"] input[type="email"],
+        html[data-theme="dark"] input[type="password"], html[data-theme="dark"] input[type="url"],
+        html[data-theme="dark"] input[type="tel"], html[data-theme="dark"] textarea,
+        html[data-theme="dark"] select {
+            background-color: var(--surface-2) !important;
+            color: var(--text-primary) !important;
+            border-color: var(--border) !important;
+        }
+        html[data-theme="dark"] table thead { background: var(--surface-2) !important; }
+        html[data-theme="dark"] table thead tr { background: var(--surface-2) !important; }
+        html[data-theme="dark"] table tbody tr:hover { background: rgba(255,255,255,0.03) !important; }
+        html[data-theme="dark"] .bg-indigo-50, html[data-theme="dark"] .bg-indigo-100 { background-color: rgba(10,132,255,0.14) !important; }
+        html[data-theme="dark"] .bg-emerald-50, html[data-theme="dark"] .bg-emerald-100 { background-color: rgba(31,157,85,0.14) !important; }
+        html[data-theme="dark"] .bg-rose-50, html[data-theme="dark"] .bg-rose-100 { background-color: rgba(255,59,48,0.14) !important; }
+        html[data-theme="dark"] .bg-amber-50, html[data-theme="dark"] .bg-amber-100 { background-color: rgba(245,158,11,0.14) !important; }
+        html[data-theme="dark"] .bg-pink-50, html[data-theme="dark"] .bg-pink-100 { background-color: rgba(219,39,119,0.14) !important; }
+        html[data-theme="dark"] .bg-orange-50, html[data-theme="dark"] .bg-orange-100 { background-color: rgba(234,88,12,0.14) !important; }
+        html[data-theme="dark"] .bg-slate-100, html[data-theme="dark"] .bg-slate-200 { background-color: var(--surface-2) !important; }
+
+        /* ─── Dark Mode Fix: hardcoded near-black inline text colors ───
+           Several elements set their text color via inline style="color:#..."
+           instead of the text-slate-* classes above, so they were left black
+           and became unreadable once their containers switched to a dark
+           surface. Force those specific dark/near-black inline colors to the
+           theme's text color while Dark Mode is on. */
+        html[data-theme="dark"] [style*="color:#1e293b"],
+        html[data-theme="dark"] [style*="color: #1e293b"],
+        html[data-theme="dark"] [style*="color:#0f172a"],
+        html[data-theme="dark"] [style*="color: #0f172a"],
+        html[data-theme="dark"] [style*="color:#1d1d1f"],
+        html[data-theme="dark"] [style*="color: #1d1d1f"],
+        html[data-theme="dark"] [style*="color:#1a1a2e"],
+        html[data-theme="dark"] [style*="color:#1e1b4b"],
+        html[data-theme="dark"] [style*="color:#2c2c2e"],
+        html[data-theme="dark"] [style*="color:#333"],
+        html[data-theme="dark"] [style*="color: #333"],
+        html[data-theme="dark"] [style*="color:#555"],
+        html[data-theme="dark"] [style*="color: #555"],
+        html[data-theme="dark"] [style*="color:#4a4a6a"],
+        html[data-theme="dark"] [style*="color:#000000"],
+        html[data-theme="dark"] [style*="color: #000000"] {
+            color: var(--text-primary) !important;
+        }
+
+        /* ─── Dark Mode Fix: hardcoded light/white inline backgrounds ───
+           Several cards/panels/popups set a light background via inline
+           style="background:#..." instead of the bg-white/bg-slate-* classes
+           above, so they stayed white and didn't switch with the rest of the
+           theme. Force those neutral light inline backgrounds to a dark
+           surface while Dark Mode is on. */
+        html[data-theme="dark"] [style*="background:#fff"],
+        html[data-theme="dark"] [style*="background: #fff"],
+        html[data-theme="dark"] [style*="background:#f8fafc"],
+        html[data-theme="dark"] [style*="background: #f8fafc"],
+        html[data-theme="dark"] [style*="background:#f1f5f9"],
+        html[data-theme="dark"] [style*="background: #f1f5f9"],
+        html[data-theme="dark"] [style*="background:#fafbff"],
+        html[data-theme="dark"] [style*="background:#f4f3f8"],
+        html[data-theme="dark"] [style*="background:#eceaf4"],
+        html[data-theme="dark"] [style*="background: #f2f6fb"],
+        html[data-theme="dark"] [style*="background: #e2e8f0"],
+        html[data-theme="dark"] [style*="background-color: #f2f2f2"],
+        html[data-theme="dark"] [style*="background: #f5f5f7"] {
+            background-color: var(--surface-2) !important;
+        }
+
+        /* ─── Global Theme Binding (system-wide, both light & dark) ─── */
+        body { background-color: var(--page-bg); }
+        header { background-color: var(--surface) !important; border-color: var(--border) !important; }
+        #header-title { color: var(--text-primary) !important; }
+        .bg-white { background-color: var(--surface) !important; }
+        .bg-slate-50 { background-color: var(--surface-2) !important; }
+        .border-slate-100, .border-slate-200, .border-slate-300 { border-color: var(--border) !important; }
+        .text-slate-900, .text-slate-800 { color: var(--text-primary) !important; }
+        .text-slate-700, .text-slate-600 { color: var(--text-secondary) !important; }
+        .text-slate-500, .text-slate-400 { color: var(--text-muted) !important; }
+        #main-nav .nav-btn { color: var(--sidebar-text) !important; }
+        #main-nav .nav-btn:hover, #main-nav .nav-btn.bg-indigo-600, #main-nav .nav-btn.bg-indigo-600:hover { color: var(--sidebar-text-active) !important; }
+        #settings .settings-label { color: var(--text-primary); }
+        #settings .settings-desc { color: var(--text-muted); }
+        #settings select.settings-select { background: var(--surface); color: var(--text-primary); border-color: var(--border); }
+        #settings .settings-reset-btn { background: var(--surface-2); color: var(--text-primary); border-color: var(--border); }
+
+        /* ─── Appearance Settings: Toggle Switch ──── */
+        .settings-toggle { position: relative; display: inline-block; width: 46px; height: 26px; flex-shrink: 0; }
+        .settings-toggle input { opacity: 0; width: 0; height: 0; }
+        .settings-toggle-slider { position: absolute; cursor: pointer; inset: 0; background-color: #cbd5e1; border-radius: 999px; transition: background-color .2s ease; }
+        .settings-toggle-slider::before { content: ""; position: absolute; height: 20px; width: 20px; left: 3px; top: 3px; background-color: #fff; border-radius: 50%; transition: transform .2s ease; box-shadow: 0 1px 3px rgba(0,0,0,0.25); }
+        .settings-toggle input:checked + .settings-toggle-slider { background-color: var(--brand-primary); }
+        .settings-toggle input:checked + .settings-toggle-slider::before { transform: translateX(20px); }
+
+        /* ─── Footer Text Modes ─────────────────────── */
+        #app-footer-text-wrap { overflow: hidden; max-width: 100%; }
+
+        /* ─── Idle Auto-Logout: Rolling Digit Counter (odometer style) ─── */
+        .idle-counter {
+            --idle-font-size: 0.875rem;
+            --idle-digit-padding: 6px;
+            --idle-digit-height: calc(var(--idle-font-size) + var(--idle-digit-padding));
+            display: inline-flex;
+            overflow: hidden;
+            font-size: var(--idle-font-size);
+            font-weight: 700;
+            font-variant-numeric: tabular-nums;
+            line-height: 1;
+            vertical-align: middle;
+        }
+        .idle-digit-col {
+            position: relative;
+            width: 1ch;
+            height: var(--idle-digit-height);
+            overflow: hidden;
+        }
+        .idle-digit-track {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .idle-number-item {
+            height: var(--idle-digit-height);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        #app-footer-text-wrap.footer-ticker { white-space: nowrap; }
+        #app-footer-text-wrap.footer-ticker #app-footer-text { display: inline-block; padding-left: 100%; white-space: nowrap; animation-name: footerTickerScroll; animation-timing-function: linear; animation-iteration-count: infinite; }
+        @keyframes footerTickerScroll { from { transform: translateX(0); } to { transform: translateX(-100%); } }
+        @keyframes footerFadePulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
+
+        /* ─── Reduced Motion (Animations OFF setting) ─── */
+        html.no-animations, html.no-animations * {
+            animation-duration: 0.001ms !important;
+            animation-iteration-count: 1 !important;
+            transition-duration: 0.001ms !important;
+        }
+        html.no-animations .card:hover, html.no-animations .stat-card:hover { transform: none !important; }
+
         * { box-sizing: border-box; }
 
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Inter', sans-serif;
-            background-color: #f5f5f7;
             min-height: 100vh;
             -webkit-font-smoothing: antialiased;
         }
@@ -162,7 +319,7 @@
 
         /* ─── Sidebar ────────────────────────────── */
         aside#sidebar {
-            background: linear-gradient(180deg, #1d1d1f 0%, #232325 100%) !important;
+            background: linear-gradient(180deg, #1d1d1f 0%, #232325 100%);
             border-right: 1px solid rgba(255,255,255,0.06) !important;
             box-shadow: 1px 0 0 rgba(0,0,0,0.1);
             display: flex !important;
@@ -292,6 +449,7 @@
         [data-section="backup"]::before { content: "\f019"; }
         [data-section="utility-bills"]::before { content: "\f0e7"; }
         [data-section="debts"]::before { content: "\f571"; }
+        [data-section="affiliate"]::before { content: "\f2b5"; }
 
         /* ─── Header ─────────────────────────────── */
         header.bg-white {
@@ -655,7 +813,7 @@
         }
 
         /* ─── Table Styling ──────────────────────── */
-        table thead tr { background: #f5f5f7; }
+        table thead tr { background: var(--page-bg, #f5f5f7); }
         table thead th { color: var(--text-primary) !important; font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Inter', sans-serif; font-size: 0.75rem; }
         table tbody tr { transition: background 0.15s ease; }
         table tbody tr:hover { background: #f5f5f7; }
@@ -816,6 +974,19 @@
         #phone-directory .pd-tab-btn:hover:not(.active) { color: #1d1d1f; background: #eef4fc; }
         #phone-directory .pd-tab-panel { display: none; }
         #phone-directory .pd-tab-panel.active { display: block; }
+        #analytics .an-tabnav { display:flex; gap:6px; margin-bottom:20px; border-bottom:1px solid #eef4fc; padding-bottom:0; flex-wrap:wrap; }
+        #analytics .an-tab-btn { display:flex; align-items:center; gap:7px; padding:10px 18px; border:none; background:transparent; cursor:pointer; font-family:-apple-system,BlinkMacSystemFont,'Inter',sans-serif; font-size:0.83rem; font-weight:600; color:#64748b; border-radius:10px 10px 0 0; position:relative; transition:all .18s; }
+        #analytics .an-tab-btn i { font-size:0.78rem; }
+        #analytics .an-tab-btn:hover:not(.active) { color:#0071e3; background:#f8fafc; }
+        #analytics .an-tab-btn.active { color:#0071e3; }
+        #analytics .an-tab-btn.active::after { content:''; position:absolute; left:10px; right:10px; bottom:-1px; height:2px; background:#0071e3; border-radius:2px; }
+        #analytics .an-tab-panel { display:none; }
+        #analytics .an-tab-panel.active { display:block; animation: anFadeIn .2s ease; }
+        @keyframes anFadeIn { from { opacity:0; transform:translateY(4px); } to { opacity:1; transform:translateY(0); } }
+        #debts .debt-subtab-btn { display:inline-flex; align-items:center; gap:7px; padding:10px 18px; border:none; background:transparent; cursor:pointer; font-family:-apple-system,BlinkMacSystemFont,'Inter',sans-serif; font-size:0.83rem; font-weight:600; color:#64748b; border-radius:10px 10px 0 0; position:relative; transition:all .18s; }
+        #debts .debt-subtab-btn:hover:not(.active) { color:#0071e3; background:#f8fafc; }
+        #debts .debt-subtab-btn.active { color:#0071e3; }
+        #debts .debt-subtab-btn.active::after { content:''; position:absolute; left:10px; right:10px; bottom:-1px; height:2px; background:#0071e3; border-radius:2px; }
         #phone-directory .pd-field-group { margin-bottom: 13px; }
         #phone-directory .pd-field-group label {
             display: block;
@@ -1177,11 +1348,9 @@
             font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Inter', sans-serif;
             font-size: 0.85rem;
             font-weight: 600;
-            color: #1d1d1f;
         }
         #settings .settings-desc {
             font-size: 0.75rem;
-            color: #94a3b8;
             margin-top: 2px;
         }
         #settings .settings-control { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
@@ -1203,8 +1372,6 @@
             border-radius: 8px;
             font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Inter', sans-serif;
             font-size: 0.83rem;
-            color: #0f172a;
-            background: #fff;
             outline: none;
             cursor: pointer;
             min-width: 140px;
@@ -1221,8 +1388,6 @@
             align-items: center;
             gap: 6px;
             padding: 9px 18px;
-            background: #f1f5f9;
-            color: #1d1d1f;
             border: 1.5px solid #e2e8f0;
             border-radius: 8px;
             font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Inter', sans-serif;
@@ -1822,6 +1987,7 @@
                     <li><button data-section="calculator" class="nav-btn text-slate-600 hover:bg-indigo-50 hover:text-indigo-600">CGS Calculator</button></li>
                     <li><button data-section="expenses" class="nav-btn text-slate-600 hover:bg-indigo-50 hover:text-indigo-600">Expenses</button></li>
                     <li><button data-section="debts" class="nav-btn text-slate-600 hover:bg-indigo-50 hover:text-indigo-600">Debts</button></li>
+                    <li><button data-section="affiliate" class="nav-btn text-slate-600 hover:bg-indigo-50 hover:text-indigo-600">Affiliate Program</button></li>
                     <div class="nav-section-label" style="margin-top:0.5rem;">Management</div>
                     <li><button data-section="profiles" class="nav-btn text-slate-600 hover:bg-indigo-50 hover:text-indigo-600">Client Profiles</button></li>
                     <li><button data-section="employees" class="nav-btn text-slate-600 hover:bg-indigo-50 hover:text-indigo-600">HR &amp; Employees</button></li>
@@ -1876,14 +2042,14 @@
                                     <i class="fas fa-exclamation-circle" style="color:#ff3b30;"></i>
                                 </div>
                                 <h3 style="color:#94a3b8;font-size:0.7rem;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:4px;">Complaints</h3>
-                                <p id="total-complaints" class="text-2xl xl:text-3xl font-bold" style="color:#0f172a;">0</p>
+                                <p id="total-complaints" class="text-2xl xl:text-3xl font-bold" style="color:var(--text-primary);">0</p>
                             </div>
                             <div id="total-clients-card" class="stat-card cursor-pointer">
                                 <div class="stat-icon" style="background:linear-gradient(135deg,#eef4fc,#9cc6fb);">
                                     <i class="fas fa-users" style="color:#0071e3;"></i>
                                 </div>
                                 <h3 style="color:#94a3b8;font-size:0.7rem;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:4px;">Total Clients</h3>
-                                <p id="total-clients" class="text-2xl xl:text-3xl font-bold" style="color:#0f172a;">0</p>
+                                <p id="total-clients" class="text-2xl xl:text-3xl font-bold" style="color:var(--text-primary);">0</p>
                             </div>
                             <div id="active-clients-card" class="stat-card cursor-pointer">
                                 <div class="stat-icon" style="background:linear-gradient(135deg,#d1fae5,#6ee7b7);">
@@ -1891,7 +2057,7 @@
                                 </div>
                                 <h3 style="color:#94a3b8;font-size:0.7rem;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:4px;">Active Clients (Last 2 Mo)</h3>
                                 <div class="dash-value-row">
-                                    <p id="active-clients" class="text-2xl xl:text-3xl font-bold" style="color:#0f172a;">0</p>
+                                    <p id="active-clients" class="text-2xl xl:text-3xl font-bold" style="color:var(--text-primary);">0</p>
                                     <span id="active-clients-trend" class="dash-trend"></span>
                                     <span class="dash-trend-label">vs last month</span>
                                 </div>
@@ -1914,7 +2080,7 @@
                                     <i class="fas fa-id-badge" style="color:#d97706;"></i>
                                 </div>
                                 <h3 style="color:#94a3b8;font-size:0.7rem;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:4px;">Total Employees</h3>
-                                <p id="total-employees" class="text-2xl xl:text-3xl font-bold" style="color:#0f172a;">0</p>
+                                <p id="total-employees" class="text-2xl xl:text-3xl font-bold" style="color:var(--text-primary);">0</p>
                             </div>
                             <div id="dashboard-total-commission-card" class="stat-card">
                                 <div class="stat-icon" style="background:linear-gradient(135deg,#ede9fe,#c4b5fd);">
@@ -1957,7 +2123,12 @@
                                     <i class="fas fa-hand-holding-usd" style="color:#e11d48;"></i>
                                 </div>
                                 <h3 style="color:#94a3b8;font-size:0.7rem;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:4px;">Clients Debts</h3>
-                                <p id="dashboard-total-debts" class="text-2xl xl:text-3xl font-bold" style="color:#e11d48;">PKR 0</p>
+                                <div class="dash-value-row">
+                                    <p id="dashboard-total-debts" class="text-2xl xl:text-3xl font-bold" style="color:#e11d48;">PKR 0</p>
+                                    <span id="debts-trend" class="dash-trend"></span>
+                                    <span class="dash-trend-label">vs last day</span>
+                                </div>
+                                <div id="debts-spark" class="dash-sparkline"></div>
                             </div>
                         </div>
                         
@@ -2715,6 +2886,16 @@
                                     <!-- UPDATED: Text color -->
                                     <label for="profile-is-old-client" class="text-slate-700">Old Client (before software)</label>
                                 </div>
+                                <div class="flex items-center space-x-2 md:col-span-2">
+                                    <input type="checkbox" id="profile-is-affiliate" class="h-4 w-4 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500">
+                                    <label for="profile-is-affiliate" class="text-slate-700">Affiliate Client (referred by an agent)</label>
+                                </div>
+                                <div id="profile-affiliate-agent-wrapper" class="md:col-span-2 hidden">
+                                    <label for="profile-affiliate-agent" class="text-sm text-slate-600 ml-2">Referring Agent</label>
+                                    <select id="profile-affiliate-agent" class="w-full px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                                        <option value="">-- Select Agent --</option>
+                                    </select>
+                                </div>
                                 <!-- UPDATED: Button color -->
                                 <button type="submit" class="w-full bg-indigo-600 text-white py-2 rounded-full font-semibold hover:bg-indigo-700 animated-btn md:col-span-2">
                                     Save Client Profile
@@ -3158,7 +3339,7 @@
                                     <i class="fas fa-shield-alt text-2xl" style="color:#0071e3;"></i>
                                 </div>
                                 <div>
-                                    <h3 class="text-xl font-bold" style="color:#1d1d1f;">Internal Use Only</h3>
+                                    <h3 class="text-xl font-bold" style="color:var(--text-primary);">Internal Use Only</h3>
                                     <p class="text-sm text-slate-500 mt-0.5">Darson Securities (Pvt.) Limited — Sargodha Branch</p>
                                 </div>
                             </div>
@@ -3220,6 +3401,28 @@
                     <section id="settings" class="section-container">
                         <h2 class="text-3xl font-bold text-slate-800 mb-6">Appearance Settings</h2>
 
+                        <!-- Dark / Night Mode -->
+                        <div class="settings-card">
+                            <div class="settings-card-header">
+                                <i class="fas fa-moon" style="color:#9cc6fb;"></i>
+                                <h3>Appearance Mode</h3>
+                            </div>
+                            <div class="settings-card-body">
+                                <div class="settings-row">
+                                    <div>
+                                        <div class="settings-label">Dark / Night Mode</div>
+                                        <div class="settings-desc">Pura system dark theme mein switch karen — sidebar, header, cards, tables, sab jagah</div>
+                                    </div>
+                                    <div class="settings-control">
+                                        <label class="settings-toggle">
+                                            <input type="checkbox" id="set-dark-mode" onchange="applyAppearance()">
+                                            <span class="settings-toggle-slider"></span>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
                         <!-- Color Scheme -->
                         <div class="settings-card">
                             <div class="settings-card-header">
@@ -3243,6 +3446,15 @@
                                     </div>
                                     <div class="settings-control">
                                         <input type="color" id="set-sidebar-color" value="#1d1d1f" oninput="applyAppearance()">
+                                    </div>
+                                </div>
+                                <div class="settings-row">
+                                    <div>
+                                        <div class="settings-label">Sidebar Text Color</div>
+                                        <div class="settings-desc">Color of menu labels in the left sidebar</div>
+                                    </div>
+                                    <div class="settings-control">
+                                        <input type="color" id="set-sidebar-text-color" value="#ffffff" oninput="applyAppearance()">
                                     </div>
                                 </div>
                                 <div class="settings-row">
@@ -3417,6 +3629,61 @@
                                         </select>
                                     </div>
                                 </div>
+                                <div class="settings-row">
+                                    <div>
+                                        <div class="settings-label">Enable Animations</div>
+                                        <div class="settings-desc">Hover effects, transitions aur section animations on/off</div>
+                                    </div>
+                                    <div class="settings-control">
+                                        <label class="settings-toggle">
+                                            <input type="checkbox" id="set-animations-enabled" checked onchange="applyAppearance()">
+                                            <span class="settings-toggle-slider"></span>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Footer Customization -->
+                        <div class="settings-card">
+                            <div class="settings-card-header">
+                                <i class="fas fa-shoe-prints" style="color:#9cc6fb;"></i>
+                                <h3>Footer Customization</h3>
+                            </div>
+                            <div class="settings-card-body">
+                                <div class="settings-row">
+                                    <div style="flex:1;min-width:220px;">
+                                        <div class="settings-label">Footer Text</div>
+                                        <div class="settings-desc">System ke sab se neeche dikhne wala text</div>
+                                    </div>
+                                    <div class="settings-control" style="flex:1;min-width:220px;">
+                                        <input type="text" id="set-footer-text" placeholder="Footer text" oninput="applyAppearance()"
+                                               style="width:100%;padding:8px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:0.82rem;background:var(--surface);color:var(--text-primary);">
+                                    </div>
+                                </div>
+                                <div class="settings-row">
+                                    <div>
+                                        <div class="settings-label">Display Style</div>
+                                        <div class="settings-desc">Static, fade animation ya scrolling ticker</div>
+                                    </div>
+                                    <div class="settings-control">
+                                        <select class="settings-select" id="set-footer-mode" onchange="applyAppearance()">
+                                            <option value="static">Static</option>
+                                            <option value="fade">Animated (Fade)</option>
+                                            <option value="ticker">Scrolling Ticker</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="settings-row">
+                                    <div>
+                                        <div class="settings-label">Ticker Speed</div>
+                                        <div class="settings-desc">Sirf "Scrolling Ticker" mode ke liye — kam value = tez scroll</div>
+                                    </div>
+                                    <div class="settings-control">
+                                        <input type="range" id="set-footer-ticker-speed" min="6" max="40" value="18" step="1" oninput="applyAppearance(); document.getElementById('set-footer-ticker-speed-val').textContent = this.value + 's'">
+                                        <span class="settings-value-badge" id="set-footer-ticker-speed-val">18s</span>
+                                    </div>
+                                </div>
                             </div>
                         </div>
 
@@ -3472,7 +3739,7 @@
                         <h2 class="text-3xl font-bold text-slate-800 mb-6">Backup &amp; Restore</h2>
 
                         <!-- Info note -->
-                        <div style="background:rgba(20,124,229,0.07);border-left:4px solid #0071e3;border-radius:0 12px 12px 0;padding:14px 18px;margin-bottom:24px;font-size:0.85rem;color:#1d1d1f;font-family:-apple-system,BlinkMacSystemFont,'Inter',sans-serif;line-height:1.6;">
+                        <div style="background:rgba(20,124,229,0.07);border-left:4px solid #0071e3;border-radius:0 12px 12px 0;padding:14px 18px;margin-bottom:24px;font-size:0.85rem;color:var(--text-primary);font-family:-apple-system,BlinkMacSystemFont,'Inter',sans-serif;line-height:1.6;">
                             <strong><i class="fas fa-shield-alt mr-2" style="color:#0071e3;"></i>Backup kya hai?</strong><br>
                             Yahan se aap apna poora system data (complaints, commission, expenses, clients, employees, couriers) ek JSON file ke tor par download (export) kar saktay hain. Agar kabhi system crash ho ya data kharab ho jaye to usi JSON file ko yahan upload (import) kar ke system wahan se continue kar saktay hain jahan chhora tha.
                         </div>
@@ -3487,7 +3754,7 @@
                                 </div>
                                 <div class="settings-card-body">
                                     <p style="font-size:0.8rem;color:#64748b;margin-bottom:16px;font-family:-apple-system,BlinkMacSystemFont,'Inter',sans-serif;">Apna poora Firestore data ek JSON file mein download karen. Yeh file safe jagah rakhein.</p>
-                                    <div id="backup-export-collections" style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:18px;font-size:0.78rem;color:#1d1d1f;font-family:-apple-system,BlinkMacSystemFont,'Inter',sans-serif;">
+                                    <div id="backup-export-collections" style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:18px;font-size:0.78rem;color:var(--text-primary);font-family:-apple-system,BlinkMacSystemFont,'Inter',sans-serif;">
                                         <span><i class="fas fa-check-circle mr-1" style="color:#1f9d55;"></i> Complaints</span>
                                         <span><i class="fas fa-check-circle mr-1" style="color:#1f9d55;"></i> Daily Commissions</span>
                                         <span><i class="fas fa-check-circle mr-1" style="color:#1f9d55;"></i> Commission Received</span>
@@ -3635,6 +3902,12 @@
                                     </tbody>
                                 </table>
                             </div>
+                            <div class="flex justify-end mt-4 pt-4 border-t">
+                                <div class="text-right">
+                                    <span class="text-sm font-medium text-slate-500 mr-2">Total Amount:</span>
+                                    <span id="bills-total-amount" class="text-lg font-bold text-emerald-700">PKR 0.00</span>
+                                </div>
+                            </div>
                         </div>
                     </section>
 
@@ -3659,13 +3932,13 @@
                     <!-- ─── DEBTS SECTION ─── -->
                     <section id="debts" class="section-container">
                         <h2 class="text-3xl font-bold text-slate-800 mb-2">Debts</h2>
-                        <p class="text-sm text-slate-500 mb-6">Clients jin ke debts han — account number, name &amp; amount</p>
+                        <p class="text-sm text-slate-500 mb-6">List of Clients with Outstanding Debts — account number, name &amp; amount</p>
 
                         <!-- Bulk Text Upload -->
                         <div class="card p-6 mb-6" id="debt-bulk-upload-wrapper">
                             <h3 class="text-xl font-semibold mb-1"><i class="fas fa-cloud-upload-alt mr-2 text-indigo-500"></i>Bulk Text Upload</h3>
-                            <p class="text-sm text-slate-500 mb-4">Trial Balance text yahan paste karen. Account number, client name &amp; debit amount khud fetch ho jayega.</p>
-                            <textarea id="debt-bulk-text" rows="8" placeholder="Bulk trial balance text yahan paste karen..." class="w-full px-4 py-3 border rounded-2xl focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm font-mono"></textarea>
+                            <p class="text-sm text-slate-500 mb-4">Paste the Trial Balance text here. Account number, client name &amp; debit amount will be extracted automatically..</p>
+                            <textarea id="debt-bulk-text" rows="8" placeholder="Paste the Trial Balance text here..." class="w-full px-4 py-3 border rounded-2xl focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm font-mono"></textarea>
                             <div class="flex gap-3 mt-3 flex-wrap">
                                 <button id="debt-parse-btn" class="bg-indigo-600 text-white px-6 py-2 rounded-full font-semibold hover:bg-indigo-700 animated-btn">
                                     <i class="fas fa-magic mr-2"></i>Parse Text
@@ -3743,11 +4016,21 @@
                                 <h3 class="text-xl font-semibold">Client Debts</h3>
                                 <div class="flex items-center gap-3 flex-wrap">
                                     <span id="debt-total-badge" class="text-xs font-semibold bg-indigo-100 text-indigo-700 px-3 py-1 rounded-full"></span>
+                                    <button id="debt-print-report-btn" class="bg-slate-700 text-white px-4 py-2 rounded-full font-semibold hover:bg-slate-800 animated-btn text-sm">
+                                        <i class="fas fa-print mr-1"></i>Print Report
+                                    </button>
                                     <button id="debt-clear-all-btn" class="bg-rose-600 text-white px-4 py-2 rounded-full font-semibold hover:bg-rose-700 animated-btn text-sm">
                                         <i class="fas fa-trash-alt mr-1"></i>Clear All
                                     </button>
                                 </div>
                             </div>
+
+                            <!-- Sub-sections: All Debts / Clean Debts -->
+                            <div class="flex flex-wrap" id="debt-subtab-nav" style="border-bottom:1px solid #eef4fc;margin-bottom:16px;">
+                                <button id="debt-subtab-all" class="debt-subtab-btn active" onclick="debtSwitchSubTab('all')"><i class="fas fa-list"></i>All Debts</button>
+                                <button id="debt-subtab-clean" class="debt-subtab-btn" onclick="debtSwitchSubTab('clean')"><i class="fas fa-check-double"></i>Clean Debts</button>
+                            </div>
+
                             <div class="mb-4">
                                 <input type="text" id="debt-search" placeholder="Account number ya name se search karen..." class="w-full md:w-80 px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm">
                             </div>
@@ -3758,13 +4041,15 @@
                                             <th class="p-2">#</th>
                                             <th class="p-2">Account Number</th>
                                             <th class="p-2">Client Name</th>
+                                            <th class="p-2">Contact</th>
                                             <th class="p-2 text-right">Debt Amount (PKR)</th>
                                             <th class="p-2">Last Updated</th>
+                                            <th class="p-2 text-center">Clean Debt</th>
                                             <th class="p-2 actions-header">Actions</th>
                                         </tr>
                                     </thead>
                                     <tbody id="debts-list">
-                                        <tr><td colspan="6" class="p-4 text-center text-slate-500">Abhi tak koi debt add nahi hui.</td></tr>
+                                        <tr><td colspan="8" class="p-4 text-center text-slate-500">Abhi tak koi debt add nahi hui.</td></tr>
                                     </tbody>
                                 </table>
                             </div>
@@ -3772,132 +4057,250 @@
                     </section>
                     <!-- ─── END DEBTS SECTION ─── -->
 
+                    <!-- ─── AFFILIATE PROGRAM SECTION ─── -->
+                    <section id="affiliate" class="section-container">
+                        <h2 class="text-3xl font-bold text-slate-800 mb-2">Affiliate Program</h2>
+                        <p class="text-sm text-slate-500 mb-6">Referral agents, affiliate clients &amp; auto-calculated commissions — account &amp; commission details are read-only except Add Agent and Debit/Credit entries.</p>
+
+                        <!-- Add Agent (Writable) -->
+                        <div class="card p-6 mb-6" id="add-agent-wrapper">
+                            <h3 class="text-xl font-semibold mb-4"><i class="fas fa-user-plus mr-2 text-indigo-500"></i>Add New Agent</h3>
+                            <form id="add-agent-form" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div class="md:col-span-2"><p class="text-xs font-bold text-indigo-600 uppercase tracking-wider mb-2"><i class="fas fa-user mr-1"></i>Basic Information</p></div>
+                                <input type="text" id="agent-name" placeholder="Full Name" required class="w-full px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                                <input type="text" id="agent-contact" placeholder="Contact Number" required class="w-full px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                                <input type="text" id="agent-profile" placeholder="Profile / Designation" class="w-full px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-indigo-500 md:col-span-2">
+
+                                <div class="md:col-span-2"><p class="text-xs font-bold text-indigo-600 uppercase tracking-wider mb-2 mt-2"><i class="fas fa-id-card mr-1"></i>Personal Details</p></div>
+                                <input type="text" id="agent-father-name" placeholder="Father's Name" class="w-full px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                                <input type="text" id="agent-cnic" placeholder="CNIC" class="w-full px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                                <input type="text" id="agent-address" placeholder="Postal Address" class="w-full px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-indigo-500 md:col-span-2">
+                                <div>
+                                    <label for="agent-dob" class="text-sm text-slate-600 ml-2">Date of Birth</label>
+                                    <input type="date" id="agent-dob" class="w-full px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                                </div>
+                                <div>
+                                    <label class="text-sm text-slate-600 ml-2">Marital Status</label>
+                                    <select id="agent-marital-status" class="w-full px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                                        <option value="">-- Select --</option>
+                                        <option value="Single">Single</option>
+                                        <option value="Married">Married</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="text-sm text-slate-600 ml-2">Resident Status</label>
+                                    <select id="agent-resident-status" class="w-full px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                                        <option value="">-- Select --</option>
+                                        <option value="Resident">Resident</option>
+                                        <option value="Non-Resident">Non-Resident</option>
+                                    </select>
+                                </div>
+                                <input type="text" id="agent-mobile" placeholder="Mobile Number" class="w-full px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                                <input type="text" id="agent-emergency-contact" placeholder="Emergency Contact Number" class="w-full px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-indigo-500">
+
+                                <div class="md:col-span-2"><p class="text-xs font-bold text-indigo-600 uppercase tracking-wider mb-2 mt-2"><i class="fas fa-university mr-1"></i>Bank &amp; Commission</p></div>
+                                <input type="text" id="agent-bank-account" placeholder="Bank Account Number" class="w-full px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                                <div>
+                                    <label for="agent-commission-rate" class="text-sm text-slate-600 ml-2">Commission Rate (%)</label>
+                                    <input type="number" id="agent-commission-rate" value="20" min="0" max="100" step="0.01" class="w-full px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                                </div>
+
+                                <div class="md:col-span-2"><p class="text-xs font-bold text-indigo-600 uppercase tracking-wider mb-2 mt-2"><i class="fas fa-file-upload mr-1"></i>Documents</p></div>
+                                <div>
+                                    <label class="text-sm text-slate-600 ml-2">CNIC Front Image</label>
+                                    <input type="file" id="agent-cnic-front" accept="image/*" class="w-full px-3 py-2 border rounded-full text-sm">
+                                </div>
+                                <div>
+                                    <label class="text-sm text-slate-600 ml-2">CNIC Back Image</label>
+                                    <input type="file" id="agent-cnic-back" accept="image/*" class="w-full px-3 py-2 border rounded-full text-sm">
+                                </div>
+                                <div>
+                                    <label class="text-sm text-slate-600 ml-2">Educational Documents</label>
+                                    <input type="file" id="agent-edu-docs" accept="image/*,.pdf" class="w-full px-3 py-2 border rounded-full text-sm">
+                                </div>
+                                <div>
+                                    <label class="text-sm text-slate-600 ml-2">Other Supporting Documents</label>
+                                    <input type="file" id="agent-other-docs" accept="image/*,.pdf" class="w-full px-3 py-2 border rounded-full text-sm">
+                                </div>
+
+                                <div id="agent-save-status" class="md:col-span-2 text-xs hidden"></div>
+                                <button type="submit" id="agent-save-btn" class="w-full bg-indigo-600 text-white py-2 rounded-full font-semibold hover:bg-indigo-700 animated-btn md:col-span-2">
+                                    <i class="fas fa-save mr-2"></i>Save Agent
+                                </button>
+                            </form>
+                        </div>
+
+                        <!-- Agents List (Read-only) -->
+                        <div class="card p-6">
+                            <div class="flex items-center justify-between mb-4 flex-wrap gap-3">
+                                <h3 class="text-xl font-semibold">Affiliate Agents</h3>
+                                <input type="text" id="agent-search" placeholder="Search agent by name or contact..." class="w-full md:w-80 px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm">
+                            </div>
+                            <div class="overflow-x-auto">
+                                <table class="w-full text-left table-auto text-sm">
+                                    <thead class="border-b-2">
+                                        <tr class="text-slate-600 uppercase text-xs">
+                                            <th class="p-2">#</th>
+                                            <th class="p-2">Name</th>
+                                            <th class="p-2">Contact</th>
+                                            <th class="p-2 text-center">Commission Rate</th>
+                                            <th class="p-2 text-center">Affiliate Clients</th>
+                                            <th class="p-2 text-right">Balance (PKR)</th>
+                                            <th class="p-2 actions-header">Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="agents-list">
+                                        <tr><td colspan="7" class="p-4 text-center text-slate-500">Abhi tak koi agent add nahi hua.</td></tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </section>
+                    <!-- ─── END AFFILIATE PROGRAM SECTION ─── -->
+
                     <!-- ─── ANALYTICS SECTION ─── -->
                     <section id="analytics" class="section-container">
                         <h2 class="text-3xl font-bold text-slate-800 mb-2">Analytics</h2>
                         <p class="text-slate-500 mb-6" style="font-family:-apple-system,BlinkMacSystemFont,'Inter',sans-serif;font-size:0.9rem;">Session activity and access timestamps for this application.</p>
 
-                        <!-- Summary Stat Row -->
-                        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;margin-bottom:24px;">
-                            <div class="stat-card">
-                                <div class="stat-icon" style="background:linear-gradient(135deg,#0071e3,#147ce5);">
-                                    <i class="fas fa-desktop" style="color:#fff;"></i>
-                                </div>
-                                <div style="font-size:0.73rem;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:#94a3b8;margin-bottom:4px;font-family:-apple-system,BlinkMacSystemFont,'Inter',sans-serif;">Frontend Last Seen</div>
-                                <div id="analytics-fe-last-seen" style="font-size:1rem;font-weight:700;color:#0f172a;font-family:-apple-system,BlinkMacSystemFont,'Inter',sans-serif;word-break:break-word;">—</div>
-                            </div>
-
-                            <div class="stat-card">
-                                <div class="stat-icon" style="background:linear-gradient(135deg,#d97706,#fbbf24);">
-                                    <i class="fas fa-clock" style="color:#fff;"></i>
-                                </div>
-                                <div style="font-size:0.73rem;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:#94a3b8;margin-bottom:4px;font-family:-apple-system,BlinkMacSystemFont,'Inter',sans-serif;">Current Session Duration</div>
-                                <div id="analytics-session-dur" style="font-size:1rem;font-weight:700;color:#0f172a;font-family:-apple-system,BlinkMacSystemFont,'Inter',sans-serif;">—</div>
-                            </div>
-                            <div class="stat-card">
-                                <div class="stat-icon" style="background:linear-gradient(135deg,#7c3aed,#a78bfa);">
-                                    <i class="fas fa-sign-in-alt" style="color:#fff;"></i>
-                                </div>
-                                <div style="font-size:0.73rem;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:#94a3b8;margin-bottom:4px;font-family:-apple-system,BlinkMacSystemFont,'Inter',sans-serif;">Session Started</div>
-                                <div id="analytics-session-start" style="font-size:1rem;font-weight:700;color:#0f172a;font-family:-apple-system,BlinkMacSystemFont,'Inter',sans-serif;word-break:break-word;">—</div>
-                            </div>
+                        <!-- Tab Navigation -->
+                        <div class="an-tabnav">
+                            <button class="an-tab-btn active" onclick="analyticsSwitchTab('overview')" id="an-tab-overview"><i class="fas fa-gauge-high"></i> Overview</button>
+                            <button class="an-tab-btn" onclick="analyticsSwitchTab('sessions')" id="an-tab-sessions"><i class="fas fa-history"></i> Session History</button>
+                            <button class="an-tab-btn" onclick="analyticsSwitchTab('pagetime')" id="an-tab-pagetime"><i class="fas fa-hourglass-half"></i> Page Activity</button>
+                            <button class="an-tab-btn" onclick="analyticsSwitchTab('shared')" id="an-tab-shared"><i class="fas fa-share-alt"></i> Shared Visitors</button>
                         </div>
 
-                        <!-- Session History Table -->
-                        <div class="settings-card">
-                            <div class="settings-card-header">
-                                <i class="fas fa-history" style="color:#9cc6fb;"></i>
-                                <h3>Login Session History</h3>
-                            </div>
-                            <div class="settings-card-body" style="padding:0;">
-                                <div style="overflow-x:auto;">
-                                    <table style="width:100%;border-collapse:collapse;font-family:-apple-system,BlinkMacSystemFont,'Inter',sans-serif;font-size:0.82rem;">
-                                        <thead>
-                                            <tr style="background:linear-gradient(90deg,#f8fafc,#f2f6fb);border-bottom:2px solid #eef4fc;">
-                                                <th style="padding:10px 16px;text-align:left;font-weight:700;color:#475569;letter-spacing:0.04em;text-transform:uppercase;font-size:0.72rem;">#</th>
-                                                <th style="padding:10px 16px;text-align:left;font-weight:700;color:#475569;letter-spacing:0.04em;text-transform:uppercase;font-size:0.72rem;">Login Time</th>
-                                                <th style="padding:10px 16px;text-align:left;font-weight:700;color:#475569;letter-spacing:0.04em;text-transform:uppercase;font-size:0.72rem;">Logout / Last Active</th>
-                                                <th style="padding:10px 16px;text-align:left;font-weight:700;color:#475569;letter-spacing:0.04em;text-transform:uppercase;font-size:0.72rem;">Duration</th>
-                                                <th style="padding:10px 16px;text-align:left;font-weight:700;color:#475569;letter-spacing:0.04em;text-transform:uppercase;font-size:0.72rem;">Status</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody id="analytics-session-tbody">
-                                            <tr><td colspan="5" style="text-align:center;padding:24px;color:#94a3b8;">No sessions recorded yet.</td></tr>
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Frontend Activity -->
-                        <div class="settings-card" style="margin-top:20px;">
-                            <div class="settings-card-header">
-                                <i class="fas fa-desktop" style="color:#9cc6fb;"></i>
-                                <h3>Frontend Activity</h3>
-                            </div>
-                            <div class="settings-card-body">
-                                <div style="background:#f8fafc;border-radius:12px;padding:16px;border:1px solid #eef4fc;max-width:400px;">
-                                    <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;">
-                                        <div style="width:10px;height:10px;border-radius:50%;background:#0071e3;flex-shrink:0;"></div>
-                                        <span style="font-weight:700;font-family:-apple-system,BlinkMacSystemFont,'Inter',sans-serif;font-size:0.9rem;color:#1d1d1f;">Frontend</span>
+                        <!-- Overview Tab -->
+                        <div class="an-tab-panel active" id="an-panel-overview">
+                            <!-- Summary Stat Row -->
+                            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;margin-bottom:20px;">
+                                <div class="stat-card">
+                                    <div class="stat-icon" style="background:linear-gradient(135deg,#0071e3,#147ce5);">
+                                        <i class="fas fa-desktop" style="color:#fff;"></i>
                                     </div>
-                                    <div style="font-size:0.78rem;color:#64748b;margin-bottom:6px;font-family:-apple-system,BlinkMacSystemFont,'Inter',sans-serif;">Browser client activity</div>
-                                    <div style="font-size:0.78rem;color:#475569;font-family:-apple-system,BlinkMacSystemFont,'Inter',sans-serif;"><span style="color:#94a3b8;">First Visit:</span> <span id="analytics-fe-first">—</span></div>
-                                    <div style="font-size:0.78rem;color:#475569;font-family:-apple-system,BlinkMacSystemFont,'Inter',sans-serif;margin-top:4px;"><span style="color:#94a3b8;">Last Seen:</span> <span id="analytics-fe-last2">—</span></div>
-                                    <div style="font-size:0.78rem;color:#475569;font-family:-apple-system,BlinkMacSystemFont,'Inter',sans-serif;margin-top:4px;"><span style="color:#94a3b8;">Total Visits:</span> <span id="analytics-fe-visits">—</span></div>
+                                    <div style="font-size:0.73rem;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:#94a3b8;margin-bottom:4px;font-family:-apple-system,BlinkMacSystemFont,'Inter',sans-serif;">Frontend Last Seen</div>
+                                    <div id="analytics-fe-last-seen" style="font-size:1rem;font-weight:700;color:var(--text-primary);font-family:-apple-system,BlinkMacSystemFont,'Inter',sans-serif;word-break:break-word;">—</div>
+                                </div>
+
+                                <div class="stat-card">
+                                    <div class="stat-icon" style="background:linear-gradient(135deg,#d97706,#fbbf24);">
+                                        <i class="fas fa-clock" style="color:#fff;"></i>
+                                    </div>
+                                    <div style="font-size:0.73rem;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:#94a3b8;margin-bottom:4px;font-family:-apple-system,BlinkMacSystemFont,'Inter',sans-serif;">Current Session Duration</div>
+                                    <div id="analytics-session-dur" style="font-size:1rem;font-weight:700;color:var(--text-primary);font-family:-apple-system,BlinkMacSystemFont,'Inter',sans-serif;">—</div>
+                                </div>
+                                <div class="stat-card">
+                                    <div class="stat-icon" style="background:linear-gradient(135deg,#7c3aed,#a78bfa);">
+                                        <i class="fas fa-sign-in-alt" style="color:#fff;"></i>
+                                    </div>
+                                    <div style="font-size:0.73rem;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:#94a3b8;margin-bottom:4px;font-family:-apple-system,BlinkMacSystemFont,'Inter',sans-serif;">Session Started</div>
+                                    <div id="analytics-session-start" style="font-size:1rem;font-weight:700;color:var(--text-primary);font-family:-apple-system,BlinkMacSystemFont,'Inter',sans-serif;word-break:break-word;">—</div>
+                                </div>
+                            </div>
+
+                            <!-- Frontend Activity -->
+                            <div class="settings-card">
+                                <div class="settings-card-header">
+                                    <i class="fas fa-desktop" style="color:#9cc6fb;"></i>
+                                    <h3>Frontend Activity</h3>
+                                </div>
+                                <div class="settings-card-body">
+                                    <div style="background:#f8fafc;border-radius:12px;padding:16px;border:1px solid #eef4fc;max-width:400px;">
+                                        <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;">
+                                            <div style="width:10px;height:10px;border-radius:50%;background:#0071e3;flex-shrink:0;"></div>
+                                            <span style="font-weight:700;font-family:-apple-system,BlinkMacSystemFont,'Inter',sans-serif;font-size:0.9rem;color:#1d1d1f;">Frontend</span>
+                                        </div>
+                                        <div style="font-size:0.78rem;color:#64748b;margin-bottom:6px;font-family:-apple-system,BlinkMacSystemFont,'Inter',sans-serif;">Browser client activity</div>
+                                        <div style="font-size:0.78rem;color:#475569;font-family:-apple-system,BlinkMacSystemFont,'Inter',sans-serif;"><span style="color:#94a3b8;">First Visit:</span> <span id="analytics-fe-first">—</span></div>
+                                        <div style="font-size:0.78rem;color:#475569;font-family:-apple-system,BlinkMacSystemFont,'Inter',sans-serif;margin-top:4px;"><span style="color:#94a3b8;">Last Seen:</span> <span id="analytics-fe-last2">—</span></div>
+                                        <div style="font-size:0.78rem;color:#475569;font-family:-apple-system,BlinkMacSystemFont,'Inter',sans-serif;margin-top:4px;"><span style="color:#94a3b8;">Total Visits:</span> <span id="analytics-fe-visits">—</span></div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
 
-                        <!-- Pages Spent Most Time -->
-                        <div class="settings-card" style="margin-top:20px;">
-                            <div class="settings-card-header">
-                                <i class="fas fa-hourglass-half" style="color:#9cc6fb;"></i>
-                                <h3>Pages Spent Most Time On</h3>
-                            </div>
-                            <div class="settings-card-body" style="padding:0;">
-                                <div style="overflow-x:auto;">
-                                    <table style="width:100%;border-collapse:collapse;font-family:-apple-system,BlinkMacSystemFont,'Inter',sans-serif;font-size:0.82rem;">
-                                        <thead>
-                                            <tr style="background:linear-gradient(90deg,#f8fafc,#f2f6fb);border-bottom:2px solid #eef4fc;">
-                                                <th style="padding:10px 16px;text-align:left;font-weight:700;color:#475569;letter-spacing:0.04em;text-transform:uppercase;font-size:0.72rem;">#</th>
-                                                <th style="padding:10px 16px;text-align:left;font-weight:700;color:#475569;letter-spacing:0.04em;text-transform:uppercase;font-size:0.72rem;">Page</th>
-                                                <th style="padding:10px 16px;text-align:left;font-weight:700;color:#475569;letter-spacing:0.04em;text-transform:uppercase;font-size:0.72rem;">Total Time Spent</th>
-                                                <th style="padding:10px 16px;text-align:left;font-weight:700;color:#475569;letter-spacing:0.04em;text-transform:uppercase;font-size:0.72rem;">Visits</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody id="analytics-page-time-tbody">
-                                            <tr><td colspan="4" style="text-align:center;padding:24px;color:#94a3b8;">No page activity recorded yet.</td></tr>
-                                        </tbody>
-                                    </table>
+                        <!-- Session History Tab -->
+                        <div class="an-tab-panel" id="an-panel-sessions">
+                            <div class="settings-card">
+                                <div class="settings-card-header">
+                                    <i class="fas fa-history" style="color:#9cc6fb;"></i>
+                                    <h3>Login Session History</h3>
+                                </div>
+                                <div class="settings-card-body" style="padding:0;">
+                                    <div style="overflow-x:auto;max-height:520px;overflow-y:auto;">
+                                        <table style="width:100%;border-collapse:collapse;font-family:-apple-system,BlinkMacSystemFont,'Inter',sans-serif;font-size:0.82rem;">
+                                            <thead>
+                                                <tr style="background:linear-gradient(90deg,#f8fafc,#f2f6fb);border-bottom:2px solid #eef4fc;">
+                                                    <th style="padding:10px 16px;text-align:left;font-weight:700;color:#475569;letter-spacing:0.04em;text-transform:uppercase;font-size:0.72rem;">#</th>
+                                                    <th style="padding:10px 16px;text-align:left;font-weight:700;color:#475569;letter-spacing:0.04em;text-transform:uppercase;font-size:0.72rem;">Login Time</th>
+                                                    <th style="padding:10px 16px;text-align:left;font-weight:700;color:#475569;letter-spacing:0.04em;text-transform:uppercase;font-size:0.72rem;">Logout / Last Active</th>
+                                                    <th style="padding:10px 16px;text-align:left;font-weight:700;color:#475569;letter-spacing:0.04em;text-transform:uppercase;font-size:0.72rem;">Duration</th>
+                                                    <th style="padding:10px 16px;text-align:left;font-weight:700;color:#475569;letter-spacing:0.04em;text-transform:uppercase;font-size:0.72rem;">Status</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="analytics-session-tbody">
+                                                <tr><td colspan="5" style="text-align:center;padding:24px;color:#94a3b8;">No sessions recorded yet.</td></tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
                                 </div>
                             </div>
                         </div>
 
-                        <!-- Shared Frontend Visitors -->
-                        <div class="settings-card" style="margin-top:20px;">
-                            <div class="settings-card-header">
-                                <i class="fas fa-share-alt" style="color:#9cc6fb;"></i>
-                                <h3>Shared Frontend Visitors</h3>
-                            </div>
-                            <div class="settings-card-body" style="padding:0;">
-                                <div id="analytics-shared-visitors-summary" style="padding:14px 20px 10px;font-family:-apple-system,BlinkMacSystemFont,'Inter',sans-serif;font-size:0.83rem;color:#475569;border-bottom:1px solid #f1f5f9;">
-                                    Loading visitor data…
+                        <!-- Page Activity Tab -->
+                        <div class="an-tab-panel" id="an-panel-pagetime">
+                            <div class="settings-card">
+                                <div class="settings-card-header">
+                                    <i class="fas fa-hourglass-half" style="color:#9cc6fb;"></i>
+                                    <h3>Pages Spent Most Time On</h3>
                                 </div>
-                                <div style="overflow-x:auto;">
-                                    <table style="width:100%;border-collapse:collapse;font-family:-apple-system,BlinkMacSystemFont,'Inter',sans-serif;font-size:0.82rem;">
-                                        <thead>
-                                            <tr style="background:linear-gradient(90deg,#f8fafc,#f2f6fb);border-bottom:2px solid #eef4fc;">
-                                                <th style="padding:10px 16px;text-align:left;font-weight:700;color:#475569;letter-spacing:0.04em;text-transform:uppercase;font-size:0.72rem;">#</th>
-                                                <th style="padding:10px 16px;text-align:left;font-weight:700;color:#475569;letter-spacing:0.04em;text-transform:uppercase;font-size:0.72rem;">Visited At</th>
-                                                <th style="padding:10px 16px;text-align:left;font-weight:700;color:#475569;letter-spacing:0.04em;text-transform:uppercase;font-size:0.72rem;">Time Elapsed Since Visit</th>
-                                                <th style="padding:10px 16px;text-align:left;font-weight:700;color:#475569;letter-spacing:0.04em;text-transform:uppercase;font-size:0.72rem;">Referrer</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody id="analytics-shared-visitors-tbody">
-                                            <tr><td colspan="4" style="text-align:center;padding:24px;color:#94a3b8;">No shared-link visits recorded yet.</td></tr>
-                                        </tbody>
-                                    </table>
+                                <div class="settings-card-body" style="padding:0;">
+                                    <div style="overflow-x:auto;max-height:520px;overflow-y:auto;">
+                                        <table style="width:100%;border-collapse:collapse;font-family:-apple-system,BlinkMacSystemFont,'Inter',sans-serif;font-size:0.82rem;">
+                                            <thead>
+                                                <tr style="background:linear-gradient(90deg,#f8fafc,#f2f6fb);border-bottom:2px solid #eef4fc;">
+                                                    <th style="padding:10px 16px;text-align:left;font-weight:700;color:#475569;letter-spacing:0.04em;text-transform:uppercase;font-size:0.72rem;">#</th>
+                                                    <th style="padding:10px 16px;text-align:left;font-weight:700;color:#475569;letter-spacing:0.04em;text-transform:uppercase;font-size:0.72rem;">Page</th>
+                                                    <th style="padding:10px 16px;text-align:left;font-weight:700;color:#475569;letter-spacing:0.04em;text-transform:uppercase;font-size:0.72rem;">Total Time Spent</th>
+                                                    <th style="padding:10px 16px;text-align:left;font-weight:700;color:#475569;letter-spacing:0.04em;text-transform:uppercase;font-size:0.72rem;">Visits</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="analytics-page-time-tbody">
+                                                <tr><td colspan="4" style="text-align:center;padding:24px;color:#94a3b8;">No page activity recorded yet.</td></tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Shared Visitors Tab -->
+                        <div class="an-tab-panel" id="an-panel-shared">
+                            <div class="settings-card">
+                                <div class="settings-card-header">
+                                    <i class="fas fa-share-alt" style="color:#9cc6fb;"></i>
+                                    <h3>Shared Frontend Visitors</h3>
+                                </div>
+                                <div class="settings-card-body" style="padding:0;">
+                                    <div id="analytics-shared-visitors-summary" style="padding:14px 20px 10px;font-family:-apple-system,BlinkMacSystemFont,'Inter',sans-serif;font-size:0.83rem;color:#475569;border-bottom:1px solid #f1f5f9;">
+                                        Loading visitor data…
+                                    </div>
+                                    <div style="overflow-x:auto;max-height:520px;overflow-y:auto;">
+                                        <table style="width:100%;border-collapse:collapse;font-family:-apple-system,BlinkMacSystemFont,'Inter',sans-serif;font-size:0.82rem;">
+                                            <thead>
+                                                <tr style="background:linear-gradient(90deg,#f8fafc,#f2f6fb);border-bottom:2px solid #eef4fc;">
+                                                    <th style="padding:10px 16px;text-align:left;font-weight:700;color:#475569;letter-spacing:0.04em;text-transform:uppercase;font-size:0.72rem;">#</th>
+                                                    <th style="padding:10px 16px;text-align:left;font-weight:700;color:#475569;letter-spacing:0.04em;text-transform:uppercase;font-size:0.72rem;">Visited At</th>
+                                                    <th style="padding:10px 16px;text-align:left;font-weight:700;color:#475569;letter-spacing:0.04em;text-transform:uppercase;font-size:0.72rem;">Time Elapsed Since Visit</th>
+                                                    <th style="padding:10px 16px;text-align:left;font-weight:700;color:#475569;letter-spacing:0.04em;text-transform:uppercase;font-size:0.72rem;">Referrer</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="analytics-shared-visitors-tbody">
+                                                <tr><td colspan="4" style="text-align:center;padding:24px;color:#94a3b8;">No shared-link visits recorded yet.</td></tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -4347,8 +4750,9 @@
             
             <!-- UPDATED: Footer theme -->
             <footer class="text-slate-300 p-4 mt-auto" style="background: linear-gradient(180deg, #1d1d1f 0%, #232325 100%);">
-                <div class="container mx-auto text-center text-sm">
-                    Developed by Weblora| Developer Afrasiab Asghar | Contact: +923060406003 | https://www.webloraa.com/
+                <div class="container mx-auto text-center text-sm" style="display:flex;align-items:center;justify-content:center;gap:14px;flex-wrap:wrap;">
+                    <div id="app-footer-text-wrap"><span id="app-footer-text">Developed by Weblora| Developer Afrasiab Asghar | Contact: +923060406003 | https://www.webloraa.com/</span></div>
+                    <span id="idle-timer-badge" class="hidden" style="opacity:0.85;">Auto Logout: <span id="idle-timer-secs" class="idle-counter"></span>s</span>
                 </div>
             </footer>
         </div>
@@ -4411,6 +4815,16 @@
                         <input type="email" id="edit-profile-email" placeholder="Email" class="w-full px-4 py-2 border rounded-full">
                         <input type="text" id="edit-profile-contact" placeholder="Contact" class="w-full px-4 py-2 border rounded-full">
                         <input type="text" id="edit-profile-address" placeholder="Address" class="w-full px-4 py-2 border rounded-full md:col-span-2">
+                        <div class="flex items-center space-x-2 md:col-span-2">
+                            <input type="checkbox" id="edit-profile-is-affiliate" class="h-4 w-4 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500">
+                            <label for="edit-profile-is-affiliate" class="text-slate-700">Affiliate Client (referred by an agent)</label>
+                        </div>
+                        <div id="edit-profile-affiliate-agent-wrapper" class="md:col-span-2 hidden">
+                            <label for="edit-profile-affiliate-agent" class="text-sm text-slate-600 ml-2">Referring Agent</label>
+                            <select id="edit-profile-affiliate-agent" class="w-full px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                                <option value="">-- Select Agent --</option>
+                            </select>
+                        </div>
                     </div>
                     <div class="flex justify-end gap-4 mt-4">
                         <!-- UPDATED: Button colors -->
@@ -4625,6 +5039,96 @@
         </div>
     </div>
     
+    <div id="agent-detail-modal" class="popup-window-overlay">
+        <div class="popup-window-content">
+            <div class="popup-window-header">
+                <h3 id="agent-detail-name" class="text-2xl font-bold text-slate-800">Agent Profile</h3>
+                <button id="close-agent-btn" class="text-slate-500 hover:text-slate-800">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+            <div class="popup-window-body">
+                <div id="agent-detail-info" class="text-slate-700 text-sm mb-6 bg-white p-6 rounded-lg shadow-sm grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4"></div>
+
+                <div class="bg-white p-4 rounded-lg shadow-sm mb-6">
+                    <h4 class="font-semibold text-lg mb-3"><i class="fas fa-file-alt mr-1 text-indigo-500"></i>Documents</h4>
+                    <div id="agent-detail-documents" class="grid grid-cols-2 md:grid-cols-4 gap-3 text-sm text-slate-500"></div>
+                </div>
+
+                <div class="bg-white p-4 rounded-lg shadow-sm mb-6 flex items-center justify-between flex-wrap gap-3">
+                    <div>
+                        <p class="text-xs font-bold text-slate-500 uppercase tracking-wider">Current Balance</p>
+                        <p id="agent-detail-balance" class="text-3xl font-bold text-emerald-600">PKR 0</p>
+                    </div>
+                    <button id="agent-print-profile-btn" class="bg-slate-700 text-white px-5 py-2 rounded-full font-semibold hover:bg-slate-800 animated-btn text-sm">
+                        <i class="fas fa-print mr-1"></i>Print Report
+                    </button>
+                </div>
+
+                <div class="bg-white p-4 rounded-lg shadow-sm mb-6">
+                    <h4 class="font-semibold text-lg mb-3"><i class="fas fa-users mr-1 text-indigo-500"></i>Affiliate Clients &amp; Commission Breakdown</h4>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left text-sm">
+                            <thead class="border-b-2">
+                                <tr class="text-slate-600 uppercase text-xs">
+                                    <th class="p-2">Client</th>
+                                    <th class="p-2">Account</th>
+                                    <th class="p-2 text-right">Gross Commission</th>
+                                    <th class="p-2 text-right">Branch Commission (after tax)</th>
+                                    <th class="p-2 text-right">Agent Commission</th>
+                                </tr>
+                            </thead>
+                            <tbody id="agent-detail-clients-tbody"></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="bg-white p-4 rounded-lg shadow-sm mb-6" id="agent-debit-credit-wrapper">
+                    <h4 class="font-semibold text-lg mb-3"><i class="fas fa-exchange-alt mr-1 text-indigo-500"></i>Add Debit / Credit</h4>
+                    <form id="agent-transaction-form" class="grid grid-cols-1 md:grid-cols-4 gap-3 items-end">
+                        <div>
+                            <label class="text-sm text-slate-600 ml-2">Type</label>
+                            <select id="agent-txn-type" class="w-full px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                                <option value="debit">Debit (Payment to Agent)</option>
+                                <option value="credit">Credit (Add to Balance)</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="text-sm text-slate-600 ml-2">Amount (PKR)</label>
+                            <input type="number" id="agent-txn-amount" min="0" step="0.01" required class="w-full px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                        </div>
+                        <div class="md:col-span-2">
+                            <label class="text-sm text-slate-600 ml-2">Note</label>
+                            <input type="text" id="agent-txn-note" placeholder="Reason / description" class="w-full px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                        </div>
+                        <button type="submit" class="w-full bg-indigo-600 text-white py-2 rounded-full font-semibold hover:bg-indigo-700 animated-btn md:col-span-4">
+                            <i class="fas fa-plus mr-2"></i>Add Entry
+                        </button>
+                    </form>
+                </div>
+
+                <div class="bg-white p-4 rounded-lg shadow-sm">
+                    <h4 class="font-semibold text-lg mb-3"><i class="fas fa-history mr-1 text-indigo-500"></i>Transaction History</h4>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left text-sm">
+                            <thead class="border-b-2">
+                                <tr class="text-slate-600 uppercase text-xs">
+                                    <th class="p-2">Date</th>
+                                    <th class="p-2">Type</th>
+                                    <th class="p-2">Note</th>
+                                    <th class="p-2 text-right">Amount (PKR)</th>
+                                </tr>
+                            </thead>
+                            <tbody id="agent-detail-transactions-tbody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
     <datalist id="client-trading-accounts"></datalist>
 
     <script src="https://www.gstatic.com/firebasejs/11.6.1/firebase-app-compat.js"></script>
@@ -4656,7 +5160,8 @@
         let isSharedView = false; // Flag for read-only mode
 
         // REMOVED: allDeposits, allWithdrawals, allCourierRecords
-        let allComplaints = [], allDailyCommissions = [], allCommissionReceived = [], allExpenses = [], allClients = [], allEmployees = [], allClientPayments = [], allPettyCashEntries = [], allEmployeePerformance = [], allCgsEntries = {}, allCouriers = [], allTradeLogEntries = {}, allUtilityBills = [], allMonthlyExpenses = [], allDebts = [];
+        let allComplaints = [], allDailyCommissions = [], allCommissionReceived = [], allExpenses = [], allClients = [], allEmployees = [], allClientPayments = [], allPettyCashEntries = [], allEmployeePerformance = [], allCgsEntries = {}, allCouriers = [], allTradeLogEntries = {}, allUtilityBills = [], allMonthlyExpenses = [], allDebts = [], allAffiliateAgents = [], allAffiliateTransactions = [];
+        let currentAgentProfileId = null;
         let calculatedTransactions = [];
         let editingTransactionId = null; // ADDED: tracks which CGS transaction (by id) is currently being edited
         let rawParsedTrades = []; // Complete per-trade details from uploaded file for Trade Log sync
@@ -4806,6 +5311,8 @@
                     headerTitle.textContent = 'Utility Bills';
                 } else if (sectionId === 'employees') {
                     headerTitle.textContent = 'HR Module';
+                } else if (sectionId === 'affiliate') {
+                    headerTitle.textContent = 'Affiliate Program';
                 } else {
                     headerTitle.textContent = sectionId.charAt(0).toUpperCase() + sectionId.slice(1);
                 }
@@ -4967,6 +5474,10 @@
                 if (debtPreviewWrapper) debtPreviewWrapper.style.display = 'none';
                 const debtClearAllBtn = document.getElementById('debt-clear-all-btn');
                 if (debtClearAllBtn) debtClearAllBtn.style.display = 'none';
+                const addAgentWrapper = document.getElementById('add-agent-wrapper');
+                if (addAgentWrapper) addAgentWrapper.style.display = 'none';
+                const agentDebitCreditWrapper = document.getElementById('agent-debit-credit-wrapper');
+                if (agentDebitCreditWrapper) agentDebitCreditWrapper.style.display = 'none';
 
                 // Apply section visibility from owner's saved preferences
                 applySharedVisibility(visibilitySettings);
@@ -5012,6 +5523,105 @@
         
         signOutBtn.addEventListener('click', () => { backupLockSession(); auth.signOut(); });
 
+        // ─── IDLE AUTO-LOGOUT SYSTEM ───────────────────────────────────────────
+        // Logs the user out automatically after 30 minutes (1800 secs) of no interaction.
+        // Any mouse/keyboard/touch/scroll activity resets the countdown back to 1800.
+        const IDLE_LIMIT_SECS = 1800;
+        let idleSecsLeft = IDLE_LIMIT_SECS;
+        let idleIntervalHandle = null;
+        const idleBadgeEl = document.getElementById('idle-timer-badge');
+        const idleSecsEl = document.getElementById('idle-timer-secs');
+        const IDLE_DIGIT_HEIGHT = 20; // must match --idle-digit-height (0.875rem + 6px padding) in CSS
+
+        // Fixed number of digit columns, sized to the longest possible value (IDLE_LIMIT_SECS)
+        function idleGetPlaces(val) {
+            const places = [1];
+            let p = 10;
+            while (val >= p) {
+                places.unshift(p);
+                p *= 10;
+            }
+            return places;
+        }
+        const IDLE_PLACES = idleGetPlaces(IDLE_LIMIT_SECS);
+
+        function idleRenderDigitColumns() {
+            if (!idleSecsEl || idleSecsEl.dataset.rendered) return;
+            idleSecsEl.innerHTML = '';
+            IDLE_PLACES.forEach(place => {
+                const col = document.createElement('div');
+                col.className = 'idle-digit-col';
+                col.dataset.place = place;
+
+                const track = document.createElement('div');
+                track.className = 'idle-digit-track';
+
+                for (let i = 0; i < 10; i++) {
+                    const num = document.createElement('div');
+                    num.className = 'idle-number-item';
+                    num.textContent = i;
+                    track.appendChild(num);
+                }
+
+                col.appendChild(track);
+                idleSecsEl.appendChild(col);
+            });
+            idleSecsEl.dataset.rendered = '1';
+        }
+
+        function idleUpdateDigitPositions(val) {
+            if (!idleSecsEl) return;
+            idleSecsEl.querySelectorAll('.idle-digit-col').forEach(col => {
+                const place = parseInt(col.dataset.place, 10);
+                const digitValue = Math.floor(val / place) % 10;
+                const track = col.querySelector('.idle-digit-track');
+                track.style.transform = `translateY(-${digitValue * IDLE_DIGIT_HEIGHT}px)`;
+            });
+        }
+
+        function idleUpdateDisplay() {
+            idleRenderDigitColumns();
+            idleUpdateDigitPositions(idleSecsLeft);
+        }
+
+        function idleResetTimer() {
+            idleSecsLeft = IDLE_LIMIT_SECS;
+            idleUpdateDisplay();
+        }
+
+        function idleTick() {
+            idleSecsLeft--;
+            if (idleSecsLeft <= 0) {
+                idleUpdateDisplay();
+                idleStop();
+                backupLockSession();
+                auth.signOut();
+                return;
+            }
+            idleUpdateDisplay();
+        }
+
+        function idleStart() {
+            if (idleIntervalHandle) return; // already running
+            idleResetTimer();
+            if (idleBadgeEl) idleBadgeEl.classList.remove('hidden');
+            idleIntervalHandle = setInterval(idleTick, 1000);
+        }
+
+        function idleStop() {
+            if (idleIntervalHandle) { clearInterval(idleIntervalHandle); idleIntervalHandle = null; }
+            if (idleBadgeEl) idleBadgeEl.classList.add('hidden');
+        }
+
+        ['mousemove', 'mousedown', 'keydown', 'scroll', 'touchstart', 'click'].forEach(evt => {
+            document.addEventListener(evt, () => { if (idleIntervalHandle) idleResetTimer(); }, { passive: true });
+        });
+
+        // Idle timer only runs for a real logged-in session (not shared/read-only links)
+        auth.onAuthStateChanged(user => {
+            if (user && !isSharedView) idleStart(); else idleStop();
+        });
+
         // --- DASHBOARD SHARING ---
         shareDashboardBtn.addEventListener('click', async () => {
             if (!currentUserId) return;
@@ -5049,7 +5659,7 @@
         // --- REALTIME DATA LISTENERS ---
         function startRealtimeListeners() {
             if (unsubscribeListeners.length > 0) return; 
-            const collections = ['complaints', 'daily_commissions', 'commission_received', 'expenses', 'clients', 'employees', 'client_payments', 'petty_cash', 'employee_performance', 'cgs_entries', 'couriers', 'trade_log_entries', 'utility_bills', 'debts'];
+            const collections = ['complaints', 'daily_commissions', 'commission_received', 'expenses', 'clients', 'employees', 'client_payments', 'petty_cash', 'employee_performance', 'cgs_entries', 'couriers', 'trade_log_entries', 'utility_bills', 'debts', 'affiliate_agents', 'affiliate_transactions'];
             const dataHandlers = {
                 complaints: data => { allComplaints = data; renderComplaints(); updateDashboard(); },
                 daily_commissions: data => { allDailyCommissions = data; renderCommissionSection(); updateDashboard(); },
@@ -5102,6 +5712,17 @@
                 },
                 utility_bills: data => { allUtilityBills = data; renderUtilityBills(); },
                 debts: data => { allDebts = data; renderDebts(); updateDashboard(); },
+                affiliate_agents: data => {
+                    allAffiliateAgents = data;
+                    renderAffiliateAgents();
+                    populateAffiliateAgentSelects();
+                    if (currentAgentProfileId) showAgentProfile(currentAgentProfileId);
+                },
+                affiliate_transactions: data => {
+                    allAffiliateTransactions = data;
+                    renderAffiliateAgents();
+                    if (currentAgentProfileId) showAgentProfile(currentAgentProfileId);
+                },
             };
 
             collections.forEach(col => {
@@ -5274,24 +5895,27 @@
             }
 
             // Renders an up/down arrow + percentage-change badge comparing current vs previous period,
-            // plus (optionally) a mini trend-line sparkline fed by a monthly history series
-            function renderDashTrend(elId, current, previous, sparkId, series) {
+            // plus (optionally) a mini trend-line sparkline fed by a monthly history series.
+            // invert=true means a rise in the value is bad (colored red) e.g. debts.
+            function renderDashTrend(elId, current, previous, sparkId, series, invert) {
                 const el = document.getElementById(elId);
                 if (!el) return;
-                let isUp = true;
+                let isIncrease = true;
                 if (!previous) {
                     if (!current) { el.innerHTML = ''; }
                     else {
-                        el.className = 'dash-trend dash-trend-up';
+                        const good = !invert;
+                        el.className = 'dash-trend ' + (good ? 'dash-trend-up' : 'dash-trend-down');
                         el.innerHTML = '<i class="fas fa-arrow-up"></i> 100%';
                     }
                 } else {
                     const pct = ((current - previous) / previous) * 100;
-                    isUp = pct >= 0;
-                    el.className = 'dash-trend ' + (isUp ? 'dash-trend-up' : 'dash-trend-down');
-                    el.innerHTML = `<i class="fas fa-arrow-${isUp ? 'up' : 'down'}"></i> ${Math.abs(pct).toFixed(1)}%`;
+                    isIncrease = pct >= 0;
+                    const good = invert ? !isIncrease : isIncrease;
+                    el.className = 'dash-trend ' + (good ? 'dash-trend-up' : 'dash-trend-down');
+                    el.innerHTML = `<i class="fas fa-arrow-${isIncrease ? 'up' : 'down'}"></i> ${Math.abs(pct).toFixed(1)}%`;
                 }
-                if (sparkId) renderSparkline(sparkId, series, isUp);
+                if (sparkId) renderSparkline(sparkId, series, invert ? !isIncrease : isIncrease);
             }
 
             // Last 6 month keys (oldest -> current), used to build the trend-line series for each stat card
@@ -5357,6 +5981,29 @@
             // Clients Debts card
             const totalOutstandingDebt = (allDebts || []).reduce((sum, d) => sum + (parseFloat(d.debtAmount) || 0), 0);
             document.getElementById('dashboard-total-debts').textContent = `PKR ${totalOutstandingDebt.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`;
+
+            // Day-over-day debt trend: store today's total in localStorage, compare vs most recent prior day
+            const localDateKey = d => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+            let debtSnaps = {};
+            try { debtSnaps = JSON.parse(localStorage.getItem('debtDailySnapshots') || '{}'); } catch (e) { debtSnaps = {}; }
+            debtSnaps[localDateKey(new Date())] = totalOutstandingDebt;
+            try { localStorage.setItem('debtDailySnapshots', JSON.stringify(debtSnaps)); } catch (e) {}
+
+            let prevDayDebtTotal = null;
+            for (let i = 1; i <= 14; i++) {
+                const d = new Date(); d.setDate(d.getDate() - i);
+                const k = localDateKey(d);
+                if (Object.prototype.hasOwnProperty.call(debtSnaps, k)) { prevDayDebtTotal = debtSnaps[k]; break; }
+            }
+            const debtTrendSeries = [];
+            let lastKnownDebt = null;
+            for (let i = 6; i >= 0; i--) {
+                const d = new Date(); d.setDate(d.getDate() - i);
+                const k = localDateKey(d);
+                if (Object.prototype.hasOwnProperty.call(debtSnaps, k)) lastKnownDebt = debtSnaps[k];
+                debtTrendSeries.push(lastKnownDebt !== null ? lastKnownDebt : totalOutstandingDebt);
+            }
+            renderDashTrend('debts-trend', totalOutstandingDebt, prevDayDebtTotal, 'debts-spark', debtTrendSeries, true);
 
             // Trend badges + mini trend-line sparklines: current period vs last month
             renderDashTrend('active-clients-trend', activeClientIds.size, previousActiveClientCount, 'active-clients-spark', activeClientsSeries);
@@ -7825,17 +8472,29 @@
                     address: form['profile-address'].value,
                     accountOpenDate: form['profile-account-date'].value,
                     isOldClient: form['profile-is-old-client'].checked,
+                    isAffiliate: form['profile-is-affiliate'].checked,
+                    affiliateAgentId: form['profile-is-affiliate'].checked ? (form['profile-affiliate-agent'].value || null) : null,
                     isClosed: false,
                     createdAt: firebase.firestore.FieldValue.serverTimestamp()
                 };
                 await db.collection(`users/${currentUserId}/clients`).add(clientData);
                 showMessage('Success', 'Client profile saved successfully!');
                 form.reset();
+                document.getElementById('profile-affiliate-agent-wrapper').classList.add('hidden');
             } catch (error) {
                 showMessage('Error', 'Failed to save client: ' + error.message);
             } finally {
                 hideLoading();
             }
+        });
+
+        document.getElementById('profile-is-affiliate').addEventListener('change', (e) => {
+            document.getElementById('profile-affiliate-agent-wrapper').classList.toggle('hidden', !e.target.checked);
+            if (e.target.checked) populateAffiliateAgentSelects();
+        });
+        document.getElementById('edit-profile-is-affiliate').addEventListener('change', (e) => {
+            document.getElementById('edit-profile-affiliate-agent-wrapper').classList.toggle('hidden', !e.target.checked);
+            if (e.target.checked) populateAffiliateAgentSelects();
         });
 
         profilesSearch.addEventListener('input', () => renderProfiles());
@@ -8378,6 +9037,7 @@
                 <div><p class="font-semibold">Contact:</p><p>${client.contact || 'N/A'}</p></div>
                 <div><p class="font-semibold">Email:</p><p>${client.email || 'N/A'}</p></div>
                 <div><p class="font-semibold">Address:</p><p>${client.address || 'N/A'}</p></div>
+                <div><p class="font-semibold">Affiliate:</p><p>${client.isAffiliate ? `Yes (Agent: ${(allAffiliateAgents.find(a => a.id === client.affiliateAgentId) || {}).name || 'N/A'})` : 'No'}</p></div>
                 <div class="md:col-span-2"><p class="font-semibold">Status:</p><p>${client.isClosed ? `Closed (${client.closureDate ? new Date(client.closureDate).toLocaleDateString() : 'N/A'})` : 'Active'}</p></div>
             `;
             
@@ -8494,6 +9154,10 @@
             document.getElementById('edit-profile-email').value = client.email || '';
             document.getElementById('edit-profile-contact').value = client.contact || '';
             document.getElementById('edit-profile-address').value = client.address || '';
+            document.getElementById('edit-profile-is-affiliate').checked = !!client.isAffiliate;
+            populateAffiliateAgentSelects();
+            document.getElementById('edit-profile-affiliate-agent').value = client.affiliateAgentId || '';
+            document.getElementById('edit-profile-affiliate-agent-wrapper').classList.toggle('hidden', !client.isAffiliate);
 
             document.getElementById('profile-detail-info-wrapper').classList.add('hidden');
             document.getElementById('add-payment-and-actions-wrapper').classList.add('hidden');
@@ -8519,6 +9183,8 @@
                 email: document.getElementById('edit-profile-email').value,
                 contact: document.getElementById('edit-profile-contact').value,
                 address: document.getElementById('edit-profile-address').value,
+                isAffiliate: document.getElementById('edit-profile-is-affiliate').checked,
+                affiliateAgentId: document.getElementById('edit-profile-is-affiliate').checked ? (document.getElementById('edit-profile-affiliate-agent').value || null) : null,
             };
 
             requestPasswordVerification(async () => {
@@ -12008,6 +12674,7 @@ ${(d.totalDeductions > 0) ? `
             { id: 'backup',          label: 'Backup & Restore', icon: 'fa-database',        defaultOn: false },
             { id: 'utility-bills',   label: 'Utility Bills',    icon: 'fa-bolt',            defaultOn: false },
             { id: 'debts',           label: 'Debts',            icon: 'fa-file-invoice-dollar', defaultOn: false },
+            { id: 'affiliate',       label: 'Affiliate Program', icon: 'fa-handshake',      defaultOn: false },
         ];
 
         function getSVSettings() {
@@ -12142,12 +12809,20 @@ ${(d.totalDeductions > 0) ? `
             slate:  { brandPrimary:'#475569', sidebarColor:'#0f172a', bgColor:'#f8fafc', cardBg:'#ffffff', textPrimary:'#0f172a', textSecondary:'#64748b', btnPrimary:'#475569', btnSuccess:'#059669', btnDanger:'#e11d48' },
         };
 
+        const DEFAULT_FOOTER_TEXT = "Developed by Weblora| Developer Afrasiab Asghar | Contact: +923060406003 | https://www.webloraa.com/";
+
         function getAppearanceSettings() {
             try { return JSON.parse(localStorage.getItem(APP_SETTINGS_KEY) || 'null'); } catch(e) { return null; }
         }
 
         function saveAppearanceSettings(s) {
             localStorage.setItem(APP_SETTINGS_KEY, JSON.stringify(s));
+        }
+
+        function hexToRgba(hex, alpha) {
+            const h = (hex || '#ffffff').replace('#', '');
+            const r = parseInt(h.slice(0,2),16), g = parseInt(h.slice(2,4),16), b = parseInt(h.slice(4,6),16);
+            return `rgba(${r},${g},${b},${alpha})`;
         }
 
         function applyAppearanceCss(s) {
@@ -12158,19 +12833,30 @@ ${(d.totalDeductions > 0) ? `
             root.style.setProperty('--text-primary', s.textPrimary);
             root.style.setProperty('--text-secondary', s.textSecondary);
             root.style.setProperty('--surface', s.cardBg);
+            root.style.setProperty('--page-bg', s.bgColor);
+            root.style.setProperty('--accent-emerald', s.btnSuccess);
+            root.style.setProperty('--accent-rose', s.btnDanger);
 
-            // Page background
-            document.body.style.backgroundColor = s.bgColor;
+            // Sidebar text (inactive = softened, active/hover = full strength)
+            const sidebarTextColor = s.sidebarTextColor || '#ffffff';
+            root.style.setProperty('--sidebar-text', hexToRgba(sidebarTextColor, 0.65));
+            root.style.setProperty('--sidebar-text-active', sidebarTextColor);
 
-            // Font size & family
+            // Font size & family (unaffected by theme)
             document.body.style.fontSize = s.fontSize + 'px';
             document.body.style.fontFamily = s.fontFamily;
 
-            // Sidebar
+            // Sidebar background gradient
             const sidebar = document.getElementById('sidebar');
             if (sidebar) sidebar.style.background = `linear-gradient(160deg, ${s.sidebarColor} 0%, ${hexMix(s.sidebarColor, s.brandPrimary, 0.5)} 60%, ${s.brandPrimary} 100%)`;
 
-            // Cards border radius
+            // Dark / Night mode
+            applyDarkMode(!!s.darkMode);
+
+            // Animations on/off
+            document.documentElement.classList.toggle('no-animations', s.animationsEnabled === false);
+
+            // Cards border radius, button colors, table stripe
             const styleEl = document.getElementById('app-dynamic-styles') || (() => {
                 const el = document.createElement('style');
                 el.id = 'app-dynamic-styles';
@@ -12179,9 +12865,9 @@ ${(d.totalDeductions > 0) ? `
             })();
 
             const stripeRule = s.tableStripe === 'light'
-                ? 'table tbody tr:nth-child(even) { background: rgba(0,0,0,0.025) !important; }'
+                ? 'table tbody tr:nth-child(even) { background: rgba(127,127,127,0.045) !important; }'
                 : s.tableStripe === 'medium'
-                ? 'table tbody tr:nth-child(even) { background: rgba(0,0,0,0.055) !important; }'
+                ? 'table tbody tr:nth-child(even) { background: rgba(127,127,127,0.09) !important; }'
                 : '';
 
             styleEl.textContent = `
@@ -12192,9 +12878,33 @@ ${(d.totalDeductions > 0) ? `
                 .bg-emerald-700, button.bg-emerald-700 { background-color: ${s.btnSuccess} !important; filter: brightness(0.9); }
                 .bg-rose-600, button.bg-rose-600 { background-color: ${s.btnDanger} !important; }
                 .bg-rose-700, button.bg-rose-700 { background-color: ${s.btnDanger} !important; filter: brightness(0.9); }
-                .text-indigo-600 { color: ${s.btnPrimary} !important; }
+                .text-indigo-500, .text-indigo-600, .text-indigo-700 { color: ${s.btnPrimary} !important; }
+                .text-emerald-600, .text-emerald-700 { color: ${s.btnSuccess} !important; }
+                .text-rose-600, .text-rose-700 { color: ${s.btnDanger} !important; }
                 ${stripeRule}
             `;
+
+            applyFooterSettings(s);
+        }
+
+        function applyDarkMode(enabled) {
+            document.documentElement.setAttribute('data-theme', enabled ? 'dark' : 'light');
+        }
+
+        function applyFooterSettings(s) {
+            const textEl = document.getElementById('app-footer-text');
+            const wrapEl = document.getElementById('app-footer-text-wrap');
+            if (!textEl || !wrapEl) return;
+            textEl.textContent = s.footerText || DEFAULT_FOOTER_TEXT;
+            wrapEl.classList.remove('footer-ticker');
+            textEl.style.animation = '';
+            const mode = s.footerMode || 'static';
+            if (mode === 'ticker') {
+                wrapEl.classList.add('footer-ticker');
+                textEl.style.animationDuration = (s.footerTickerSpeed || 18) + 's';
+            } else if (mode === 'fade') {
+                textEl.style.animation = 'footerFadePulse 3.2s ease-in-out infinite';
+            }
         }
 
         function hexMix(hex1, hex2, ratio) {
@@ -12214,6 +12924,7 @@ ${(d.totalDeductions > 0) ? `
                 cardBg:        document.getElementById('set-card-bg')?.value        || '#ffffff',
                 textPrimary:   document.getElementById('set-text-primary')?.value   || '#0f172a',
                 textSecondary: document.getElementById('set-text-secondary')?.value || '#475569',
+                sidebarTextColor: document.getElementById('set-sidebar-text-color')?.value || '#ffffff',
                 btnPrimary:    document.getElementById('set-btn-primary')?.value    || '#4f46e5',
                 btnSuccess:    document.getElementById('set-btn-success')?.value    || '#059669',
                 btnDanger:     document.getElementById('set-btn-danger')?.value     || '#e11d48',
@@ -12221,6 +12932,11 @@ ${(d.totalDeductions > 0) ? `
                 fontFamily:    document.getElementById('set-font-family')?.value    || "'DM Sans', sans-serif",
                 borderRadius:  parseInt(document.getElementById('set-border-radius')?.value || 16),
                 tableStripe:   document.getElementById('set-table-stripe')?.value   || 'none',
+                darkMode:      !!document.getElementById('set-dark-mode')?.checked,
+                animationsEnabled: document.getElementById('set-animations-enabled') ? !!document.getElementById('set-animations-enabled').checked : true,
+                footerText:    document.getElementById('set-footer-text')?.value ?? DEFAULT_FOOTER_TEXT,
+                footerMode:    document.getElementById('set-footer-mode')?.value || 'static',
+                footerTickerSpeed: parseInt(document.getElementById('set-footer-ticker-speed')?.value || 18),
             };
         }
 
@@ -12232,6 +12948,7 @@ ${(d.totalDeductions > 0) ? `
             set('set-card-bg',        s.cardBg);
             set('set-text-primary',   s.textPrimary);
             set('set-text-secondary', s.textSecondary);
+            set('set-sidebar-text-color', s.sidebarTextColor || '#ffffff');
             set('set-btn-primary',    s.btnPrimary);
             set('set-btn-success',    s.btnSuccess);
             set('set-btn-danger',     s.btnDanger);
@@ -12239,13 +12956,30 @@ ${(d.totalDeductions > 0) ? `
             set('set-font-family',    s.fontFamily);
             set('set-border-radius',  s.borderRadius);
             set('set-table-stripe',   s.tableStripe);
+            set('set-footer-text',    s.footerText ?? DEFAULT_FOOTER_TEXT);
+            set('set-footer-mode',    s.footerMode || 'static');
+            set('set-footer-ticker-speed', s.footerTickerSpeed || 18);
+            const darkEl = document.getElementById('set-dark-mode');
+            if (darkEl) darkEl.checked = !!s.darkMode;
+            const animEl = document.getElementById('set-animations-enabled');
+            if (animEl) animEl.checked = s.animationsEnabled !== false;
             const fsVal = document.getElementById('set-font-size-val');
             if (fsVal) fsVal.textContent = s.fontSize + 'px';
             const radVal = document.getElementById('set-radius-val');
             if (radVal) radVal.textContent = s.borderRadius + 'px';
+            const tickVal = document.getElementById('set-footer-ticker-speed-val');
+            if (tickVal) tickVal.textContent = (s.footerTickerSpeed || 18) + 's';
         }
 
         // ─── ANALYTICS MODULE ──────────────────────────────────────────────
+        function analyticsSwitchTab(tab) {
+            document.querySelectorAll('#analytics .an-tab-panel').forEach(p => p.classList.remove('active'));
+            document.querySelectorAll('#analytics .an-tab-btn').forEach(b => b.classList.remove('active'));
+            const panel = document.getElementById('an-panel-' + tab);
+            const btn   = document.getElementById('an-tab-' + tab);
+            if (panel) panel.classList.add('active');
+            if (btn) btn.classList.add('active');
+        }
         const ANALYTICS_KEY = 'dsl_analytics_v1';
         let _analyticsSessionStart = null;
         let _analyticsSessionTimer = null;
@@ -12421,7 +13155,7 @@ ${(d.totalDeductions > 0) ? `
                                 : '<span style="background:#f1f5f9;color:#64748b;padding:3px 11px;border-radius:20px;font-size:0.7rem;font-weight:600;">Ended</span>');
                         return `<tr style="border-bottom:1px solid #f1f5f9;${i % 2 !== 0 ? 'background:#fafbff;' : ''}">
                     <td style="padding:10px 14px;color:#94a3b8;font-size:0.78rem;font-weight:600;">${rowNum}</td>
-                    <td style="padding:10px 14px;color:#0f172a;font-weight:500;font-size:0.83rem;">${analyticsFmtDate(s.loginTime)}</td>
+                    <td style="padding:10px 14px;color:var(--text-primary);font-weight:500;font-size:0.83rem;">${analyticsFmtDate(s.loginTime)}</td>
                     <td style="padding:10px 14px;color:#475569;font-size:0.83rem;">${logoutCol}</td>
                     <td style="padding:10px 14px;color:#475569;font-size:0.83rem;">${dur}</td>
                     <td style="padding:10px 14px;">${badge}</td>
@@ -12445,7 +13179,7 @@ ${(d.totalDeductions > 0) ? `
                         const dur = analyticsDuration(new Date(Date.now() - e.totalMs).toISOString(), null);
                         return `<tr style="border-bottom:1px solid #f1f5f9;${i % 2 !== 0 ? 'background:#fafbff;' : ''}">
                             <td style="padding:10px 14px;color:#94a3b8;font-size:0.78rem;font-weight:600;">${i + 1}</td>
-                            <td style="padding:10px 14px;color:#0f172a;font-weight:500;font-size:0.83rem;">${label}</td>
+                            <td style="padding:10px 14px;color:var(--text-primary);font-weight:500;font-size:0.83rem;">${label}</td>
                             <td style="padding:10px 14px;color:#475569;font-size:0.83rem;">${dur}</td>
                             <td style="padding:10px 14px;color:#475569;font-size:0.83rem;">${e.visits}</td>
                         </tr>`;
@@ -12486,7 +13220,7 @@ ${(d.totalDeductions > 0) ? `
                         const ref       = d.referrer && d.referrer !== '—' && d.referrer !== '' ? d.referrer : '<span style="color:#94a3b8;">Direct / Unknown</span>';
                         return `<tr style="border-bottom:1px solid #f1f5f9;${i % 2 !== 0 ? 'background:#fafbff;' : ''}">
                             <td style="padding:10px 14px;color:#94a3b8;font-size:0.78rem;font-weight:600;">${snap.size - i}</td>
-                            <td style="padding:10px 14px;color:#0f172a;font-weight:500;font-size:0.83rem;">${analyticsFmtDate(visitedAt)}</td>
+                            <td style="padding:10px 14px;color:var(--text-primary);font-weight:500;font-size:0.83rem;">${analyticsFmtDate(visitedAt)}</td>
                             <td style="padding:10px 14px;color:#475569;font-size:0.83rem;">${elapsed}</td>
                             <td style="padding:10px 14px;color:#475569;font-size:0.83rem;word-break:break-all;">${ref}</td>
                         </tr>`;
@@ -12813,10 +13547,19 @@ ${(d.totalDeductions > 0) ? `
                 return true;
             });
 
+            const totalEl = document.getElementById('bills-total-amount');
+
             if (filtered.length === 0) {
                 tbody.innerHTML = '<tr><td colspan="6" class="p-4 text-center text-slate-500">No bills found.</td></tr>';
+                if (totalEl) totalEl.textContent = 'PKR 0.00';
                 return;
             }
+
+            if (totalEl) {
+                const totalAmount = filtered.reduce((sum, bill) => sum + parseFloat(bill.amount || 0), 0);
+                totalEl.textContent = `PKR ${totalAmount.toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2})}`;
+            }
+
             const sorted = [...filtered].sort((a, b) => new Date(b.date) - new Date(a.date));
             tbody.innerHTML = sorted.map((bill, i) => {
                 const driveCell = bill.driveLink
@@ -12898,6 +13641,7 @@ ${(d.totalDeductions > 0) ? `
         // ─── DEBTS MODULE ──────────────────────────────────────────────────────────
         let debtEditingId = null;
         let debtParsedEntries = [];
+        let debtsActiveSubTab = 'all'; // 'all' = All Debts, 'clean' = Clean Debts
 
         function parseDebtBulkText(text) {
             const lines = (text || '').split(/\r?\n/);
@@ -12937,22 +13681,30 @@ ${(d.totalDeductions > 0) ? `
             return null;
         }
 
+        // Returns contact number of the registered client behind a debt entry, or '' if none.
+        function getDebtContact(d) {
+            const c = findRegisteredClientForDebt(d.accountNumber, d.clientName);
+            return (c && c.contact) ? c.contact : '';
+        }
+
         function renderDebts() {
             const tbody = document.getElementById('debts-list');
             if (!tbody) return;
 
-            const totalBadge = document.getElementById('debt-total-badge');
-            const totalDebt = (allDebts || []).reduce((sum, d) => sum + (parseFloat(d.debtAmount) || 0), 0);
-            if (totalBadge) totalBadge.textContent = `Total Outstanding: PKR ${totalDebt.toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2})}`;
-
             const searchRaw = ((document.getElementById('debt-search') || {}).value || '').trim().toLowerCase();
             let filtered = (allDebts || []).filter(d => {
+                if (debtsActiveSubTab === 'clean' && !d.isCleanDebt) return false;
                 if (!searchRaw) return true;
                 return (d.accountNumber || '').toLowerCase().includes(searchRaw) || (d.clientName || '').toLowerCase().includes(searchRaw);
             });
 
+            const totalBadge = document.getElementById('debt-total-badge');
+            const totalDebt = filtered.reduce((sum, d) => sum + (parseFloat(d.debtAmount) || 0), 0);
+            const badgeLabel = debtsActiveSubTab === 'clean' ? 'Clean Debts Total' : 'Total Outstanding';
+            if (totalBadge) totalBadge.textContent = `${badgeLabel}: PKR ${totalDebt.toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2})}`;
+
             if (filtered.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="6" class="p-4 text-center text-slate-500">Koi debt nahi mili.</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="8" class="p-4 text-center text-slate-500">Koi debt nahi mili.</td></tr>';
                 return;
             }
 
@@ -12966,8 +13718,10 @@ ${(d.totalDeductions > 0) ? `
                         <td class="p-2 text-slate-500 text-sm">${i + 1}</td>
                         <td class="p-2 font-semibold text-slate-800">${d.accountNumber || ''}</td>
                         <td class="p-2 text-slate-700">${d.clientName || ''}</td>
+                        <td class="p-2 text-slate-600 text-sm">${getDebtContact(d) || 'N/A'}</td>
                         <td class="p-2 text-right"><input type="number" id="debt-edit-input-${d.id}" value="${amt}" min="0" step="0.01" class="w-32 px-2 py-1 border rounded-full text-right focus:outline-none focus:ring-2 focus:ring-indigo-500"></td>
                         <td class="p-2 text-slate-500 text-xs">${updated}</td>
+                        <td class="p-2 text-center"><input type="checkbox" ${d.isCleanDebt ? 'checked' : ''} onchange="debtToggleClean('${d.id}', this.checked)" ${isSharedView ? 'disabled' : ''}></td>
                         <td class="p-2 actions-header">
                             <button onclick="debtSaveEdit('${d.id}')" class="text-emerald-600 hover:underline text-sm mr-3"><i class="fas fa-check"></i> Save</button>
                             <button onclick="debtCancelEdit()" class="text-slate-500 hover:underline text-sm"><i class="fas fa-times"></i> Cancel</button>
@@ -12979,8 +13733,10 @@ ${(d.totalDeductions > 0) ? `
                     <td class="p-2 text-slate-500 text-sm">${i + 1}</td>
                     <td class="p-2 font-semibold text-slate-800">${d.accountNumber || ''}</td>
                     <td class="p-2 text-slate-700">${d.clientName || ''}</td>
+                    <td class="p-2 text-slate-600 text-sm">${getDebtContact(d) || 'N/A'}</td>
                     <td class="p-2 text-right font-semibold ${amt <= 0 ? 'text-emerald-600' : 'text-rose-600'}">PKR ${amt.toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2})}</td>
                     <td class="p-2 text-slate-500 text-xs">${updated}</td>
+                    <td class="p-2 text-center"><input type="checkbox" ${d.isCleanDebt ? 'checked' : ''} onchange="debtToggleClean('${d.id}', this.checked)" ${isSharedView ? 'disabled' : ''}></td>
                     <td class="p-2 actions-header">${isSharedView ? '' : `
                         <button onclick="debtStartEdit('${d.id}')" class="text-indigo-600 hover:underline text-sm mr-3"><i class="fas fa-edit"></i> Update</button>
                         <button onclick="debtMarkCleared('${d.id}')" class="text-emerald-600 hover:underline text-sm"><i class="fas fa-check-circle"></i> Mark Cleared</button>
@@ -13032,6 +13788,78 @@ ${(d.totalDeductions > 0) ? `
             }
         };
 
+        window.debtSwitchSubTab = function(tab) {
+            debtsActiveSubTab = tab;
+            const allBtn = document.getElementById('debt-subtab-all');
+            const cleanBtn = document.getElementById('debt-subtab-clean');
+            if (allBtn) allBtn.classList.toggle('active', tab === 'all');
+            if (cleanBtn) cleanBtn.classList.toggle('active', tab === 'clean');
+            renderDebts();
+        };
+
+        window.debtToggleClean = async function(id, checked) {
+            if (!currentUserId || isSharedView) return;
+            try {
+                await db.collection(`users/${currentUserId}/debts`).doc(id).update({
+                    isCleanDebt: checked,
+                    lastUpdated: new Date().toISOString()
+                });
+            } catch (e) {
+                showMessage('Error', 'Clean Debt status update nahi hui: ' + e.message);
+            }
+        };
+
+        // Prints the currently active sub-tab's list (respects active search filter).
+        window.debtPrintReport = function() {
+            const searchRaw = ((document.getElementById('debt-search') || {}).value || '').trim().toLowerCase();
+            let rows = (allDebts || []).filter(d => {
+                if (debtsActiveSubTab === 'clean' && !d.isCleanDebt) return false;
+                if (!searchRaw) return true;
+                return (d.accountNumber || '').toLowerCase().includes(searchRaw) || (d.clientName || '').toLowerCase().includes(searchRaw);
+            });
+            rows = [...rows].sort((a, b) => (parseFloat(b.debtAmount) || 0) - (parseFloat(a.debtAmount) || 0));
+            const total = rows.reduce((sum, d) => sum + (parseFloat(d.debtAmount) || 0), 0);
+            const title = debtsActiveSubTab === 'clean' ? 'Clean Debts Report' : 'All Debts Report';
+            const subtitle = debtsActiveSubTab === 'clean' ? 'Clients with no equity, stock or cash in custody' : 'List of Clients with Outstanding Debts';
+            const dateStr = new Date().toLocaleDateString();
+
+            let rowsHtml = '';
+            rows.forEach((d, i) => {
+                const amt = parseFloat(d.debtAmount) || 0;
+                const updated = d.lastUpdated ? new Date(d.lastUpdated).toLocaleDateString() : '';
+                const contact = getDebtContact(d) || 'N/A';
+                rowsHtml += `<tr><td>${i + 1}</td><td>${d.accountNumber || ''}</td><td>${d.clientName || ''}</td><td>${contact}</td><td class="amt">PKR ${amt.toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2})}</td><td>${updated}</td></tr>`;
+            });
+
+            const html = `<!DOCTYPE html><html><head><title>${title}</title><meta charset="utf-8">
+                <style>
+                    body{font-family:Arial,Helvetica,sans-serif;padding:28px;color:#1e293b;}
+                    h1{font-size:20px;margin:0 0 4px;}
+                    .meta{font-size:12px;color:#64748b;margin-bottom:20px;}
+                    table{width:100%;border-collapse:collapse;font-size:13px;}
+                    th,td{border:1px solid #cbd5e1;padding:6px 10px;text-align:left;}
+                    th{background:#f1f5f9;text-transform:uppercase;font-size:11px;}
+                    .amt{text-align:right;}
+                    tfoot td{font-weight:bold;background:#f8fafc;}
+                    @media print { body{padding:0;} }
+                </style></head><body>
+                <h1>${title}</h1>
+                <div class="meta">${subtitle} &mdash; Generated: ${dateStr}</div>
+                <table>
+                    <thead><tr><th>#</th><th>Account Number</th><th>Client Name</th><th>Contact</th><th class="amt">Debt Amount (PKR)</th><th>Last Updated</th></tr></thead>
+                    <tbody>${rowsHtml || '<tr><td colspan="6" style="text-align:center;">Koi record nahi mila.</td></tr>'}</tbody>
+                    <tfoot><tr><td colspan="4">Total</td><td class="amt">PKR ${total.toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2})}</td><td></td></tr></tfoot>
+                </table>
+            </body></html>`;
+
+            const w = window.open('', '_blank');
+            if (!w) { showMessage('Error', 'Print window open nahi hui. Popup blocker check karen.'); return; }
+            w.document.open();
+            w.document.write(html);
+            w.document.close();
+            w.onload = function() { w.focus(); w.print(); };
+        };
+
         window.debtClearAll = async function() {
             if (!currentUserId || isSharedView) return;
             if (!allDebts || allDebts.length === 0) return;
@@ -13057,6 +13885,8 @@ ${(d.totalDeductions > 0) ? `
             const clearAllBtn = document.getElementById('debt-clear-all-btn');
             const debtAccInput = document.getElementById('debt-account-number');
             const debtNameInput = document.getElementById('debt-client-name');
+            const printReportBtn = document.getElementById('debt-print-report-btn');
+            if (printReportBtn) printReportBtn.addEventListener('click', () => window.debtPrintReport());
 
             if (parseBtn) {
                 parseBtn.addEventListener('click', function() {
@@ -13212,6 +14042,329 @@ ${(d.totalDeductions > 0) ? `
         });
         // ─── END DEBTS MODULE ──────────────────────────────────────────────────────
 
+        // ─── AFFILIATE PROGRAM MODULE ─────────────────────────────────────────────
+        // Commission math reuses the existing CommissionService.calculateDeductions
+        // (40% HO / 60% branch / 12% tax on branch share) and reads gross per-client
+        // commission from computeTradeLogClientCommissions() — no Trade Log data is
+        // duplicated or restructured; everything is computed live, on read.
+
+        function computeAffiliateCommissions() {
+            const { byClient } = computeTradeLogClientCommissions();
+            const byAgent = {};
+            (allClients || []).forEach(client => {
+                if (!client.isAffiliate || !client.affiliateAgentId) return;
+                const agent = (allAffiliateAgents || []).find(a => a.id === client.affiliateAgentId);
+                if (!agent) return;
+                const clientCommission = byClient[client.id];
+                const gross = clientCommission ? clientCommission.total : 0;
+                const { finalHouseCommission } = CommissionService.calculateDeductions(gross);
+                const rateRaw = agent.commissionRate;
+                const rate = (rateRaw === undefined || rateRaw === null || rateRaw === '') ? 20 : parseFloat(rateRaw);
+                const agentCommission = finalHouseCommission * ((isNaN(rate) ? 20 : rate) / 100);
+                if (!byAgent[agent.id]) byAgent[agent.id] = { total: 0, clients: [] };
+                byAgent[agent.id].total += agentCommission;
+                byAgent[agent.id].clients.push({
+                    clientId: client.id, name: client.name || '', account: client.tradingAccount || '',
+                    gross, branchFinal: finalHouseCommission, agentCommission
+                });
+            });
+            return byAgent;
+        }
+
+        function getAgentTransactionTotals(agentId) {
+            let credits = 0, debits = 0;
+            (allAffiliateTransactions || []).forEach(t => {
+                if (t.agentId !== agentId) return;
+                const amt = parseFloat(t.amount) || 0;
+                if (t.type === 'credit') credits += amt; else if (t.type === 'debit') debits += amt;
+            });
+            return { credits, debits };
+        }
+
+        function getAgentBalance(agentId, commissionTotal) {
+            const { credits, debits } = getAgentTransactionTotals(agentId);
+            return (commissionTotal || 0) + credits - debits;
+        }
+
+        function agentRateDisplay(agent) {
+            const r = agent.commissionRate;
+            return (r === undefined || r === null || r === '') ? 20 : r;
+        }
+
+        function populateAffiliateAgentSelects() {
+            [document.getElementById('profile-affiliate-agent'), document.getElementById('edit-profile-affiliate-agent')].forEach(sel => {
+                if (!sel) return;
+                const currentVal = sel.value;
+                const options = ['<option value="">-- Select Agent --</option>'].concat(
+                    (allAffiliateAgents || []).slice().sort((a, b) => (a.name || '').localeCompare(b.name || ''))
+                        .map(a => `<option value="${a.id}">${a.name || 'Unnamed'}</option>`)
+                );
+                sel.innerHTML = options.join('');
+                if (currentVal) sel.value = currentVal;
+            });
+        }
+
+        function renderAffiliateAgents() {
+            const tbody = document.getElementById('agents-list');
+            if (!tbody) return;
+            const byAgent = computeAffiliateCommissions();
+            const searchRaw = ((document.getElementById('agent-search') || {}).value || '').trim().toLowerCase();
+            const agents = (allAffiliateAgents || []).filter(a => {
+                if (!searchRaw) return true;
+                return (a.name || '').toLowerCase().includes(searchRaw) || (a.contact || '').toLowerCase().includes(searchRaw);
+            });
+            document.getElementById('add-agent-wrapper').style.display = isSharedView ? 'none' : 'block';
+            if (agents.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="7" class="p-4 text-center text-slate-500">Koi agent nahi mila.</td></tr>';
+                return;
+            }
+            const sorted = [...agents].sort((a, b) => (a.name || '').localeCompare(b.name || ''));
+            tbody.innerHTML = sorted.map((a, i) => {
+                const commissionData = byAgent[a.id] || { total: 0, clients: [] };
+                const balance = getAgentBalance(a.id, commissionData.total);
+                const clientCount = (allClients || []).filter(c => c.isAffiliate && c.affiliateAgentId === a.id).length;
+                return `<tr class="border-b hover:bg-slate-50">
+                    <td class="p-2 text-slate-500 text-sm">${i + 1}</td>
+                    <td class="p-2 font-semibold text-slate-800">${a.name || ''}</td>
+                    <td class="p-2 text-slate-700">${a.contact || ''}</td>
+                    <td class="p-2 text-center">${agentRateDisplay(a)}%</td>
+                    <td class="p-2 text-center">${clientCount}</td>
+                    <td class="p-2 text-right font-semibold text-emerald-600">PKR ${balance.toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2})}</td>
+                    <td class="p-2 actions-header"><button onclick="showAgentProfile('${a.id}')" class="text-indigo-600 hover:underline text-sm"><i class="fas fa-eye"></i> View Profile</button></td>
+                </tr>`;
+            }).join('');
+        }
+
+        window.showAgentProfile = function(agentId) {
+            const agent = (allAffiliateAgents || []).find(a => a.id === agentId);
+            if (!agent) return;
+            currentAgentProfileId = agentId;
+
+            const byAgent = computeAffiliateCommissions();
+            const commissionData = byAgent[agentId] || { total: 0, clients: [] };
+            const balance = getAgentBalance(agentId, commissionData.total);
+
+            document.getElementById('agent-detail-name').textContent = agent.name || 'Agent Profile';
+            document.getElementById('agent-detail-info').innerHTML = `
+                <div><p class="font-semibold">Contact:</p><p>${agent.contact || 'N/A'}</p></div>
+                <div><p class="font-semibold">Profile / Designation:</p><p>${agent.profile || 'N/A'}</p></div>
+                <div><p class="font-semibold">Father's Name:</p><p>${agent.fatherName || 'N/A'}</p></div>
+                <div><p class="font-semibold">CNIC:</p><p>${agent.cnic || 'N/A'}</p></div>
+                <div class="md:col-span-2"><p class="font-semibold">Postal Address:</p><p>${agent.address || 'N/A'}</p></div>
+                <div><p class="font-semibold">Date of Birth:</p><p>${agent.dob ? new Date(agent.dob).toLocaleDateString() : 'N/A'}</p></div>
+                <div><p class="font-semibold">Marital Status:</p><p>${agent.maritalStatus || 'N/A'}</p></div>
+                <div><p class="font-semibold">Resident Status:</p><p>${agent.residentStatus || 'N/A'}</p></div>
+                <div><p class="font-semibold">Mobile Number:</p><p>${agent.mobile || 'N/A'}</p></div>
+                <div><p class="font-semibold">Emergency Contact:</p><p>${agent.emergencyContact || 'N/A'}</p></div>
+                <div><p class="font-semibold">Bank Account:</p><p>${agent.bankAccount || 'N/A'}</p></div>
+                <div><p class="font-semibold">Commission Rate:</p><p>${agentRateDisplay(agent)}%</p></div>
+            `;
+
+            const docs = agent.documents || {};
+            const docList = [
+                { label: 'CNIC Front', url: docs.cnicFront },
+                { label: 'CNIC Back', url: docs.cnicBack },
+                { label: 'Educational Docs', url: docs.eduDocs },
+                { label: 'Other Docs', url: docs.otherDocs }
+            ];
+            document.getElementById('agent-detail-documents').innerHTML = docList.map(d => {
+                if (!d.url) return `<div class="border rounded-lg p-3 text-center text-slate-400"><i class="fas fa-file mb-1 block text-lg"></i>${d.label}<br><span class="text-xs">Not uploaded</span></div>`;
+                const isImg = d.url.startsWith('data:image');
+                return `<a href="${d.url}" target="_blank" class="border rounded-lg p-2 text-center hover:bg-slate-50 block">
+                    ${isImg ? `<img src="${d.url}" class="w-full h-20 object-cover rounded mb-1">` : `<i class="fas fa-file-pdf text-2xl text-rose-500 mb-1 block"></i>`}
+                    <span class="text-xs text-slate-600">${d.label}</span>
+                </a>`;
+            }).join('');
+
+            document.getElementById('agent-detail-balance').textContent = `PKR ${balance.toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2})}`;
+
+            const clientsTbody = document.getElementById('agent-detail-clients-tbody');
+            clientsTbody.innerHTML = commissionData.clients.length === 0
+                ? '<tr><td colspan="5" class="p-3 text-center text-slate-400">Is agent ka koi affiliate client abhi commission generate nahi kar raha.</td></tr>'
+                : commissionData.clients.map(c => `<tr class="border-b">
+                    <td class="p-2">${c.name}</td>
+                    <td class="p-2">${c.account}</td>
+                    <td class="p-2 text-right">PKR ${c.gross.toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2})}</td>
+                    <td class="p-2 text-right">PKR ${c.branchFinal.toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2})}</td>
+                    <td class="p-2 text-right font-semibold text-indigo-700">PKR ${c.agentCommission.toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2})}</td>
+                </tr>`).join('');
+
+            const txns = (allAffiliateTransactions || []).filter(t => t.agentId === agentId).sort((a, b) => new Date(b.date) - new Date(a.date));
+            const txnsTbody = document.getElementById('agent-detail-transactions-tbody');
+            txnsTbody.innerHTML = txns.length === 0
+                ? '<tr><td colspan="4" class="p-3 text-center text-slate-400">Koi debit/credit entry nahi.</td></tr>'
+                : txns.map(t => `<tr class="border-b">
+                    <td class="p-2 text-xs text-slate-500">${t.date ? new Date(t.date).toLocaleDateString() : ''}</td>
+                    <td class="p-2"><span class="px-2 py-0.5 rounded-full text-xs font-semibold ${t.type === 'credit' ? 'bg-emerald-100 text-emerald-700' : 'bg-rose-100 text-rose-700'}">${t.type === 'credit' ? 'Credit' : 'Debit'}</span></td>
+                    <td class="p-2 text-slate-600">${t.note || ''}</td>
+                    <td class="p-2 text-right font-semibold ${t.type === 'credit' ? 'text-emerald-600' : 'text-rose-600'}">${t.type === 'credit' ? '+' : '-'}PKR ${(parseFloat(t.amount)||0).toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2})}</td>
+                </tr>`).join('');
+
+            document.getElementById('agent-transaction-form').dataset.agentId = agentId;
+            document.getElementById('agent-debit-credit-wrapper').style.display = isSharedView ? 'none' : 'block';
+            document.getElementById('agent-print-profile-btn').dataset.agentId = agentId;
+
+            const overlay = document.getElementById('agent-detail-modal');
+            const content = overlay.querySelector('.popup-window-content');
+            overlay.classList.add('active');
+            content.classList.add('active');
+        };
+
+        window.agentPrintReport = function(agentId) {
+            const agent = (allAffiliateAgents || []).find(a => a.id === agentId);
+            if (!agent) return;
+            const byAgent = computeAffiliateCommissions();
+            const commissionData = byAgent[agentId] || { total: 0, clients: [] };
+            const balance = getAgentBalance(agentId, commissionData.total);
+            const txns = (allAffiliateTransactions || []).filter(t => t.agentId === agentId).sort((a, b) => new Date(b.date) - new Date(a.date));
+            const dateStr = new Date().toLocaleDateString();
+
+            const clientRows = commissionData.clients.map((c, i) => `<tr><td>${i+1}</td><td>${c.name}</td><td>${c.account}</td><td class="amt">PKR ${c.gross.toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2})}</td><td class="amt">PKR ${c.branchFinal.toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2})}</td><td class="amt">PKR ${c.agentCommission.toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2})}</td></tr>`).join('');
+            const txnRows = txns.map(t => `<tr><td>${t.date ? new Date(t.date).toLocaleDateString() : ''}</td><td>${t.type === 'credit' ? 'Credit' : 'Debit'}</td><td>${t.note || ''}</td><td class="amt">${t.type === 'credit' ? '+' : '-'}PKR ${(parseFloat(t.amount)||0).toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2})}</td></tr>`).join('');
+
+            const html = `<!DOCTYPE html><html><head><title>Agent Report - ${agent.name || ''}</title><meta charset="utf-8">
+                <style>
+                    body{font-family:Arial,Helvetica,sans-serif;padding:28px;color:#1e293b;}
+                    h1{font-size:20px;margin:0 0 4px;} h2{font-size:15px;margin:24px 0 8px;}
+                    .meta{font-size:12px;color:#64748b;margin-bottom:20px;}
+                    table{width:100%;border-collapse:collapse;font-size:12px;margin-bottom:10px;}
+                    th,td{border:1px solid #cbd5e1;padding:6px 8px;text-align:left;}
+                    th{background:#f1f5f9;text-transform:uppercase;font-size:10px;}
+                    .amt{text-align:right;} .info{font-size:13px;margin-bottom:4px;}
+                    .balance{font-size:16px;font-weight:bold;margin:14px 0;}
+                    @media print { body{padding:0;} }
+                </style></head><body>
+                <h1>Affiliate Agent Report — ${agent.name || ''}</h1>
+                <div class="meta">Generated: ${dateStr}</div>
+                <div class="info"><b>Contact:</b> ${agent.contact || 'N/A'} &nbsp; | &nbsp; <b>CNIC:</b> ${agent.cnic || 'N/A'} &nbsp; | &nbsp; <b>Commission Rate:</b> ${agentRateDisplay(agent)}%</div>
+                <div class="info"><b>Address:</b> ${agent.address || 'N/A'}</div>
+                <div class="info"><b>Bank Account:</b> ${agent.bankAccount || 'N/A'}</div>
+                <div class="balance">Current Balance: PKR ${balance.toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2})}</div>
+                <h2>Affiliate Clients &amp; Commission Breakdown</h2>
+                <table><thead><tr><th>#</th><th>Client</th><th>Account</th><th class="amt">Gross Commission</th><th class="amt">Branch Commission</th><th class="amt">Agent Commission</th></tr></thead>
+                <tbody>${clientRows || '<tr><td colspan="6" style="text-align:center;">Koi record nahi.</td></tr>'}</tbody></table>
+                <h2>Debit / Credit Transaction History</h2>
+                <table><thead><tr><th>Date</th><th>Type</th><th>Note</th><th class="amt">Amount</th></tr></thead>
+                <tbody>${txnRows || '<tr><td colspan="4" style="text-align:center;">Koi record nahi.</td></tr>'}</tbody></table>
+            </body></html>`;
+
+            const w = window.open('', '_blank');
+            if (!w) { showMessage('Error', 'Print window open nahi hui. Popup blocker check karen.'); return; }
+            w.document.open(); w.document.write(html); w.document.close();
+            w.onload = function() { w.focus(); w.print(); };
+        };
+
+        function readFileAsDataURL(file) {
+            return new Promise((resolve, reject) => {
+                if (!file) { resolve(null); return; }
+                const reader = new FileReader();
+                reader.onload = () => resolve(reader.result);
+                reader.onerror = reject;
+                reader.readAsDataURL(file);
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const agentForm = document.getElementById('add-agent-form');
+            const agentSearchInput = document.getElementById('agent-search');
+            const closeAgentBtn = document.getElementById('close-agent-btn');
+            const agentTxnForm = document.getElementById('agent-transaction-form');
+            const agentPrintBtn = document.getElementById('agent-print-profile-btn');
+
+            if (agentSearchInput) agentSearchInput.addEventListener('input', () => renderAffiliateAgents());
+
+            if (closeAgentBtn) {
+                closeAgentBtn.addEventListener('click', () => {
+                    const overlay = document.getElementById('agent-detail-modal');
+                    const content = overlay.querySelector('.popup-window-content');
+                    overlay.classList.remove('active');
+                    content.classList.remove('active');
+                    currentAgentProfileId = null;
+                });
+            }
+
+            if (agentPrintBtn) {
+                agentPrintBtn.addEventListener('click', (e) => {
+                    const agentId = e.currentTarget.dataset.agentId;
+                    if (agentId) window.agentPrintReport(agentId);
+                });
+            }
+
+            if (agentForm) {
+                agentForm.addEventListener('submit', async function(e) {
+                    e.preventDefault();
+                    if (!currentUserId || isSharedView) return;
+                    const statusEl = document.getElementById('agent-save-status');
+                    const saveBtn = document.getElementById('agent-save-btn');
+                    const name = document.getElementById('agent-name').value.trim();
+                    const contact = document.getElementById('agent-contact').value.trim();
+                    if (!name || !contact) { showMessage('Error', 'Naam aur Contact zaroori hain.'); return; }
+                    try {
+                        if (saveBtn) { saveBtn.disabled = true; saveBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Saving...'; }
+                        if (statusEl) { statusEl.classList.add('hidden'); }
+
+                        const [cnicFront, cnicBack, eduDocs, otherDocs] = await Promise.all([
+                            readFileAsDataURL(document.getElementById('agent-cnic-front').files[0]),
+                            readFileAsDataURL(document.getElementById('agent-cnic-back').files[0]),
+                            readFileAsDataURL(document.getElementById('agent-edu-docs').files[0]),
+                            readFileAsDataURL(document.getElementById('agent-other-docs').files[0])
+                        ]);
+
+                        const rateVal = parseFloat(document.getElementById('agent-commission-rate').value);
+                        const agentData = {
+                            name,
+                            contact,
+                            profile: document.getElementById('agent-profile').value.trim(),
+                            fatherName: document.getElementById('agent-father-name').value.trim(),
+                            cnic: document.getElementById('agent-cnic').value.trim(),
+                            address: document.getElementById('agent-address').value.trim(),
+                            dob: document.getElementById('agent-dob').value,
+                            maritalStatus: document.getElementById('agent-marital-status').value,
+                            residentStatus: document.getElementById('agent-resident-status').value,
+                            mobile: document.getElementById('agent-mobile').value.trim(),
+                            emergencyContact: document.getElementById('agent-emergency-contact').value.trim(),
+                            bankAccount: document.getElementById('agent-bank-account').value.trim(),
+                            commissionRate: isNaN(rateVal) ? 20 : rateVal,
+                            documents: { cnicFront, cnicBack, eduDocs, otherDocs },
+                            createdAt: new Date().toISOString()
+                        };
+
+                        await db.collection(`users/${currentUserId}/affiliate_agents`).add(agentData);
+                        showMessage('Success', 'Agent saved successfully!');
+                        agentForm.reset();
+                        document.getElementById('agent-commission-rate').value = 20;
+                    } catch (err) {
+                        showMessage('Error', 'Agent save nahi hua: ' + err.message);
+                    } finally {
+                        if (saveBtn) { saveBtn.disabled = false; saveBtn.innerHTML = '<i class="fas fa-save mr-2"></i>Save Agent'; }
+                    }
+                });
+            }
+
+            if (agentTxnForm) {
+                agentTxnForm.addEventListener('submit', async function(e) {
+                    e.preventDefault();
+                    if (!currentUserId || isSharedView) return;
+                    const agentId = agentTxnForm.dataset.agentId;
+                    if (!agentId) return;
+                    const type = document.getElementById('agent-txn-type').value;
+                    const amount = parseFloat(document.getElementById('agent-txn-amount').value);
+                    const note = document.getElementById('agent-txn-note').value.trim();
+                    if (isNaN(amount) || amount <= 0) { showMessage('Error', 'Sahi amount dalen.'); return; }
+                    try {
+                        await db.collection(`users/${currentUserId}/affiliate_transactions`).add({
+                            agentId, type, amount, note, date: new Date().toISOString()
+                        });
+                        agentTxnForm.reset();
+                        document.getElementById('agent-txn-type').value = 'debit';
+                    } catch (err) {
+                        showMessage('Error', 'Entry save nahi hui: ' + err.message);
+                    }
+                });
+            }
+        });
+        // ─── END AFFILIATE PROGRAM MODULE ─────────────────────────────────────────
+
         window.applyAppearance = function() {
             const s = readControlsToSettings();
             applyAppearanceCss(s);
@@ -13236,9 +14389,11 @@ ${(d.totalDeductions > 0) ? `
         window.resetAppearance = function() {
             const defaults = {
                 brandPrimary:'#4f46e5', sidebarColor:'#1e1b4b', bgColor:'#eef2ff', cardBg:'#ffffff',
-                textPrimary:'#0f172a', textSecondary:'#475569', btnPrimary:'#4f46e5',
+                textPrimary:'#0f172a', textSecondary:'#475569', sidebarTextColor:'#ffffff', btnPrimary:'#4f46e5',
                 btnSuccess:'#059669', btnDanger:'#e11d48', fontSize:14,
-                fontFamily:"'DM Sans', sans-serif", borderRadius:16, tableStripe:'none'
+                fontFamily:"'DM Sans', sans-serif", borderRadius:16, tableStripe:'none',
+                darkMode:false, animationsEnabled:true,
+                footerText: DEFAULT_FOOTER_TEXT, footerMode:'static', footerTickerSpeed:18
             };
             populateControls(defaults);
             applyAppearanceCss(defaults);
