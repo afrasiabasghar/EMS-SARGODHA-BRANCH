@@ -3687,8 +3687,11 @@
                             </div>
                         </div>
 
-                        <!-- Reset -->
-                        <div style="text-align:right;margin-top:8px;">
+                        <!-- Save / Reset -->
+                        <div style="text-align:right;margin-top:8px;display:flex;gap:10px;justify-content:flex-end;flex-wrap:wrap;">
+                            <button class="bg-indigo-600 text-white px-6 py-2 rounded-full font-semibold hover:bg-indigo-700 animated-btn" id="settings-save-btn" onclick="saveAppearanceToAccount()">
+                                <i class="fas fa-cloud-upload-alt"></i> Save Settings
+                            </button>
                             <button class="settings-reset-btn" onclick="resetAppearance()">
                                 <i class="fas fa-undo"></i> Reset to Defaults
                             </button>
@@ -12819,6 +12822,48 @@ ${(d.totalDeductions > 0) ? `
             localStorage.setItem(APP_SETTINGS_KEY, JSON.stringify(s));
         }
 
+        // Save appearance settings to the user's account (Firestore) so the
+        // same settings apply no matter which browser/device they log in from.
+        window.saveAppearanceToAccount = async function() {
+            const s = readControlsToSettings();
+            applyAppearanceCss(s);
+            saveAppearanceSettings(s); // keep a local copy too (instant load, offline fallback)
+
+            if (!currentUserId) {
+                showMessage('Saved Locally', 'Settings saved on this device. Log in to save them to your account so they follow you to other browsers/devices.');
+                return;
+            }
+
+            const btn = document.getElementById('settings-save-btn');
+            const originalHtml = btn ? btn.innerHTML : null;
+            if (btn) { btn.disabled = true; btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...'; }
+            try {
+                await db.collection('users').doc(currentUserId).set({ appearanceSettings: s }, { merge: true });
+                showMessage('Saved', 'Your appearance settings have been saved to your account. They will now apply on any browser or device where you log in.');
+            } catch (err) {
+                console.error('Appearance cloud save error:', err);
+                showMessage('Error', 'Could not save settings to your account: ' + err.message);
+            } finally {
+                if (btn) { btn.disabled = false; btn.innerHTML = originalHtml; }
+            }
+        };
+
+        // Load appearance settings saved to the user's account (Firestore), so
+        // logging in from a new browser/device shows the same saved appearance.
+        function loadAppearanceFromAccount() {
+            if (!currentUserId) return;
+            db.collection('users').doc(currentUserId).get().then(doc => {
+                const cloudSettings = doc.exists ? doc.data().appearanceSettings : null;
+                if (cloudSettings) {
+                    populateControls(cloudSettings);
+                    applyAppearanceCss(cloudSettings);
+                    saveAppearanceSettings(cloudSettings); // keep local copy in sync
+                }
+            }).catch(err => {
+                console.warn('Appearance cloud load error:', err);
+            });
+        }
+
         function hexToRgba(hex, alpha) {
             const h = (hex || '#ffffff').replace('#', '');
             const r = parseInt(h.slice(0,2),16), g = parseInt(h.slice(2,4),16), b = parseInt(h.slice(4,6),16);
@@ -13244,6 +13289,7 @@ ${(d.totalDeductions > 0) ? `
                     showSection('dashboard');
                     analyticsOnLogin();
                     startRealtimeListeners();
+                    loadAppearanceFromAccount();
                     if (window._pdLoadFromFirebase) window._pdLoadFromFirebase();
                     backupCheckWeeklyReminder();
                 } else {
