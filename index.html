@@ -5345,7 +5345,7 @@
         let isSharedView = false; // Flag for read-only mode
 
         // REMOVED: allDeposits, allWithdrawals, allCourierRecords
-        let allComplaints = [], allDailyCommissions = [], allCommissionReceived = [], allExpenses = [], allClients = [], allEmployees = [], allClientPayments = [], allPettyCashEntries = [], allEmployeePerformance = [], allCgsEntries = {}, allCouriers = [], allTradeLogEntries = {}, allUtilityBills = [], allMonthlyExpenses = [], allDebts = [], allAffiliateAgents = [], allAffiliateTransactions = [];
+        let allComplaints = [], allDailyCommissions = [], allCommissionReceived = [], allExpenses = [], allClients = [], allEmployees = [], allClientPayments = [], allPettyCashEntries = [], allEmployeePerformance = [], allCgsEntries = {}, allCouriers = [], allTradeLogEntries = {}, allUtilityBills = [], allMonthlyExpenses = [], allDebts = [], allAffiliateAgents = [], allAffiliateTransactions = [], allTasks = [];
         let currentAgentProfileId = null;
         let calculatedTransactions = [];
         let editingTransactionId = null; // ADDED: tracks which CGS transaction (by id) is currently being edited
@@ -5861,7 +5861,7 @@
         // --- REALTIME DATA LISTENERS ---
         function startRealtimeListeners() {
             if (unsubscribeListeners.length > 0) return; 
-            const collections = ['complaints', 'daily_commissions', 'commission_received', 'expenses', 'clients', 'employees', 'client_payments', 'petty_cash', 'employee_performance', 'cgs_entries', 'couriers', 'trade_log_entries', 'utility_bills', 'debts', 'affiliate_agents', 'affiliate_transactions'];
+            const collections = ['complaints', 'daily_commissions', 'commission_received', 'expenses', 'clients', 'employees', 'client_payments', 'petty_cash', 'employee_performance', 'cgs_entries', 'couriers', 'trade_log_entries', 'utility_bills', 'debts', 'affiliate_agents', 'affiliate_transactions', 'tasks'];
             const dataHandlers = {
                 complaints: data => { allComplaints = data; renderComplaints(); updateDashboard(); },
                 daily_commissions: data => { allDailyCommissions = data; renderCommissionSection(); updateDashboard(); },
@@ -5925,6 +5925,7 @@
                     renderAffiliateAgents();
                     if (currentAgentProfileId) showAgentProfile(currentAgentProfileId);
                 },
+                tasks: data => { allTasks = data; tmRenderTasks(); },
             };
 
             collections.forEach(col => {
@@ -13769,18 +13770,11 @@ ${(d.totalDeductions > 0) ? `
         });
         // ─── END BACKUP MODULE ────────────────────────────────────────────────────
 
-        // ─── TASK MANAGER MODULE ──────────────────────────────────────────────────
-        const TASKS_STORAGE_KEY = 'darson_task_manager_v1';
+        // ─── TASK MANAGER MODULE (Firestore-backed, same pattern as other sections) ──
         const TASK_NOTIF_LAST_KEY = 'darson_task_notif_last_v1';
         let tmCurrentFilter = 'all';
         let tmActiveTaskId = null;
 
-        function tmGetTasks() {
-            try { return JSON.parse(localStorage.getItem(TASKS_STORAGE_KEY) || '[]'); } catch(e) { return []; }
-        }
-        function tmSaveTasks(tasks) {
-            try { localStorage.setItem(TASKS_STORAGE_KEY, JSON.stringify(tasks)); } catch(e) {}
-        }
         function tmTodayStr() {
             const d = new Date();
             return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
@@ -13805,29 +13799,39 @@ ${(d.totalDeductions > 0) ? `
             div.textContent = str || '';
             return div.innerHTML;
         }
+        function tmCreatedAtMs(task) {
+            if (task.createdAt && typeof task.createdAt.toDate === 'function') return task.createdAt.toDate().getTime();
+            if (task.createdAt) return new Date(task.createdAt).getTime() || 0;
+            return 0;
+        }
 
         document.addEventListener('DOMContentLoaded', () => {
             const form = document.getElementById('add-task-form');
             if (form) {
-                form.addEventListener('submit', (e) => {
+                form.addEventListener('submit', async (e) => {
                     e.preventDefault();
+                    if (!currentUserId || isSharedView) return;
                     const title = document.getElementById('task-title-input').value.trim();
                     if (!title) return;
                     const deadline = document.getElementById('task-deadline-input').value || '';
                     const description = document.getElementById('task-desc-input').value.trim();
-                    const tasks = tmGetTasks();
-                    tasks.unshift({
-                        id: 'tsk_' + Date.now() + '_' + Math.random().toString(36).slice(2, 8),
-                        title, description, deadline,
-                        progress: 0,
-                        status: 'open',
-                        followUps: [],
-                        createdAt: new Date().toISOString(),
-                        closedAt: null
-                    });
-                    tmSaveTasks(tasks);
-                    form.reset();
-                    tmRenderTasks();
+                    const submitBtn = form.querySelector('button[type="submit"]');
+                    if (submitBtn) submitBtn.disabled = true;
+                    try {
+                        await db.collection(`users/${currentUserId}/tasks`).add({
+                            title, description, deadline,
+                            progress: 0,
+                            status: 'open',
+                            followUps: [],
+                            createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                            closedAt: null
+                        });
+                        form.reset();
+                    } catch (err) {
+                        showMessage('Error', 'Task add nahi hua: ' + err.message);
+                    } finally {
+                        if (submitBtn) submitBtn.disabled = false;
+                    }
                 });
             }
         });
@@ -13841,14 +13845,15 @@ ${(d.totalDeductions > 0) ? `
         }
 
         function tmFilteredTasks() {
-            const tasks = tmGetTasks();
             const searchEl = document.getElementById('task-search');
             const search = (searchEl ? searchEl.value : '').trim().toLowerCase();
-            return tasks.filter(t => {
-                if (search && !t.title.toLowerCase().includes(search)) return false;
-                if (tmCurrentFilter === 'all') return true;
-                return tmStatusInfo(t).key === tmCurrentFilter;
-            });
+            return allTasks
+                .filter(t => {
+                    if (search && !t.title.toLowerCase().includes(search)) return false;
+                    if (tmCurrentFilter === 'all') return true;
+                    return tmStatusInfo(t).key === tmCurrentFilter;
+                })
+                .sort((a, b) => tmCreatedAtMs(b) - tmCreatedAtMs(a));
         }
 
         function tmRenderTasks() {
@@ -13882,15 +13887,14 @@ ${(d.totalDeductions > 0) ? `
         }
 
         function tmUpdateStats() {
-            const tasks = tmGetTasks();
             let open = 0, overdue = 0, closed = 0;
-            tasks.forEach(t => {
+            allTasks.forEach(t => {
                 const info = tmStatusInfo(t);
                 if (info.key === 'closed') closed++;
                 else { open++; if (info.key === 'overdue') overdue++; }
             });
             const setText = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
-            setText('tm-stat-total', tasks.length);
+            setText('tm-stat-total', allTasks.length);
             setText('tm-stat-open', open);
             setText('tm-stat-overdue', overdue);
             setText('tm-stat-closed', closed);
@@ -13900,13 +13904,13 @@ ${(d.totalDeductions > 0) ? `
                 if (open > 0) { badge.textContent = open > 99 ? '99+' : String(open); badge.style.display = 'flex'; }
                 else { badge.style.display = 'none'; }
             }
-            tmRenderNotifDropdown(tasks);
+            tmRenderNotifDropdown();
         }
 
-        function tmRenderNotifDropdown(tasksParam) {
+        function tmRenderNotifDropdown() {
             const list = document.getElementById('task-notif-list');
             if (!list) return;
-            const tasks = (tasksParam || tmGetTasks()).filter(t => tmStatusInfo(t).key !== 'closed');
+            const tasks = allTasks.filter(t => tmStatusInfo(t).key !== 'closed');
             if (tasks.length === 0) {
                 list.innerHTML = '<div class="tm-notif-row" style="color:#94a3b8;">Koi pending task nahi hai.</div>';
                 return;
@@ -13925,8 +13929,7 @@ ${(d.totalDeductions > 0) ? `
         }
 
         function tmOpenDetail(taskId) {
-            const tasks = tmGetTasks();
-            const task = tasks.find(t => t.id === taskId);
+            const task = allTasks.find(t => t.id === taskId);
             if (!task) return;
             tmActiveTaskId = taskId;
             document.getElementById('task-detail-title').textContent = task.title;
@@ -13965,56 +13968,62 @@ ${(d.totalDeductions > 0) ? `
             tmActiveTaskId = null;
         }
 
-        function tmSaveProgress() {
-            if (!tmActiveTaskId) return;
-            const tasks = tmGetTasks();
-            const task = tasks.find(t => t.id === tmActiveTaskId);
+        async function tmSaveProgress() {
+            if (!tmActiveTaskId || !currentUserId || isSharedView) return;
+            const task = allTasks.find(t => t.id === tmActiveTaskId);
             if (!task) return;
             const progress = parseInt(document.getElementById('task-detail-progress-range').value, 10) || 0;
             const note = document.getElementById('task-detail-note-input').value.trim();
-            task.progress = progress;
-            task.followUps = task.followUps || [];
-            task.followUps.push({ date: new Date().toISOString(), note, progress });
-            tmSaveTasks(tasks);
-            tmRenderTasks();
-            tmOpenDetail(task.id);
-        }
-
-        function tmToggleCloseTask() {
-            if (!tmActiveTaskId) return;
-            const tasks = tmGetTasks();
-            const task = tasks.find(t => t.id === tmActiveTaskId);
-            if (!task) return;
-            if (task.status === 'closed') {
-                task.status = 'open';
-                task.closedAt = null;
-            } else {
-                task.status = 'closed';
-                task.closedAt = new Date().toISOString();
-                task.progress = 100;
+            const entry = { date: new Date().toISOString(), note, progress };
+            try {
+                await db.collection(`users/${currentUserId}/tasks`).doc(tmActiveTaskId).update({
+                    progress,
+                    followUps: firebase.firestore.FieldValue.arrayUnion(entry)
+                });
+            } catch (err) {
+                showMessage('Error', 'Progress update nahi hua: ' + err.message);
             }
-            tmSaveTasks(tasks);
-            tmRenderTasks();
-            tmCloseDetailModal();
         }
 
-        function tmDeleteTask() {
-            if (!tmActiveTaskId) return;
+        async function tmToggleCloseTask() {
+            if (!tmActiveTaskId || !currentUserId || isSharedView) return;
+            const task = allTasks.find(t => t.id === tmActiveTaskId);
+            if (!task) return;
+            try {
+                if (task.status === 'closed') {
+                    await db.collection(`users/${currentUserId}/tasks`).doc(tmActiveTaskId).update({
+                        status: 'open', closedAt: null
+                    });
+                } else {
+                    await db.collection(`users/${currentUserId}/tasks`).doc(tmActiveTaskId).update({
+                        status: 'closed', closedAt: new Date().toISOString(), progress: 100
+                    });
+                }
+                tmCloseDetailModal();
+            } catch (err) {
+                showMessage('Error', 'Task status update nahi hua: ' + err.message);
+            }
+        }
+
+        async function tmDeleteTask() {
+            if (!tmActiveTaskId || !currentUserId || isSharedView) return;
             if (!confirm('Kya aap is task ko delete karna chahtay hain?')) return;
-            let tasks = tmGetTasks();
-            tasks = tasks.filter(t => t.id !== tmActiveTaskId);
-            tmSaveTasks(tasks);
-            tmRenderTasks();
-            tmCloseDetailModal();
+            try {
+                await db.collection(`users/${currentUserId}/tasks`).doc(tmActiveTaskId).delete();
+                tmCloseDetailModal();
+            } catch (err) {
+                showMessage('Error', 'Task delete nahi hua: ' + err.message);
+            }
         }
 
         // ── Daily pending-tasks notification (browser Notification API + in-app toast) ──
+        // (Purely a local reminder throttle — actual task data always lives in Firestore)
         function tmDailyNotificationCheck() {
             if (typeof isSharedView !== 'undefined' && isSharedView) return;
             const today = tmTodayStr();
             const lastNotified = localStorage.getItem(TASK_NOTIF_LAST_KEY);
             if (lastNotified === today) return; // already notified today
-            const openCount = tmGetTasks().filter(t => tmStatusInfo(t).key !== 'closed').length;
+            const openCount = allTasks.filter(t => tmStatusInfo(t).key !== 'closed').length;
             if (openCount === 0) { localStorage.setItem(TASK_NOTIF_LAST_KEY, today); return; }
             const msg = `Aapke ${openCount} pending task${openCount > 1 ? 's' : ''} hain jo abhi close nahi huay.`;
             if ('Notification' in window) {
@@ -14068,6 +14077,9 @@ ${(d.totalDeductions > 0) ? `
         });
 
         function taskManagerInit() {
+            // allTasks is populated by the Firestore realtime listener (startRealtimeListeners),
+            // which calls tmRenderTasks() itself whenever data changes. This just renders the
+            // current state immediately and sets up the daily reminder checks.
             tmRenderTasks();
             tmUpdateStats();
             setTimeout(() => tmDailyNotificationCheck(), 4000);
