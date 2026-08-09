@@ -446,6 +446,7 @@
         [data-section="analytics"]::before { content: "\f080"; }
         [data-section="trade-log"]::before { content: "\f201"; }
         [data-section="vtrade-trade-log"]::before { content: "\f0ce"; }
+        [data-section="client-portfolio"]::before { content: "\f0b1"; }
         [data-section="backup"]::before { content: "\f019"; }
         [data-section="utility-bills"]::before { content: "\f0e7"; }
         [data-section="debts"]::before { content: "\f571"; }
@@ -845,6 +846,59 @@
         }
         #loading-text {
             display: none;
+        }
+
+        /* ─── Header Connection Status Badge ────── */
+        #conn-status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 10px 4px 8px;
+            border-radius: 20px;
+            font-size: 0.72rem;
+            font-weight: 600;
+            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Inter', sans-serif;
+            white-space: nowrap;
+            margin-left: 10px;
+            vertical-align: middle;
+            transition: background 0.25s ease, color 0.25s ease;
+        }
+        #conn-status-badge .conn-dot {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+        #conn-status-badge.conn-connecting {
+            background: rgba(245, 158, 11, 0.12);
+            color: #92400e;
+        }
+        #conn-status-badge.conn-connecting .conn-dot {
+            background: #f59e0b;
+            animation: connPulse 1s infinite;
+        }
+        #conn-status-badge.conn-connected {
+            background: rgba(16, 185, 129, 0.12);
+            color: #065f46;
+        }
+        #conn-status-badge.conn-connected .conn-dot {
+            background: #10b981;
+        }
+        #conn-status-badge.conn-disconnected {
+            background: rgba(239, 68, 68, 0.12);
+            color: #991b1b;
+        }
+        #conn-status-badge.conn-disconnected .conn-dot {
+            background: #ef4444;
+            animation: connPulse 1s infinite;
+        }
+        @keyframes connPulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.35; }
+        }
+        @media (max-width: 480px) {
+            #conn-status-badge { padding: 4px; margin-left: 6px; }
+            #conn-status-badge #conn-status-text { display: none; }
         }
 
         /* ─── Network Status Banner ──────────────── */
@@ -1824,7 +1878,7 @@
 
             <div class="mb-4">
                 <label class="block text-sm font-medium text-slate-700 mb-1">Follow-up Note (optional)</label>
-                <textarea id="task-detail-note-input" rows="2" placeholder="Progress update ka note likhen..." class="w-full px-4 py-2 border rounded-2xl focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm"></textarea>
+                <textarea id="task-detail-note-input" rows="2" placeholder="Write a note for the progress update..." class="w-full px-4 py-2 border rounded-2xl focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm"></textarea>
             </div>
 
             <div class="flex gap-2 flex-wrap mb-4">
@@ -1981,6 +2035,40 @@
             </form>
         </div>
     </div>
+
+    <!-- Client Portfolio row Quantity Adjustment / Delete Modal (opened via double-click on a Regular Holdings / Futures Positions row) -->
+    <div id="portfolio-edit-modal" class="modal-overlay">
+        <div class="modal-content card" style="max-width:420px;width:95%;">
+            <h3 class="text-xl font-bold mb-1">Update Holding</h3>
+            <p class="text-sm text-slate-500 mb-4">Quantity kam ya zyada karein, ya poori row delete karein. Original trade log / baseline data change nahi hota, ye sirf ek adjustment ke tor par lagta hai.</p>
+            <form id="cp-edit-form">
+                <div class="text-left mb-3">
+                    <label class="block text-sm font-medium text-slate-700 mb-1">Client</label>
+                    <p id="cp-edit-client-label" class="px-4 py-2 border rounded-full bg-slate-50 text-slate-700 font-semibold"></p>
+                </div>
+                <div class="grid grid-cols-2 gap-3 mb-3">
+                    <div class="text-left">
+                        <label class="block text-sm font-medium text-slate-700 mb-1">Symbol</label>
+                        <p id="cp-edit-symbol-label" class="px-4 py-2 border rounded-full bg-slate-50 text-slate-700 font-semibold"></p>
+                    </div>
+                    <div class="text-left">
+                        <label class="block text-sm font-medium text-slate-700 mb-1">Current Qty</label>
+                        <p id="cp-edit-current-qty" class="px-4 py-2 border rounded-full bg-slate-50 text-slate-700 font-mono font-semibold">0</p>
+                    </div>
+                </div>
+                <div class="text-left mb-4">
+                    <label for="cp-edit-qty-input" class="block text-sm font-medium text-slate-700 mb-1">New Quantity</label>
+                    <input type="number" step="any" min="0" id="cp-edit-qty-input" required placeholder="New Qty" class="w-full px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                </div>
+                <div class="flex justify-center gap-3 flex-wrap">
+                    <button type="button" id="cp-edit-cancel-btn" class="bg-slate-300 text-slate-800 px-6 py-2 rounded-full font-semibold hover:bg-slate-400">Cancel</button>
+                    <button type="button" id="cp-edit-delete-row-btn" class="bg-rose-100 text-rose-700 px-6 py-2 rounded-full font-semibold hover:bg-rose-200"><i class="fas fa-trash-alt mr-1"></i>Delete Row</button>
+                    <button type="submit" class="bg-indigo-600 text-white px-6 py-2 rounded-full font-semibold hover:bg-indigo-700">Save Quantity</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
 
     <!-- ADDED: Download Client Report Modal -->
     <div id="download-report-modal" class="modal-overlay">
@@ -2165,6 +2253,7 @@
                     <li><button data-section="analytics" class="nav-btn text-slate-600 hover:bg-indigo-50 hover:text-indigo-600">Analytics</button></li>
                     <li><button data-section="trade-log" class="nav-btn text-slate-600 hover:bg-indigo-50 hover:text-indigo-600">Trade Log</button></li>
                     <li><button data-section="vtrade-trade-log" class="nav-btn text-slate-600 hover:bg-indigo-50 hover:text-indigo-600">Vtrade Trade Log</button></li>
+                    <li><button data-section="client-portfolio" class="nav-btn text-slate-600 hover:bg-indigo-50 hover:text-indigo-600">Client Portfolio</button></li>
                     <li><button data-section="backup" class="nav-btn text-slate-600 hover:bg-indigo-50 hover:text-indigo-600">Backup & Restore</button></li>
                     <li><button data-section="utility-bills" class="nav-btn text-slate-600 hover:bg-indigo-50 hover:text-indigo-600">Utility Bills</button></li>
                 </ul>
@@ -2181,6 +2270,7 @@
                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
                     </button>
                     <h2 id="header-title" class="text-xl font-semibold" style="font-family:-apple-system,BlinkMacSystemFont,'Inter',sans-serif;font-weight:700;color:#1d1d1f;letter-spacing:-0.3px;">Dashboard</h2>
+                    <span id="conn-status-badge" class="conn-connecting"><span class="conn-dot"></span><span id="conn-status-text">Connecting…</span></span>
                 </div>
                 <div class="flex items-center space-x-2 sm:space-x-4">
                     <!-- Task Manager: pending tasks notification bell (hidden in Shared Frontend view) -->
@@ -2680,12 +2770,12 @@
                             <!-- FILE UPLOAD: Auto-import from Trade Log TXT -->
                             <div class="mb-6 p-4 border rounded-lg bg-emerald-50 border-emerald-200">
                                 <h3 class="text-lg font-semibold mb-1 text-emerald-700"><i class="fas fa-file-upload mr-2"></i>Auto-Import from Trade Log File</h3>
-                                <p class="text-sm text-emerald-600 mb-3">PSX daily trade log (.txt) upload karein — same stock ki entries automatically merge ho jaengi aur CGS table fill ho jayega.</p>
+                                <p class="text-sm text-emerald-600 mb-3">Upload the PSX daily trade log (.txt) — entries for the same stock will automatically merge and fill the CGS table.</p>
                                 <div class="flex flex-col sm:flex-row gap-3 items-center">
                                     <label for="tradeLogFileInput" class="flex-grow w-full">
                                         <div class="flex items-center gap-3 border-2 border-dashed border-emerald-400 rounded-xl px-4 py-3 cursor-pointer hover:bg-emerald-100 transition">
                                             <i class="fas fa-file-alt text-emerald-500 text-xl"></i>
-                                            <span id="tradeLogFileName" class="text-slate-600 text-sm truncate">Trade Log file select karein (.txt)</span>
+                                            <span id="tradeLogFileName" class="text-slate-600 text-sm truncate">Select Trade Log file (.txt)</span>
                                         </div>
                                         <input type="file" id="tradeLogFileInput" accept=".txt,.csv" class="hidden">
                                     </label>
@@ -2694,6 +2784,42 @@
                                     </button>
                                 </div>
                                 <div id="tradeLogParseStatus" class="mt-2 text-sm font-medium hidden"></div>
+                            </div>
+                            <!-- WEEKLY ROLLOVER COMMISSION: Futures positions still open going into Friday -->
+                            <div class="mb-6 p-4 border rounded-lg bg-amber-50 border-amber-200" id="rollover-commission-box">
+                                <h3 class="text-lg font-semibold mb-1 text-amber-700"><i class="fas fa-sync-alt mr-2"></i>Weekly Rollover Commission (Futures)</h3>
+                                <p class="text-sm text-amber-700 mb-3">Futures positions that remain open going into Friday will be charged rollover commission (a position bought on Friday itself will not be charged). Select the Friday date and click Fetch.</p>
+                                <div class="flex flex-col sm:flex-row gap-3 items-end">
+                                    <div class="flex-grow">
+                                        <label for="rolloverFridayDate" class="block text-sm font-medium text-slate-700">Friday Date</label>
+                                        <input type="date" id="rolloverFridayDate" class="mt-1 p-2 border rounded-md w-full">
+                                    </div>
+                                    <button id="fetchRolloverBtn" class="bg-amber-600 text-white py-2 px-5 rounded-full font-semibold hover:bg-amber-700 animated-btn w-full sm:w-auto flex-shrink-0">
+                                        <i class="fas fa-download mr-2"></i>Fetch
+                                    </button>
+                                </div>
+                                <div id="rolloverResultsWrapper" class="hidden mt-5">
+                                    <div class="overflow-x-auto mb-4">
+                                        <table id="rolloverTransactionsTable" class="w-full text-left table-auto">
+                                            <thead>
+                                                <tr class="text-slate-600 uppercase text-sm">
+                                                    <th class="p-2">Client</th>
+                                                    <th class="p-2">Stock (Future)</th>
+                                                    <th class="p-2">Quantity</th>
+                                                    <th class="p-2">Rate</th>
+                                                    <th class="p-2">Comm. per Stock</th>
+                                                    <th class="p-2">Total Comm.</th>
+                                                    <th class="p-2 actions-header">Action</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody></tbody>
+                                        </table>
+                                    </div>
+                                    <div id="rolloverSummary" class="p-3 bg-white rounded-lg shadow mb-4 text-sm font-semibold text-amber-700"></div>
+                                    <div class="flex justify-end">
+                                        <button id="addRolloverToCgsBtn" class="bg-emerald-600 text-white px-6 py-2 rounded-full font-semibold hover:bg-emerald-700 animated-btn"><i class="fas fa-plus-circle mr-2"></i>Add to Commission Generator System</button>
+                                    </div>
+                                </div>
                             </div>
                             <div class="mb-6 p-4 border rounded-lg bg-indigo-50">
                                 <h3 class="text-lg font-semibold mb-2 text-indigo-700">Select Date for Transactions</h3>
@@ -2873,7 +2999,7 @@
                                 <div class="flex flex-col sm:flex-row items-start sm:items-center gap-4">
                                     <div class="flex-1">
                                         <p class="font-semibold text-slate-700">Save &amp; Report</p>
-                                        <p class="text-xs text-slate-400 mt-1">Firebase mein save karo aur formatted report print karo.</p>
+                                        <p class="text-xs text-slate-400 mt-1">Save to Firebase and print a formatted report.</p>
                                     </div>
                                     <div class="flex gap-3 flex-wrap">
                                         <button onclick="oePrintReport()" class="bg-slate-700 text-white px-5 py-2 rounded-full font-semibold hover:bg-slate-800 animated-btn text-sm whitespace-nowrap">
@@ -2891,7 +3017,7 @@
                                 <div class="flex flex-col sm:flex-row items-start sm:items-center gap-4">
                                     <div class="flex-1">
                                         <p class="font-semibold text-amber-800"><i class="fas fa-history mr-2"></i>Import Old Expense Data</p>
-                                        <p class="text-xs text-amber-600 mt-1">Purane system ki expenses (petty cash ledger) se month-wise reports automatically bana ke Saved Reports mein add karo.</p>
+                                        <p class="text-xs text-amber-600 mt-1">Automatically generate month-wise reports from the old system's expenses (petty cash ledger) and add them to Saved Reports.</p>
                                     </div>
                                     <button onclick="oeImportOldData()" class="bg-amber-500 text-white px-5 py-2 rounded-full font-semibold hover:bg-amber-600 animated-btn text-sm whitespace-nowrap flex-shrink-0">
                                         <i class="fas fa-file-import mr-2"></i>Import Old Data
@@ -2907,7 +3033,7 @@
                             <div id="oe-reports-list" class="space-y-4">
                                 <div class="text-center py-16 text-slate-400">
                                     <i class="fas fa-file-alt text-4xl mb-3 block opacity-30"></i>
-                                    <p class="text-sm">Koi report nahi mili. Pehle expenses enter karo aur "Save Report" dabao.</p>
+                                    <p class="text-sm">No reports found. Enter expenses first and press "Save Report".</p>
                                 </div>
                             </div>
                         </div>
@@ -3082,7 +3208,7 @@
                         </div>
                         <div id="commission-report-wrapper" class="card p-6 mb-6">
                             <h3 class="text-xl font-semibold mb-1"><i class="fas fa-file-invoice-dollar mr-2 text-indigo-500"></i>Commission Report</h3>
-                            <p class="text-sm text-slate-500 mb-4">Client aur time period select karein — us client ki har stock trade entry commission ke saath report mein show hogi, aakhir mein Total Commission, Company (Head Office) Commission, Tax aur Final House Commission ke sath.</p>
+                            <p class="text-sm text-slate-500 mb-4">Select a client and a time period — every stock trade entry for that client will be shown in the report along with its commission, ending with Total Commission, Company (Head Office) Commission, Tax and Final House Commission.</p>
                             <div class="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
                                 <div class="md:col-span-2 relative">
                                     <label for="commission-report-client-search" class="block text-sm font-medium text-slate-700 mb-1">Client (Search by Name or Account Number)</label>
@@ -3448,6 +3574,15 @@
                                                class="w-full px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-indigo-500">
                                     </div>
                                     <div>
+                                        <label for="courier-payment-responsibility" class="block text-sm font-medium text-slate-700 mb-1">Payment Responsibility</label>
+                                        <select id="courier-payment-responsibility" required
+                                                class="w-full px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                                            <option value="">Select Payment Responsibility</option>
+                                            <option value="Client">Paid by Client</option>
+                                            <option value="Branch">Paid by Branch</option>
+                                        </select>
+                                    </div>
+                                    <div>
                                         <label for="courier-tracking-service" class="block text-sm font-medium text-slate-700 mb-1">Courier Service (for Tracking)</label>
                                         <select id="courier-tracking-service"
                                                 class="w-full px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-indigo-500">
@@ -3526,6 +3661,8 @@
                                                     <th class="p-2">Sender</th>
                                                     <th class="p-2">Receiver</th>
                                                     <th class="p-2">Doc Type</th>
+                                                    <th class="p-2">Payment By</th>
+                                                    <th class="p-2">Payment Status</th>
                                                     <th class="p-2">Reason</th>
                                                     <th class="p-2">Tracking</th>
                                                     <th class="p-2 actions-header">Actions</th>
@@ -4171,7 +4308,7 @@
                                 <span class="text-2xl">⚠️</span>
                                 <div>
                                     <h3 class="text-xl font-semibold text-amber-700">Review Parsed Entries</h3>
-                                    <p class="text-sm text-slate-500 mt-0.5">Save karne se pehle confirm karen.</p>
+                                    <p class="text-sm text-slate-500 mt-0.5">Confirm before saving.</p>
                                 </div>
                             </div>
                             <div class="mb-3">
@@ -4204,7 +4341,7 @@
                         <!-- Single Entry Add Form -->
                         <div class="card p-6 mb-6" id="add-debt-wrapper">
                             <h3 class="text-xl font-semibold mb-4"><i class="fas fa-user-plus mr-2 text-indigo-500"></i>Add Single Debt Entry</h3>
-                            <p class="text-sm text-slate-500 mb-4">Sirf registered clients (Client Profiles mein maujood) ka debt add ho sakta hai. Account Number ya Name dalen, baki details khud fetch ho jayengi.</p>
+                            <p class="text-sm text-slate-500 mb-4">Only registered clients (present in Client Profiles) can have a debt added. Enter the Account Number or Name, and the rest of the details will be fetched automatically.</p>
                             <form id="add-debt-form" class="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
                                 <div>
                                     <label class="block text-sm font-medium text-slate-700 mb-1">Account Number</label>
@@ -4247,7 +4384,7 @@
                             </div>
 
                             <div class="mb-4">
-                                <input type="text" id="debt-search" placeholder="Account number ya name se search karen..." class="w-full md:w-80 px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm">
+                                <input type="text" id="debt-search" placeholder="Search by account number or name..." class="w-full md:w-80 px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm">
                             </div>
                             <div class="overflow-x-auto">
                                 <table class="w-full text-left table-auto text-sm">
@@ -4264,7 +4401,7 @@
                                         </tr>
                                     </thead>
                                     <tbody id="debts-list">
-                                        <tr><td colspan="8" class="p-4 text-center text-slate-500">Abhi tak koi debt add nahi hui.</td></tr>
+                                        <tr><td colspan="8" class="p-4 text-center text-slate-500">No debts have been added yet.</td></tr>
                                     </tbody>
                                 </table>
                             </div>
@@ -4275,7 +4412,7 @@
                     <!-- ─── TASK MANAGER SECTION ─── -->
                     <section id="task-manager" class="section-container">
                         <h2 class="text-3xl font-bold text-slate-800 mb-2">Task Manager</h2>
-                        <p class="text-sm text-slate-500 mb-6">Apne daily tasks add karen, deadline set karen, progress follow-up karen aur mukammal hone par close karen.</p>
+                        <p class="text-sm text-slate-500 mb-6">Add your daily tasks, set deadlines, follow up on progress, and close them once complete.</p>
 
                         <!-- Stats -->
                         <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
@@ -4303,7 +4440,7 @@
                             <form id="add-task-form" class="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
                                 <div class="md:col-span-2">
                                     <label class="block text-sm font-medium text-slate-700 mb-1">Task Title</label>
-                                    <input type="text" id="task-title-input" placeholder="e.g. Client ka statement bhejna" required class="w-full px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                                    <input type="text" id="task-title-input" placeholder="e.g. Send client's statement" required class="w-full px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-indigo-500">
                                 </div>
                                 <div>
                                     <label class="block text-sm font-medium text-slate-700 mb-1">Deadline</label>
@@ -4314,7 +4451,7 @@
                                 </button>
                                 <div class="md:col-span-4">
                                     <label class="block text-sm font-medium text-slate-700 mb-1">Description (optional)</label>
-                                    <textarea id="task-desc-input" rows="2" placeholder="Task ki tafseel..." class="w-full px-4 py-2 border rounded-2xl focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm"></textarea>
+                                    <textarea id="task-desc-input" rows="2" placeholder="Task details..." class="w-full px-4 py-2 border rounded-2xl focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm"></textarea>
                                 </div>
                             </form>
                         </div>
@@ -4323,7 +4460,7 @@
                         <div class="card p-6">
                             <div class="flex items-center justify-between mb-4 flex-wrap gap-3">
                                 <h3 class="text-xl font-semibold">My Tasks</h3>
-                                <input type="text" id="task-search" oninput="tmRenderTasks()" placeholder="Task search karen..." class="w-full md:w-64 px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm">
+                                <input type="text" id="task-search" oninput="tmRenderTasks()" placeholder="Search tasks..." class="w-full md:w-64 px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm">
                             </div>
                             <div class="flex flex-wrap" id="task-subtab-nav" style="border-bottom:1px solid #eef4fc;margin-bottom:16px;">
                                 <button class="tm-subtab-btn active" data-tm-filter="all" onclick="tmSwitchFilter('all')"><i class="fas fa-list"></i>All</button>
@@ -4345,7 +4482,7 @@
                                         </tr>
                                     </thead>
                                     <tbody id="tasks-list">
-                                        <tr><td colspan="6" class="p-4 text-center text-slate-500">Abhi tak koi task add nahi hua.</td></tr>
+                                        <tr><td colspan="6" class="p-4 text-center text-slate-500">No tasks have been added yet.</td></tr>
                                     </tbody>
                                 </table>
                             </div>
@@ -4825,6 +4962,30 @@
                         </div>
                     </section>
                     <!-- ─── END VTRADE TRADE LOG SUBSECTION ─── -->
+
+                    <!-- ─── CLIENT PORTFOLIO SECTION ─── -->
+                    <section id="client-portfolio" class="section-container">
+                        <h2 class="text-3xl font-bold text-slate-800 mb-2">Client Portfolio</h2>
+                        <p class="text-sm text-slate-500 mb-6">Baseline 28-07-2026 + live Trade Log updates · Registered clients only</p>
+
+                        <div class="card p-6 mb-6">
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
+                                <div class="md:col-span-2 relative">
+                                    <label for="cp-client-search" class="block text-sm font-medium text-slate-700 mb-1">Client (Search by Name or Account Number)</label>
+                                    <input type="text" id="cp-client-search" autocomplete="off" placeholder="Type client name or account number..."
+                                           class="w-full px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                                    <input type="hidden" id="cp-client-id" value="">
+                                    <div id="cp-client-suggestions" class="hidden absolute z-20 left-0 right-0 mt-1 bg-white border border-slate-200 rounded-xl shadow-lg max-h-56 overflow-y-auto"></div>
+                                </div>
+                                <button id="cp-clear-btn" class="w-full bg-slate-300 text-slate-800 px-4 py-2 rounded-full font-semibold hover:bg-slate-400 animated-btn"><i class="fas fa-times mr-1"></i>Clear</button>
+                            </div>
+                        </div>
+
+                        <div id="cp-result-area" class="card p-6">
+                            <p class="text-center text-slate-400 py-8">Search for a registered client above to view their portfolio.</p>
+                        </div>
+                    </section>
+                    <!-- ─── END CLIENT PORTFOLIO SECTION ─── -->
 
                     <!-- ─── PHONE DIRECTORY SECTION ─── -->
                     <section id="phone-directory" class="section-container">
@@ -5455,10 +5616,20 @@
         let unsubscribeListeners = [];
         let isSharedView = false; // Flag for read-only mode
 
+        // Tracks how many of the realtime collections have delivered their first
+        // snapshot (success or error) after login, so the header connection badge
+        // can flip from "Connecting…" to "Connected" once real data has arrived.
+        let connLoadTotal = 0;
+        let connLoadedSet = new Set();
+        let connDataReady = false;
+        let connIsOnline = navigator.onLine;
+        let connFallbackTimer = null; // safety net so the badge can never get stuck on "Connecting…"
+
         // REMOVED: allDeposits, allWithdrawals, allCourierRecords
-        let allComplaints = [], allDailyCommissions = [], allCommissionReceived = [], allExpenses = [], allClients = [], allEmployees = [], allClientPayments = [], allPettyCashEntries = [], allEmployeePerformance = [], allCgsEntries = {}, allCouriers = [], allTradeLogEntries = {}, allUtilityBills = [], allMonthlyExpenses = [], allDebts = [], allAffiliateAgents = [], allAffiliateTransactions = [], allTasks = [];
+        let allComplaints = [], allDailyCommissions = [], allCommissionReceived = [], allExpenses = [], allClients = [], allEmployees = [], allClientPayments = [], allPettyCashEntries = [], allEmployeePerformance = [], allCgsEntries = {}, allCouriers = [], allTradeLogEntries = {}, allUtilityBills = [], allMonthlyExpenses = [], allDebts = [], allAffiliateAgents = [], allAffiliateTransactions = [], allTasks = [], allPortfolioAdjustments = {};
         let currentAgentProfileId = null;
         let calculatedTransactions = [];
+        let rolloverFetchedItems = []; // Weekly Rollover Commission (Futures) — fetched items pending review before being added to CGS
         let editingTransactionId = null; // ADDED: tracks which CGS transaction (by id) is currently being edited
         let rawParsedTrades = []; // Complete per-trade details from uploaded file for Trade Log sync
         let rawParsedTradesDate = null; // ADDED: tracks which calculator date rawParsedTrades was parsed for
@@ -5505,6 +5676,58 @@
             loading.classList.remove('hidden');
         }
         function hideLoading() { loading.classList.add('hidden'); }
+
+        // --- HEADER CONNECTION STATUS BADGE ---
+        // "Connecting…" while login data is still loading, "Connected" once every
+        // realtime collection has delivered its first snapshot, and "Disconnected"
+        // whenever the browser goes offline (restores automatically when back online).
+        function connRenderBadge() {
+            const badge = document.getElementById('conn-status-badge');
+            const text = document.getElementById('conn-status-text');
+            if (!badge || !text) return;
+            badge.classList.remove('conn-connecting', 'conn-connected', 'conn-disconnected');
+            if (!connIsOnline) {
+                badge.classList.add('conn-disconnected');
+                text.textContent = 'Disconnected';
+            } else if (!connDataReady) {
+                badge.classList.add('conn-connecting');
+                text.textContent = 'Connecting…';
+            } else {
+                badge.classList.add('conn-connected');
+                text.textContent = 'Connected';
+            }
+        }
+        function connStart(total) {
+            connLoadedSet = new Set();
+            connLoadTotal = total || 0;
+            connDataReady = false;
+            connRenderBadge();
+            // Safety net: if something we haven't foreseen keeps one collection from
+            // ever reporting in, don't leave the badge stuck — settle it after 10s.
+            if (connFallbackTimer) clearTimeout(connFallbackTimer);
+            connFallbackTimer = setTimeout(() => {
+                if (!connDataReady) { connDataReady = true; connRenderBadge(); }
+            }, 10000);
+        }
+        function connMark(key) {
+            if (connLoadedSet.has(key)) return; // only the first snapshot per collection counts
+            connLoadedSet.add(key);
+            if (connLoadedSet.size >= connLoadTotal) {
+                connDataReady = true;
+                if (connFallbackTimer) { clearTimeout(connFallbackTimer); connFallbackTimer = null; }
+                connRenderBadge();
+            }
+        }
+        function connReset() {
+            if (connFallbackTimer) { clearTimeout(connFallbackTimer); connFallbackTimer = null; }
+            connLoadedSet = new Set();
+            connLoadTotal = 0;
+            connDataReady = false;
+            connRenderBadge();
+        }
+        window.addEventListener('online', () => { connIsOnline = true; connRenderBadge(); });
+        window.addEventListener('offline', () => { connIsOnline = false; connRenderBadge(); });
+        connRenderBadge(); // sync badge to actual online/offline state immediately
 
         // --- NETWORK STATUS MONITOR ---
         (function () {
@@ -5601,6 +5824,8 @@
                     headerTitle.textContent = 'Trade Log';
                 } else if (sectionId === 'vtrade-trade-log') {
                     headerTitle.textContent = 'Vtrade Trade Log';
+                } else if (sectionId === 'client-portfolio') {
+                    headerTitle.textContent = 'Client Portfolio';
                 } else if (sectionId === 'backup') {
                     headerTitle.textContent = 'Backup & Restore';
                 } else if (sectionId === 'utility-bills') {
@@ -5972,13 +6197,14 @@
         // --- REALTIME DATA LISTENERS ---
         function startRealtimeListeners() {
             if (unsubscribeListeners.length > 0) return; 
-            const collections = ['complaints', 'daily_commissions', 'commission_received', 'expenses', 'clients', 'employees', 'client_payments', 'petty_cash', 'employee_performance', 'cgs_entries', 'couriers', 'trade_log_entries', 'utility_bills', 'debts', 'affiliate_agents', 'affiliate_transactions', 'tasks'];
+            const collections = ['complaints', 'daily_commissions', 'commission_received', 'expenses', 'clients', 'employees', 'client_payments', 'petty_cash', 'employee_performance', 'cgs_entries', 'couriers', 'trade_log_entries', 'utility_bills', 'debts', 'affiliate_agents', 'affiliate_transactions', 'tasks', 'portfolio_adjustments'];
+            connStart(collections.length + 1); // +1 for the monthly_expenses listener below
             const dataHandlers = {
                 complaints: data => { allComplaints = data; renderComplaints(); updateDashboard(); },
                 daily_commissions: data => { allDailyCommissions = data; renderCommissionSection(); updateDashboard(); },
                 commission_received: data => { allCommissionReceived = data; renderCommissionSection(); },
                 expenses: data => { allExpenses = data; renderExpenses(); },
-                clients: data => { allClients = data; renderProfiles(); updateDashboard(); updateClientDatalist(); },
+                clients: data => { allClients = data; renderProfiles(); updateDashboard(); updateClientDatalist(); if (typeof cpRefreshIfActive === 'function') cpRefreshIfActive(); },
                 employees: data => { allEmployees = data; renderEmployees(); updateDashboard(); },
                 client_payments: data => { 
                     allClientPayments = data; 
@@ -6015,6 +6241,8 @@
                     if (document.getElementById('trade-log').classList.contains('active')) {
                         renderTradeLogForCurrentDate();
                     }
+                    // Portfolio is derived from trade log entries, so refresh it live too.
+                    if (typeof cpRefreshIfActive === 'function') cpRefreshIfActive();
                     // Active clients & per-client commissions are derived from trade logs,
                     // so refresh the dashboard and any open client profile automatically.
                     updateDashboard();
@@ -6037,13 +6265,31 @@
                     if (currentAgentProfileId) showAgentProfile(currentAgentProfileId);
                 },
                 tasks: data => { allTasks = data; tmRenderTasks(); },
+                // ADDED: manual Client Portfolio corrections (see Client Portfolio "Edit" feature).
+                // These never touch PORTFOLIO_BASELINE or trade_log_entries -- they're a separate
+                // adjustment layer applied on top when computeClientPortfolios() runs.
+                portfolio_adjustments: data => {
+                    allPortfolioAdjustments = data.reduce((acc, item) => {
+                        acc[item.id] = item;
+                        return acc;
+                    }, {});
+                    if (typeof cpRefreshIfActive === 'function') cpRefreshIfActive();
+                },
             };
 
             collections.forEach(col => {
                 const unsub = db.collection(`users/${currentUserId}/${col}`).onSnapshot(snapshot => {
                     const data = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-                    dataHandlers[col](data);
-                }, err => console.error(`Error listening to ${col}:`, err));
+                    connMark(col); // mark first — a rendering error below must never block "Connected"
+                    try {
+                        dataHandlers[col](data);
+                    } catch (renderErr) {
+                        console.error(`Error rendering ${col}:`, renderErr);
+                    }
+                }, err => {
+                    console.error(`Error listening to ${col}:`, err);
+                    connMark(col); // still count it so the badge can't get stuck on a single failed collection
+                });
                 unsubscribeListeners.push(unsub);
             });
 
@@ -6054,6 +6300,7 @@
         function stopRealtimeListeners() {
             unsubscribeListeners.forEach(unsub => unsub());
             unsubscribeListeners = [];
+            connReset();
         }
 
         // --- PASSWORD VERIFICATION ---
@@ -6839,6 +7086,12 @@
             document.getElementById('saveCgsTransactionsBtn').addEventListener('click', saveCgsTransactions);
             document.getElementById('saveCalculatedCommissionBtn').addEventListener('click', saveCalculatedCommission);
             document.getElementById('printCgsReportBtn').addEventListener('click', printCgsReport);
+
+            // Weekly Rollover Commission (Futures) listeners
+            document.getElementById('fetchRolloverBtn').addEventListener('click', fetchRolloverCommission);
+            document.getElementById('addRolloverToCgsBtn').addEventListener('click', addRolloverToCommissionGenerator);
+            document.getElementById('rolloverTransactionsTable').addEventListener('input', handleRolloverTableInput);
+            document.getElementById('rolloverTransactionsTable').addEventListener('click', handleRolloverTableClick);
         }
 
         // ADDED: New function to handle manual total update
@@ -6973,8 +7226,9 @@
             }
             calculatedTransactions.forEach(tx => {
                 const row = tbody.insertRow();
+                const rolloverBadge = tx.isRollover ? ` <span class="ml-1 px-2 py-0.5 rounded-full bg-amber-100 text-amber-700 text-xs font-semibold whitespace-nowrap">Rollover Commission${tx.clientName ? ' • ' + tx.clientName : ''}</span>` : '';
                 row.innerHTML = `
-                    <td class="p-2">${tx.stockName}</td>
+                    <td class="p-2">${tx.stockName}${rolloverBadge}</td>
                     <td class="p-2">${tx.quantity.toLocaleString()}</td>
                     <td class="p-2">PKR ${tx.rate.toLocaleString()}</td>
                     <td class="p-2">PKR ${tx.commissionPerStock.toFixed(4)}</td>
@@ -7025,6 +7279,205 @@
             updateCalculatorSummary();
             resetCalculatorInputs();
         }
+
+        // ─── WEEKLY ROLLOVER COMMISSION (Futures) ──────────────────────────────
+        // For a selected Friday: finds every registered client's Futures
+        // position that is still open going into Friday (i.e. it was already
+        // held as of Thursday's close and wasn't sold on Friday). A position
+        // opened fresh on Friday itself is excluded, since it hasn't rolled
+        // over the week. Commission on the rollover quantity uses the same
+        // CommissionService logic as normal buying. This only READS existing
+        // Trade Log / baseline data — nothing is written until the user
+        // clicks "Add to Commission Generator System".
+        function computeWeeklyRolloverCommission(fridayDate) {
+            if (!fridayDate) return [];
+            resolveFuturesSymbols(); // make sure every Futures trade has its resolved month symbol
+
+            const thu = new Date(fridayDate + 'T00:00:00');
+            thu.setDate(thu.getDate() - 1);
+
+            const thuQty = {};   // clientId -> { symbol: qty }  -- open as of Thursday close
+            const friSell = {};  // clientId -> { symbol: qty }  -- sold on Friday itself
+            const lastRate = {}; // clientId -> { symbol: rate } -- most recent known rate before Friday
+            const clientOf = {}; // clientId -> client object
+
+            function bump(map, clientId, sym, delta) {
+                if (!map[clientId]) map[clientId] = {};
+                map[clientId][sym] = (map[clientId][sym] || 0) + delta;
+            }
+
+            PORTFOLIO_BASELINE.forEach(([acc, sym, qty, type]) => {
+                if (type !== 'F') return;
+                const client = findRegisteredClientForPortfolio(acc, '');
+                if (!client) return;
+                clientOf[client.id] = client;
+                bump(thuQty, client.id, sym, qty);
+            });
+
+            Object.keys(allTradeLogEntries).sort().forEach(date => {
+                if (date <= PORTFOLIO_BASELINE_DATE || date > fridayDate) return;
+                const entry = allTradeLogEntries[date];
+                const trades = (entry && Array.isArray(entry.trades)) ? entry.trades : [];
+                trades.forEach(t => {
+                    if (!t) return;
+                    const isFuture = String(t.market || '').trim().toUpperCase().startsWith('FUT');
+                    if (!isFuture) return;
+                    const qty = parseFloat(t.quantity) || 0;
+                    if (qty <= 0) return;
+                    const client = findRegisteredClientForPortfolio(t.account, t.clientName);
+                    if (!client) return;
+                    const sym = (t._resolvedFutSymbol || t.rawSymbol || t.stockName || '').trim();
+                    if (!sym) return;
+                    clientOf[client.id] = client;
+                    const isSell = String(t.side).toLowerCase() === 'sell';
+                    const rate = parseFloat(t.rate) || 0;
+
+                    if (date < fridayDate) {
+                        bump(thuQty, client.id, sym, isSell ? -qty : qty);
+                        if (rate > 0) { if (!lastRate[client.id]) lastRate[client.id] = {}; lastRate[client.id][sym] = rate; }
+                    } else if (isSell) {
+                        // date === fridayDate
+                        bump(friSell, client.id, sym, qty);
+                    }
+                    // Friday buys are intentionally NOT added to thuQty -- a
+                    // position opened on Friday itself never rolled over.
+                });
+            });
+
+            const items = [];
+            Object.keys(thuQty).forEach(clientId => {
+                const client = clientOf[clientId];
+                Object.keys(thuQty[clientId]).forEach(sym => {
+                    const heldFromThursday = thuQty[clientId][sym] || 0;
+                    const soldOnFriday = (friSell[clientId] && friSell[clientId][sym]) || 0;
+                    const rolloverQty = Math.max(heldFromThursday - soldOnFriday, 0);
+                    if (rolloverQty <= 0) return;
+                    const rate = (lastRate[clientId] && lastRate[clientId][sym]) || 0;
+                    const { commissionPerStock, totalStockCommission } = CommissionService.calculateCommission(rate, rolloverQty);
+                    items.push({
+                        id: Date.now() + Math.random(),
+                        clientId,
+                        clientName: client.name,
+                        account: client.tradingAccount,
+                        stockName: sym,
+                        quantity: rolloverQty,
+                        rate,
+                        commissionPerStock,
+                        totalStockCommission
+                    });
+                });
+            });
+
+            items.sort((a, b) => a.clientName.localeCompare(b.clientName) || a.stockName.localeCompare(b.stockName));
+            return items;
+        }
+
+        function fetchRolloverCommission() {
+            const fridayDate = document.getElementById('rolloverFridayDate').value;
+            if (!fridayDate) {
+                showMessage('Error', 'Please select the Friday date first.');
+                return;
+            }
+            rolloverFetchedItems = computeWeeklyRolloverCommission(fridayDate);
+            document.getElementById('rolloverResultsWrapper').classList.remove('hidden');
+            renderRolloverTable();
+            updateRolloverSummary();
+            if (rolloverFetchedItems.length === 0) {
+                showMessage('Info', 'No rollover-eligible Futures position was found for this Friday.');
+            }
+        }
+
+        function renderRolloverTable() {
+            const tbody = document.getElementById('rolloverTransactionsTable').querySelector('tbody');
+            tbody.innerHTML = '';
+            if (rolloverFetchedItems.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="7" class="p-4 text-center text-slate-500">No rollover items found.</td></tr>';
+                return;
+            }
+            rolloverFetchedItems.forEach(item => {
+                const row = tbody.insertRow();
+                row.dataset.id = item.id;
+                row.innerHTML = `
+                    <td class="p-2">${item.clientName} <span class="text-xs text-slate-400">(${item.account || ''})</span></td>
+                    <td class="p-2">${item.stockName}</td>
+                    <td class="p-2"><input type="number" min="0" class="w-24 p-1 border rounded-md rollover-qty-input" value="${item.quantity}"></td>
+                    <td class="p-2"><input type="number" min="0" step="0.01" class="w-24 p-1 border rounded-md rollover-rate-input" value="${item.rate}"></td>
+                    <td class="p-2 rollover-comm-per-stock">PKR ${item.commissionPerStock.toFixed(4)}</td>
+                    <td class="p-2 rollover-total-comm">PKR ${item.totalStockCommission.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+                    <td class="p-2 actions-header"><button type="button" class="text-rose-600 hover:underline rollover-remove-btn">Remove</button></td>
+                `;
+            });
+        }
+
+        function updateRolloverSummary() {
+            const summaryEl = document.getElementById('rolloverSummary');
+            const total = rolloverFetchedItems.reduce((sum, it) => sum + it.totalStockCommission, 0);
+            summaryEl.textContent = `Total Rollover Commission: PKR ${total.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} (${rolloverFetchedItems.length} entr${rolloverFetchedItems.length === 1 ? 'y' : 'ies'})`;
+        }
+
+        function handleRolloverTableInput(e) {
+            const row = e.target.closest('tr[data-id]');
+            if (!row) return;
+            const item = rolloverFetchedItems.find(it => String(it.id) === row.dataset.id);
+            if (!item) return;
+            if (e.target.classList.contains('rollover-qty-input')) item.quantity = parseFloat(e.target.value) || 0;
+            if (e.target.classList.contains('rollover-rate-input')) item.rate = parseFloat(e.target.value) || 0;
+            const { commissionPerStock, totalStockCommission } = CommissionService.calculateCommission(item.rate, item.quantity);
+            item.commissionPerStock = commissionPerStock;
+            item.totalStockCommission = totalStockCommission;
+            row.querySelector('.rollover-comm-per-stock').textContent = `PKR ${commissionPerStock.toFixed(4)}`;
+            row.querySelector('.rollover-total-comm').textContent = `PKR ${totalStockCommission.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+            updateRolloverSummary();
+        }
+
+        function handleRolloverTableClick(e) {
+            if (!e.target.classList.contains('rollover-remove-btn')) return;
+            const row = e.target.closest('tr[data-id]');
+            if (!row) return;
+            rolloverFetchedItems = rolloverFetchedItems.filter(it => String(it.id) !== row.dataset.id);
+            renderRolloverTable();
+            updateRolloverSummary();
+        }
+
+        // Adds the (possibly edited) fetched rollover items into the Commission
+        // Generator System's transaction list for that Friday's date, tagged as
+        // Rollover Commission, so they get included in Friday's usual commission.
+        function addRolloverToCommissionGenerator() {
+            if (rolloverFetchedItems.length === 0) return;
+            const fridayDate = document.getElementById('rolloverFridayDate').value;
+            if (!fridayDate) return;
+
+            const calcDateInput = document.getElementById('calculatorDateInput');
+            if (calcDateInput.value !== fridayDate) {
+                calcDateInput.value = fridayDate;
+                loadTransactionsForCalculator();
+            }
+
+            rolloverFetchedItems.forEach(item => {
+                calculatedTransactions.push({
+                    id: Date.now() + Math.random(),
+                    stockName: item.stockName,
+                    quantity: item.quantity,
+                    rate: item.rate,
+                    commissionPerStock: item.commissionPerStock,
+                    totalStockCommission: item.totalStockCommission,
+                    clientName: item.clientName,
+                    account: item.account,
+                    isRollover: true
+                });
+            });
+
+            renderCalculatorTransactionsTable();
+            updateCalculatorSummary();
+
+            rolloverFetchedItems = [];
+            renderRolloverTable();
+            updateRolloverSummary();
+            document.getElementById('rolloverResultsWrapper').classList.add('hidden');
+
+            showMessage('Success', `Rollover Commission entries have been added to the Commission Generator System list for ${fridayDate}.`);
+        }
+        // ─── END WEEKLY ROLLOVER COMMISSION ────────────────────────────────────
 
         async function saveCgsTransactions() {
              if (calculatedTransactions.length === 0) {
@@ -7089,7 +7542,9 @@
                     }
                 } else {
                     // Fallback: raw trades not available (manual entry), use calculatedTransactions
-                    tlTrades = transactionsToSave.map(tx => ({
+                    // Rollover Commission entries are a fee, not an actual stock trade, so they are
+                    // excluded here to avoid creating a fake buy/sell in the Trade Log / client positions.
+                    tlTrades = transactionsToSave.filter(tx => !tx.isRollover).map(tx => ({
                         stockName:            tx.stockName,
                         quantity:             tx.quantity,
                         rate:                 tx.rate,
@@ -7117,7 +7572,7 @@
                 if (usingDetailedTradeLog) {
                     showMessage('Success', `Today's entries have been saved successfully.`);
                 } else {
-                    showMessage('Saved (Partial Trade Log Details)', `Entries saved, lekin Vtrade Trade Log mein Market/Time/OrderNo/Account khaali rahenge kyunke parsed file ka detailed data is waqt available nahi tha (date switch ho gayi thi ya page reload hua). Agar pura detail chahiye to is date pe wapis aa kar file ko dobara parse karein aur foran "Save Daily Entries" dabayein, beech mein date ya page change na karein.`);
+                    showMessage('Saved (Partial Trade Log Details)', `Entries saved, but the Market/Time/OrderNo/Account fields in the Vtrade Trade Log will be blank because the parsed file's detailed data was not available at this time (the date was switched or the page was reloaded). If you need the full detail, come back to this date, re-parse the file, and click "Save Daily Entries" right away without changing the date or page in between.`);
                 }
             } catch (error) {
                  showMessage('Error', `Failed to save entries: ${error.message}`);
@@ -7391,7 +7846,7 @@
             const badge = document.getElementById('oe-loaded-badge');
             if (!badge) return;
             if (loaded) {
-                badge.querySelector('span').textContent = '↓ ' + label + ' ki saved report load ho gayi — ab edit karo aur re-save karo.';
+                badge.querySelector('span').textContent = '↓ Saved report for ' + label + ' has been loaded — edit it and save again.';
                 badge.style.display = 'flex';
             } else {
                 badge.style.display = 'none';
@@ -7717,7 +8172,7 @@
             if (!allMonthlyExpenses || allMonthlyExpenses.length === 0) {
                 container.innerHTML = `<div class="text-center py-16 text-slate-400">
                     <i class="fas fa-file-alt text-4xl mb-3 block opacity-30"></i>
-                    <p class="text-sm">Koi report nahi mili. Pehle expenses enter karo aur "Save Report" dabao.</p>
+                    <p class="text-sm">No reports found. Enter expenses first and press "Save Report".</p>
                 </div>`;
                 return;
             }
@@ -7863,7 +8318,7 @@
             const label = oeGetMonthLabel();
             const exps = oeGetExpenses(m);
             const income = oeGetIncome(m);
-            if (!exps.length) { showMessage('Empty', 'Is month ke liye koi expense nahi hai.'); return; }
+            if (!exps.length) { showMessage('Empty', 'There are no expenses for this month.'); return; }
             const html = oeBuildReportHtml(m, label, exps, income);
             const win = window.open('', '_blank');
             win.document.write(html);
@@ -7874,7 +8329,7 @@
         // ── Preview a saved report in modal (frontend & backend) ──
         function oePreviewSavedReport(monthKey) {
             const rec = allMonthlyExpenses.find(r => r.monthKey === monthKey);
-            if (!rec) { showMessage('Error', 'Report nahi mili.'); return; }
+            if (!rec) { showMessage('Error', 'Report not found.'); return; }
             const exps = rec.expenses || [];
             const html = oeBuildReportHtml(rec.monthKey, rec.monthLabel || rec.monthKey, exps, rec.income || 0);
             const blob = new Blob([html], { type: 'text/html' });
@@ -7887,7 +8342,7 @@
         // ── Print a saved report by monthKey (backend only) ──
         function oePrintSavedReport(monthKey) {
             const rec = allMonthlyExpenses.find(r => r.monthKey === monthKey);
-            if (!rec) { showMessage('Error', 'Report nahi mili.'); return; }
+            if (!rec) { showMessage('Error', 'Report not found.'); return; }
             const exps = rec.expenses || [];
             const html = oeBuildReportHtml(rec.monthKey, rec.monthLabel || rec.monthKey, exps, rec.income || 0);
             const win = window.open('', '_blank');
@@ -7899,11 +8354,11 @@
         // ── Delete a saved report ──
         async function oeDeleteReport(monthKey) {
             if (!currentUserId || isSharedView) return;
-            if (!confirm(`${monthKey} ki report delete karni hai?`)) return;
+            if (!confirm(`Delete the report for ${monthKey}?`)) return;
             showLoading();
             try {
                 await db.collection(`users/${currentUserId}/monthly_expenses`).doc(monthKey).delete();
-                showMessage('Deleted', 'Report delete ho gayi.');
+                showMessage('Deleted', 'Report deleted.');
             } catch(err) {
                 showMessage('Error', err.message);
             } finally {
@@ -8036,7 +8491,7 @@
             const income = oeGetIncome(m);
             const exps = oeGetExpenses(m);
             const label = oeGetMonthLabel();
-            if (!exps.length) { showMessage('Empty', 'Is month ke liye koi expense nahi hai. Pehle add karo.'); return; }
+            if (!exps.length) { showMessage('Empty', 'There are no expenses for this month. Add some first.'); return; }
             showLoading();
             try {
                 await db.collection(`users/${currentUserId}/monthly_expenses`).doc(m).set({
@@ -8049,9 +8504,9 @@
                 });
                 if (oeData[m]) oeData[m]._dirty = false;
                 oeShowLoadedBadge(true, label);
-                showMessage('Saved ✓', `${label} ki report save ho gayi (PKR ${oeFmt(total)}). Dashboard graph update ho jayega.`);
+                showMessage('Saved ✓', `Report for ${label} has been saved (PKR ${oeFmt(total)}). The dashboard graph will update.`);
             } catch(err) {
-                showMessage('Error', 'Save nahi hua: ' + err.message);
+                showMessage('Error', 'Save failed: ' + err.message);
             } finally {
                 hideLoading();
             }
@@ -8072,7 +8527,7 @@
                 logEl.scrollTop = logEl.scrollHeight;
             }
 
-            log('⏳ Purani expenses fetch ho rahi hain...');
+            log('⏳ Fetching old expenses...');
 
             try {
                 // Fetch old expenses and petty_cash
@@ -8086,10 +8541,10 @@
                 const oldPettyCash = pcSnap.docs.map(d => ({ ...d.data(), id: d.id }));
                 const alreadySaved = new Set(savedSnap.docs.map(d => d.id));
 
-                log(`✓ ${oldExpenses.length} expenses, ${oldPettyCash.length} petty cash entries mili.`);
+                log(`✓ ${oldExpenses.length} expenses, ${oldPettyCash.length} petty cash entries found.`);
 
                 if (!oldExpenses.length && !oldPettyCash.length) {
-                    log('⚠ Koi purani data nahi mili.', '#b45309');
+                    log('⚠ No old data found.', '#b45309');
                     return;
                 }
 
@@ -8117,7 +8572,7 @@
                 });
 
                 const sortedKeys = Object.keys(byMonth).sort();
-                log(`📅 ${sortedKeys.length} mahine mile: ${sortedKeys.join(', ')}`);
+                log(`📅 ${sortedKeys.length} months found: ${sortedKeys.join(', ')}`);
 
                 let saved = 0, skipped = 0;
 
@@ -8155,7 +8610,7 @@
                 }
 
                 log(`
-🎉 Done! ${saved} reports save hue, ${skipped} skip (already existed).`, '#1e40af');
+🎉 Done! ${saved} reports saved, ${skipped} skipped (already existed).`, '#1e40af');
 
                 // Refresh saved reports
                 oeRenderReports();
@@ -8233,24 +8688,32 @@
         function startMonthlyExpensesListener() {
             const unsub = db.collection(`users/${currentUserId}/monthly_expenses`)
                 .onSnapshot(snapshot => {
-                    allMonthlyExpenses = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-                    updateDashboard();
-                    // Refresh reports tab if visible
-                    const repPane = document.getElementById('oe-pane-reports');
-                    if (repPane && repPane.style.display !== 'none') oeRenderReports();
-                    // Reload current month data into oeData if a saved report exists
-                    if (oeCurrentMonth) {
-                        const saved = allMonthlyExpenses.find(r => r.monthKey === oeCurrentMonth);
-                        if (saved && (!oeData[oeCurrentMonth] || !oeData[oeCurrentMonth]._dirty)) {
-                            oeData[oeCurrentMonth] = {
-                                expenses: (saved.expenses || []).map(e => ({ ...e, id: e.id || oeUid() })),
-                                income: saved.income || 0
-                            };
-                            oeShowLoadedBadge(true, saved.monthLabel || oeCurrentMonth);
-                            oeRender();
+                    connMark('monthly_expenses'); // mark first — a rendering error below must never block "Connected"
+                    try {
+                        allMonthlyExpenses = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                        updateDashboard();
+                        // Refresh reports tab if visible
+                        const repPane = document.getElementById('oe-pane-reports');
+                        if (repPane && repPane.style.display !== 'none') oeRenderReports();
+                        // Reload current month data into oeData if a saved report exists
+                        if (oeCurrentMonth) {
+                            const saved = allMonthlyExpenses.find(r => r.monthKey === oeCurrentMonth);
+                            if (saved && (!oeData[oeCurrentMonth] || !oeData[oeCurrentMonth]._dirty)) {
+                                oeData[oeCurrentMonth] = {
+                                    expenses: (saved.expenses || []).map(e => ({ ...e, id: e.id || oeUid() })),
+                                    income: saved.income || 0
+                                };
+                                oeShowLoadedBadge(true, saved.monthLabel || oeCurrentMonth);
+                                oeRender();
+                            }
                         }
+                    } catch (renderErr) {
+                        console.error('Error rendering monthly_expenses:', renderErr);
                     }
-                }, err => console.error('Error listening to monthly_expenses:', err));
+                }, err => {
+                    console.error('Error listening to monthly_expenses:', err);
+                    connMark('monthly_expenses'); // still count it so the badge can't get stuck
+                });
             unsubscribeListeners.push(unsub);
         }
 
@@ -8484,14 +8947,14 @@
             const dateInput = document.getElementById('bulk-expense-date');
             const rawText = textInput ? textInput.value.trim() : '';
             if (!rawText) {
-                return showMessage('Error', 'Pehle expenses ka text paste karo textarea mein.');
+                return showMessage('Error', 'Paste the expense text into the textarea first.');
             }
             if (!dateInput || !dateInput.value) {
-                return showMessage('Error', 'Date select karo imported expenses ke liye.');
+                return showMessage('Error', 'Select a date for the imported expenses.');
             }
             const expenses = parseBulkExpenseText(rawText);
             if (!expenses.length) {
-                return showMessage('Error', 'Koi bhi expense detect nahi hua. Format check karo \u2014 har line mein naam phir amount hona chahiye.');
+                return showMessage('Error', 'No expenses detected. Check the format \u2014 each line should have a name followed by an amount.');
             }
             // Sync date to file-import date field so confirm handler works
             document.getElementById('expense-import-date').value = dateInput.value;
@@ -9443,7 +9906,7 @@
                     </tr>
                 `;
             } else {
-                earnedTbody.innerHTML = '<tr><td colspan="2" class="p-3 text-center text-slate-400">Is client ki koi commission trade logs se abhi tak record nahi hui.</td></tr>';
+                earnedTbody.innerHTML = '<tr><td colspan="2" class="p-3 text-center text-slate-400">No commission has been recorded for this client from trade logs yet.</td></tr>';
             }
 
             document.getElementById('close-account-btn').dataset.id = client.id;
@@ -10482,7 +10945,7 @@
                 if (fileInput.files.length > 0) {
                     fileNameLabel.textContent = fileInput.files[0].name;
                 } else {
-                    fileNameLabel.textContent = 'Trade Log file select karein (.txt)';
+                    fileNameLabel.textContent = 'Select Trade Log file (.txt)';
                 }
                 statusDiv.classList.add('hidden');
                 statusDiv.textContent = '';
@@ -10490,7 +10953,7 @@
 
             parseBtn.addEventListener('click', () => {
                 if (!fileInput.files.length) {
-                    statusDiv.textContent = '⚠ Pehle ek trade log file select karein.';
+                    statusDiv.textContent = '⚠ Please select a trade log file first.';
                     statusDiv.className = 'mt-2 text-sm font-medium text-amber-600';
                     statusDiv.classList.remove('hidden');
                     return;
@@ -10577,7 +11040,7 @@
 
                         const stockNames = Object.keys(stockMap);
                         if (stockNames.length === 0) {
-                            statusDiv.textContent = '❌ File mein koi valid "Filled" trade nahi mila. File format check karein.';
+                            statusDiv.textContent = '❌ No valid "Filled" trade found in the file. Please check the file format.';
                             statusDiv.className = 'mt-2 text-sm font-medium text-rose-600';
                             statusDiv.classList.remove('hidden');
                             return;
@@ -10657,17 +11120,17 @@
                         renderCalculatorTransactionsTable();
                         updateCalculatorSummary();
 
-                        statusDiv.textContent = `✅ ${imported} stock(s) successfully import ho gaye! Table check karein aur zarurat ho to edit karein.`;
+                        statusDiv.textContent = `✅ ${imported} stock(s) successfully imported! Please check the table and edit if needed.`;
                         statusDiv.className = 'mt-2 text-sm font-medium text-emerald-700';
                         statusDiv.classList.remove('hidden');
 
                         // Reset file input
                         fileInput.value = '';
-                        fileNameLabel.textContent = 'Trade Log file select karein (.txt)';
+                        fileNameLabel.textContent = 'Select Trade Log file (.txt)';
 
                     } catch (err) {
                         console.error('Trade log parse error:', err);
-                        statusDiv.textContent = '❌ File parse karne mein error aaya: ' + err.message;
+                        statusDiv.textContent = '❌ Error parsing file: ' + err.message;
                         statusDiv.className = 'mt-2 text-sm font-medium text-rose-600';
                         statusDiv.classList.remove('hidden');
                     }
@@ -10753,6 +11216,9 @@
                 const title  = document.getElementById('tl-table-title');
                 const sub    = document.getElementById('tl-table-subtitle');
                 const badge  = document.getElementById('tl-total-badge');
+
+                // FIX (09-08-2026): resolve Futures contract months before display
+                resolveFuturesSymbols();
 
                 if (!date) {
                     tbody.innerHTML = '<tr><td colspan="10" class="p-6 text-center text-slate-400">Select a date above to view trades.</td></tr>';
@@ -10850,7 +11316,7 @@
                         <td class="p-2 text-slate-400 text-xs">${i + 1}</td>
                         <td class="p-2 text-xs text-slate-500">${date}</td>
                         <td class="p-2 font-medium text-slate-700">${t.clientName || '<span class="text-slate-400 italic text-xs">House</span>'} <span class="text-xs text-slate-400">${t.account ? '(' + t.account + ')' : ''}</span></td>
-                        <td class="p-2 font-semibold text-slate-800">${t.stockName}</td>
+                        <td class="p-2 font-semibold text-slate-800">${(String(t.market||'').trim().toUpperCase().startsWith('FUT')) ? (t._resolvedFutSymbol || t.rawSymbol || t.stockName) : t.stockName}</td>
                         <td class="p-2 text-right font-mono text-slate-700">${Number(t.quantity).toLocaleString()}</td>
                         <td class="p-2 text-right font-mono text-slate-700">${Number(t.rate).toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2})}</td>
                         <td class="p-2 text-right font-mono text-indigo-700">${Number(t.totalValue).toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2})}</td>
@@ -10911,10 +11377,15 @@
 
             // ── Get all trades across all dates for report generation ─────────────────
             function getAllTradesFlatSorted() {
+                resolveFuturesSymbols(); // FIX (09-08-2026): resolve Futures contract months before export
                 const out = [];
                 // From trade_log_entries (complete data — per account, per side)
                 for (const [date, entry] of Object.entries(allTradeLogEntries)) {
-                    (entry.trades || []).forEach(t => out.push({ ...t, date }));
+                    (entry.trades || []).forEach(t => {
+                        const isFut = String(t.market || '').trim().toUpperCase().startsWith('FUT');
+                        const stockName = isFut ? (t._resolvedFutSymbol || t.rawSymbol || t.stockName) : t.stockName;
+                        out.push({ ...t, date, stockName });
+                    });
                 }
                 // Fallback: dates that only exist in cgs_entries (saved before this fix)
                 for (const [date, entry] of Object.entries(allCgsEntries)) {
@@ -10984,6 +11455,8 @@
                 const date = document.getElementById('tl-view-date').value;
                 if (!date) { showMessage('Info', 'Please select a date first.'); return; }
 
+                resolveFuturesSymbols(); // FIX (09-08-2026): resolve Futures contract months before export
+
                 const entry = allTradeLogEntries[date];
                 let trades = entry ? (entry.trades || []) : [];
                 if (!trades.length) {
@@ -10996,7 +11469,11 @@
                         }));
                     }
                 } else {
-                    trades = trades.map(t => ({ ...t, date }));
+                    trades = trades.map(t => {
+                        const isFut = String(t.market || '').trim().toUpperCase().startsWith('FUT');
+                        const stockName = isFut ? (t._resolvedFutSymbol || t.rawSymbol || t.stockName) : t.stockName;
+                        return { ...t, date, stockName };
+                    });
                 }
                 downloadTradeReport(trades, `Trade_Report_${date}.csv`);
             });
@@ -11197,8 +11674,11 @@
             function vtlGroupBySymbol(trades) {
                 const map = {};
                 trades.forEach(t => {
-                    const sym = t.stockName || '—';
                     const mkt = (t.market || '').trim();
+                    const isFut = mkt.toUpperCase().startsWith('FUT');
+                    // FIX (09-08-2026): show the resolved contract month for Futures
+                    // (e.g. "LOTCHEM-JUL") instead of the bare symbol ("LOTCHEM").
+                    const sym = isFut ? (t._resolvedFutSymbol || t.rawSymbol || t.stockName || '—') : (t.stockName || '—');
                     const key = mkt ? `${sym} ${mkt}` : sym;
                     if (!map[key]) map[key] = [];
                     map[key].push(t);
@@ -11252,6 +11732,9 @@
                 }
 
                 const fmtDate = new Date(date + 'T00:00:00').toLocaleDateString('en-GB', { weekday:'long', year:'numeric', month:'long', day:'numeric' });
+
+                // FIX (09-08-2026): resolve Futures contract months before display
+                resolveFuturesSymbols();
 
                 // Get all trades for this date
                 let trades = vtlGetTradesForDate(date);
@@ -11388,6 +11871,9 @@
                 const clientLabel = _opt ? _opt.textContent : clientVal;
 
                 if (!date) { showMessage('Info', 'Please select a date first.'); return; }
+
+                // FIX (09-08-2026): resolve Futures contract months before printing
+                resolveFuturesSymbols();
 
                 let trades = vtlGetTradesForDate(date);
                 if (clientVal) {
@@ -11604,6 +12090,514 @@
 
         })();
         // ─── END VTRADE TRADE LOG MODULE ──────────────────────────────────────────
+
+        // ─── CLIENT PORTFOLIO MODULE ────────────────────────────────────────────────
+        // Baseline snapshot imported from "All Clients Actual and Future Stocks
+        // 28-07-2026" (last working day covered by the file). Format per row:
+        // [tradingAccount, symbol, netQuantity, type] — type 'A' = Actual/Regular
+        // stock, 'F' = Future Position. Futures symbols already carry their month
+        // suffix (e.g. "SSGC-JUL"), matching the convention used by Trade Log.
+        const PORTFOLIO_BASELINE_DATE = '2026-07-28';
+        const PORTFOLIO_BASELINE = [["02596","BECO",13500,"A"],["02596","FCSC",3500,"A"],["02596","FDPL",5000,"A"],["02596","KML",1000,"A"],["02596","KOSM",5000,"A"],["02596","TELE",2000,"A"],["02596","SSGC-JUL",3000,"F"],["02667","FNEL",350000,"A"],["02667","GAMON",76572,"A"],["02667","HASCOL",22700,"A"],["02667","PIAHCLA-JUL",3500,"F"],["02667","PRL-JUL",2000,"F"],["02667","TPL-AUG",6000,"F"],["02667","TPL-JUL",28500,"F"],["02750","GGL",147500,"A"],["02754","SAZEW",17,"A"],["02872","HASCOL",3000,"A"],["03159","FFC",400,"A"],["03159","LUCK",800,"A"],["03159","MARI",95,"A"],["03159","MEBL",700,"A"],["03159","SPSL",2000,"A"],["03159","SYS",2250,"A"],["03187","HASCOL",500,"A"],["03187","PIAHCLA",1000,"A"],["03187","WTL",300,"A"],["04246","EFERT",124,"A"],["04246","FFC",108,"A"],["04246","HUBC",121,"A"],["04246","MEBL",212,"A"],["04246","MTL",116,"A"],["04246","OGDC",114,"A"],["04246","PPL",119,"A"],["04261","BECO",650,"A"],["04880","DFML",5000,"A"],["04880","DOL",5000,"A"],["04880","LCI",3000,"A"],["04880","SSGC",5000,"A"],["04880","UNITY",10000,"A"],["05355","BOP",2500,"A"],["05355","INIL",5000,"A"],["05522","OCTOPUS",580,"A"],["05708","KAPCO",500,"A"],["05708","NPL",1000,"A"],["05708","PAEL",1000,"A"],["05708","ULS-26850",1000,"A"],["05771","TELE",37,"A"],["05771","WTL",3500,"A"],["05953","WAVESAPP",285,"A"],["06036","ACPL",2037,"A"],["06036","DCL",36256,"A"],["06036","FCL",24593,"A"],["06036","HUMNL",67557,"A"],["06036","KOSM",183500,"A"],["06036","SEARL",6932,"A"],["06036","SLGL",62789,"A"],["06036","WAHDAT",17210,"A"],["06081","BWCL",100,"A"],["06081","COLG",9,"A"],["06081","DCR",3000,"A"],["06081","DGKC",100,"A"],["06081","EFERT",100,"A"],["06081","LUCK",50,"A"],["06081","MLCF",700,"A"],["06081","UNITY",1000,"A"],["07710","HCAR",950,"A"],["07934","JSMFETF",3000,"A"],["07934","MIIETF",1500,"A"],["07934","MZNPETF",1500,"A"],["09098","BOP",83000,"A"],["09098","PACE",54500,"A"],["09470","FFL",86,"A"],["09470","LUCK",5,"A"],["09470","PSO",5,"A"],["09475","CEPB",700,"A"],["09475","ENGROH",60,"A"],["09475","EPCL",250,"A"],["09475","LOTCHEM",200,"A"],["09475","LUCK",50,"A"],["09475","MARI",30,"A"],["09669","BOP",6700,"A"],["09669","FATIMA",155,"A"],["09669","FFC",315,"A"],["09669","FFL",1605,"A"],["09669","HUBC",100,"A"],["09669","MARI",225,"A"],["09669","MEBL",300,"A"],["09669","MLCF",225,"A"],["09669","NBP",430,"A"],["09669","TBL",1000,"A"],["09669","UBL",165,"A"],["09727","BFMOD",1,"A"],["09727","CNERGY",31,"A"],["09727","FANM",11,"A"],["09727","FFLM",21,"A"],["09727","FIBLM",1,"A"],["09727","FIMM",1,"A"],["09727","HINO",6,"A"],["09727","HUMNL",20,"A"],["09727","ORM",1,"A"],["09727","SINDM",1,"A"],["09727","TCORPCPS",3151,"A"],["09727","TOWL",7,"A"],["09727","WASL",1,"A"],["09812","HBL",585,"A"],["09841","AGTL",500,"A"],["09841","BFMOD",2000,"A"],["09841","DGKC",500,"A"],["09841","EFERT",1100,"A"],["09841","ENGROH",500,"A"],["09841","KOHP",1000,"A"],["09841","MLCF",200,"A"],["09841","OGDC",200,"A"],["09841","PPL",2500,"A"],["09841","SEARL",2000,"A"],["09841","SYS",200,"A"],["09841","SZTM",500,"A"],["09841","TCORP",3000,"A"],["09841","THCCL",1000,"A"],["09841","TOWL",1100,"A"],["09841","WASL",500,"A"],["09842","BECO",3075,"A"],["09842","DCR",3,"A"],["09842","ENGROH",4,"A"],["09842","FATIMA",13,"A"],["09842","FCCL",200,"A"],["09842","FFC",10,"A"],["09842","FFL",318,"A"],["09842","HUBC",58,"A"],["09842","KAPCO",50,"A"],["09842","KEL",18,"A"],["09842","KHTC",4,"A"],["09842","LUCK",7,"A"],["09842","MARI",5,"A"],["09842","MEBL",52,"A"],["09842","NATF",2,"A"],["09842","OGDC",25,"A"],["09842","PACE",119,"A"],["09842","PPL",4,"A"],["09842","PSO",5,"A"],["09842","SEARL",26,"A"],["09842","SNGP",5,"A"],["09842","SSGC",21,"A"],["09842","SYS",60,"A"],["09842","TELE",270,"A"],["09842","WTL",260,"A"],["10014","JSBL",7000,"A"],["10126","AIRLINK",250,"A"],["10126","BECO",5000,"A"],["10126","BWHL",10,"A"],["10126","CNERGY",2000,"A"],["10126","DGKC",25,"A"],["10126","EFERT",25,"A"],["10126","ENGROH",60,"A"],["10126","FFC",33,"A"],["10126","FFL",540,"A"],["10126","GDL",1000,"A"],["10126","GHGL",450,"A"],["10126","HALEON",32,"A"],["10126","HUBC",25,"A"],["10126","IREIT",3000,"A"],["10126","MARI",60,"A"],["10126","MLCF",775,"A"],["10126","OGDC",65,"A"],["10126","PPL",28,"A"],["10126","PSX",240,"A"],["10126","PTC",500,"A"],["10126","SSGC",1500,"A"],["10126","SYS",518,"A"],["10126","TREET",400,"A"],["10180","AVN",1000,"A"],["10180","BECO",1000,"A"],["10180","ENGROH",50,"A"],["10180","FABL",78,"A"],["10180","FFL",340,"A"],["10180","GDL",500,"A"],["10180","KEL",2600,"A"],["10180","MLCF",98,"A"],["10180","MZNPETF",14000,"A"],["10180","PAEL",633,"A"],["10180","PAKQATAR",500,"A"],["10180","PQGTL",1000,"A"],["10180","SAZEW",15,"A"],["10180","SRR",1000,"A"],["10232","FFC",5,"A"],["10232","MARI",1,"A"],["10232","OGDC",5,"A"],["10232","PPL",5,"A"],["10278","FFC",6,"A"],["10278","MLCF",209,"A"],["10290","FATIMA",50,"A"],["10290","FFC",144,"A"],["10290","HUBC",100,"A"],["10290","PAEL",200,"A"],["10290","PPL",100,"A"],["10315","SSGC",2230,"A"],["10317","BECO",5500,"A"],["10317","TREET",11600,"A"],["10380","BNL",6500,"A"],["10380","BOP",500,"A"],["10380","ENGROH",40,"A"],["10380","LUCK",14,"A"],["10380","MLCF",200,"A"],["10380","NCPL",300,"A"],["10380","NPL",1150,"A"],["10380","PIBTL",500,"A"],["10380","TELE",100,"A"],["10380","UBL",10,"A"],["10384","AIRLINK",786,"A"],["10384","BERG",3120,"A"],["10384","DFSM",30,"A"],["10384","FFC",600,"A"],["10384","FFLM",900,"A"],["10384","HABSM",140,"A"],["10384","HAEL",720,"A"],["10384","INDU",500,"A"],["10384","NONS",300,"A"],["10384","PIAHCLA",25,"A"],["10384","PINL",500,"A"],["10384","SAZEW",1500,"A"],["10384","SGPL",1000,"A"],["10384","SYS",15,"A"],["10384","TELE",110,"A"],["10447","BECO",241819,"A"],["10447","FFL",11978,"A"],["10447","HASCOL",20000,"A"],["10447","HUMNL",252551,"A"],["10447","KOSM",1623,"A"],["10447","PAKQATAR",849,"A"],["10447","PIBTL",2437,"A"],["10447","THCCL",8549,"A"],["10740","BIPL",986,"A"],["10740","BOK",924,"A"],["10740","PTC",1000,"A"],["10764","FCCL",20,"A"],["10764","FFC",28,"A"],["10764","HASCOL",8,"A"],["10764","HUBC",6,"A"],["10764","MARI",1,"A"],["10764","MEBL",94,"A"],["10764","OGDC",51,"A"],["10764","WTL",161,"A"],["10864","HIRAT",3500,"A"],["10864","KEL",1000,"A"],["10864","LOADS",1000,"A"],["10864","PAKOXY",864,"A"],["10864","WTL",5000,"A"],["10923","ADAMS",199,"A"],["10923","ATLH",20,"A"],["10923","PSO",100,"A"],["11020","HBL",210,"A"],["11077","AHCL",500,"A"],["11077","HASCOL",2000,"A"],["11077","HUMNL",3000,"A"],["11077","PIAHCLA",3500,"A"],["11077","TELE",2000,"A"],["11084","NPL",102,"A"],["11340","EFERT",45,"A"],["11340","PSO",50,"A"],["11564","FFC",300,"A"],["11564","LUCK",800,"A"],["11564","MARI",100,"A"],["11564","MTL",200,"A"],["11564","OGDC",200,"A"],["11564","POL",50,"A"],["11564","PPL",1600,"A"],["11564","SAZEW",218,"A"],["11564","SLM",500,"A"],["11685","NCPL",700,"A"],["11685","SLM",1000,"A"],["11685","TREET",2000,"A"],["11699","JSBL",2000,"A"],["11699","MLCF",1940,"A"],["11699","SGPL",1130,"A"],["11730","PSO",800,"A"],["11765","HASCOL",3539,"A"],["11886","BAFL",12000,"A"],["11886","CNERGY",40000,"A"],["11886","GATM",15000,"A"],["11886","ILP",2000,"A"],["11886","MLCF",1000,"A"],["11886","MZNPETF",15500,"A"],["11886","NBPGETF",3500,"A"],["11886","PSX",16000,"A"],["11886","SPSL",13000,"A"],["12026","ENGROH",7,"A"],["12026","FABL",9,"A"],["12026","FFC",45,"A"],["12026","FFL",36,"A"],["12026","HUBC",60,"A"],["12026","LCI",10,"A"],["12026","MEBL",16,"A"],["12026","SYS",50,"A"],["12089","NBP",100,"A"],["12156","TELE",2000,"A"],["12164","MLCF",46,"A"],["12164","OGDC",29,"A"],["12164","PPL",15,"A"],["12164","PSO",87,"A"],["12164","SNGP",24,"A"],["12197","AIRLINK",300,"A"],["12197","BAFL",1000,"A"],["12197","FFL",300,"A"],["12197","HASCOL",500,"A"],["12197","HUBC",400,"A"],["12197","KEL",500,"A"],["12197","LUCK",110,"A"],["12197","MCB",100,"A"],["12197","MLCF",200,"A"],["12197","MTL",100,"A"],["12197","OGDC",500,"A"],["12197","PPL",150,"A"],["12197","PSO",200,"A"],["12197","SNGP",500,"A"],["12197","SSGC",1500,"A"],["12197","SYS",300,"A"],["12320","AIRLINK",135,"A"],["12320","HUBC",75,"A"],["12320","LUCK",15,"A"],["12320","MLCF",20,"A"],["12320","NML",10,"A"],["12320","OGDC",50,"A"],["12320","PIAHCLA",100,"A"],["12320","PSX",100,"A"],["12320","SEARL",100,"A"],["12537","PPL",1894,"A"],["35011","TRIBL",15000,"A"],["35012","BOP",10,"A"],["35012","HASCOL",300,"A"],["35013","PIBTL",500,"A"],["35015","SEPCO",3000,"A"],["35019","BROT",11000,"A"],["35021","AHCL",12,"A"],["35021","AICL",2,"A"],["35021","AKBL",2,"A"],["35021","BAFL",6,"A"],["35021","BIPL",61,"A"],["35021","BML",39,"A"],["35021","BNL",38,"A"],["35021","BOK",4,"A"],["35021","BOP",13,"A"],["35021","CSAP",1,"A"],["35021","DCL",7,"A"],["35021","EPQL",57,"A"],["35021","FABL",3,"A"],["35021","FCCL",23,"A"],["35021","FECTC",1,"A"],["35021","FFL",5,"A"],["35021","FLYNG",8,"A"],["35021","GGGL",276,"A"],["35021","GGL",22,"A"],["35021","HBL",3,"A"],["35021","HCAR",3,"A"],["35021","HGFA",1,"A"],["35021","HIFA",315,"A"],["35021","JSBL",155,"A"],["35021","MCB",2,"A"],["35021","MEBL",1,"A"],["35021","MLCF",1,"A"],["35021","NBP",6,"A"],["35021","OGDC",1,"A"],["35021","PIAHCLA",1457,"A"],["35021","POWER",83,"A"],["35021","SEARL",1,"A"],["35021","SGPL",51,"A"],["35021","SNBL",21,"A"],["35021","SPL",17,"A"],["35021","SPSL",293,"A"],["35021","STCL",25,"A"],["35021","TRG",11,"A"],["35021","TSBL",190,"A"],["35021","TSMF",5,"A"],["35021","TSPL",57,"A"],["35021","UBL",1,"A"],["35022","AHCL",2500,"A"],["35022","CPPL",500,"A"],["35022","DNCC",1000,"A"],["35022","FFL",2000,"A"],["35022","JOVC",10000,"A"],["35022","LIVEN",1500,"A"],["35022","OCTOPUS",1000,"A"],["35024","BGL",10000,"A"],["35024","FFL",40000,"A"],["35024","MZSM",500,"A"],["35024","PACE",2200,"A"],["35028","AIRLINK",500,"A"],["35028","ASL",1200,"A"],["35028","ATRL",100,"A"],["35028","BAHL",500,"A"],["35028","BOK",1000,"A"],["35028","CEPB",1137,"A"],["35028","DCL",1000,"A"],["35028","FECTC",3000,"A"],["35028","FFC",1000,"A"],["35028","FNEL",10000,"A"],["35028","GTYR",2000,"A"],["35028","HASCOL",9000,"A"],["35028","HINO",100,"A"],["35028","IGIHL",215,"A"],["35028","IMS",500,"A"],["35028","KEL",2000,"A"],["35028","LUCK",500,"A"],["35028","MARI",417,"A"],["35028","MCB",197,"A"],["35028","MFFL",1,"A"],["35028","MLCF",1000,"A"],["35028","NBP",1500,"A"],["35028","NCPL",500,"A"],["35028","OCTOPUS",1710,"A"],["35028","PASL",9500,"A"],["35028","PIBTL",500,"A"],["35028","POWER",2243,"A"],["35028","PREMA",1000,"A"],["35028","PSO",500,"A"],["35028","QTECH",800,"A"],["35028","SERT",500,"A"],["35028","SHEZ",110,"A"],["35028","SKRS",1500,"A"],["35028","TELE",1128,"A"],["35028","TGL",500,"A"],["35028","TRG",500,"A"],["35028","UBDL",500,"A"],["35033","BOP",40000,"A"],["35033","CPHL",1000,"A"],["35033","EPCL",8000,"A"],["35033","HASCOL",70000,"A"],["35033","JLICL",1260,"A"],["35033","PIBTL",15000,"A"],["35033","POWER",10000,"A"],["35033","PSO",500,"A"],["35037","AHCL",5600,"A"],["35037","ASL",76,"A"],["35037","ASLPS",55,"A"],["35037","FATIMA",150,"A"],["35038","BOP-AUG",5000,"F"],["35038","GGL-AUG",1500,"F"],["35038","LOTCHEM-AUGB",2000,"F"],["35038","TPLP-JUL",22500,"F"],["35041","PIAHCLA",3000,"A"],["35041","UNITY",10000,"A"],["35045","BGL",15000,"A"],["35045","LOADS",9000,"A"],["35045","MARI",1500,"A"],["35045","QUICE",10000,"A"],["35045","AIRLINK-JUL",500,"F"],["35045","HBL-JUL",1500,"F"],["35045","LOTCHEM-JUL",11000,"F"],["35045","NRL-JUL",1000,"F"],["35045","PSO-AUG",1500,"F"],["35045","UBL-JUL",500,"F"],["35046","AVN",301,"A"],["35046","PIAHCLA",2000,"A"],["35046","TRG",200,"A"],["35047","EFERT",47,"A"],["35047","ENGROH",1166,"A"],["35047","PTC",69,"A"],["35052","HBL",95,"A"],["35055","BML",60,"A"],["35055","CENI",180,"A"],["35055","MCB",42,"A"],["35055","PIL",34,"A"],["35055","UVIC",220,"A"],["35055","WAVESAPP",222,"A"],["35056","BML",78,"A"],["35056","FFC",162,"A"],["35056","MCB",11,"A"],["35056","SPSL",1000,"A"],["35060","LOADS",2500,"A"],["35060","TRG",2000,"A"],["35060","WTL",78500,"A"],["35060","SSGC-JUL",500,"F"],["35060","TRG-JUL",2500,"F"],["35061","ULS-50455",700,"A"],["35065","AKBL",761,"A"],["35065","ASL",153,"A"],["35065","ASLPS",110,"A"],["35065","ASTL",1000,"A"],["35065","BOP",5000,"A"],["35065","CLCPS",2000,"A"],["35065","CNERGY",5000,"A"],["35065","EFERT",1000,"A"],["35065","HASCOL",12035,"A"],["35065","JSCL",5000,"A"],["35065","MLCF",1500,"A"],["35065","OGDC",500,"A"],["35065","PAEL",2000,"A"],["35065","PASL",2292,"A"],["35065","PIAHCLA",1000,"A"],["35065","SCBPL",3487,"A"],["35065","UBL",1500,"A"],["35069","BML",80,"A"],["35070","MEBL",70,"A"],["35074","TRG",3000,"A"],["35074","SSGC-JUL",10500,"F"],["35074","TRG-JUL",2000,"F"],["35075","CNERGY",2000,"A"],["35075","SEPCO",30000,"A"],["35076","PACE",675,"A"],["35076","SBL",4,"A"],["35077","UBL",14,"A"],["69165","BML",526,"A"],["69165","GTYR",4700,"A"],["69165","HICL",11900,"A"],["69165","MFTM",12000,"A"],["69165","SEARL",1500,"A"],["69165","TBL",12000,"A"],["72082","FFL",11700,"A"]];
+
+        // Match a trade log row / baseline account against REGISTERED clients only
+        // (Client Profiles) — unregistered clients never appear in the Portfolio.
+        // FIX (13-08-2026): the previous version only tried an exact normalized
+        // string match (findRegisteredClientForDebt), which fails whenever the
+        // account number's zero-padding differs between the source xlsx and the
+        // Client Profile record (e.g. "35038" vs "035038"). This caused most
+        // clients' holdings to be silently dropped. We now fall back to a purely
+        // numeric comparison (leading zeros stripped from both sides) so the
+        // match succeeds regardless of padding differences.
+        // Match a trade log row / baseline account against REGISTERED clients only
+        // (Client Profiles) -- unregistered clients never appear in the Portfolio.
+        // Tries an exact normalized string match first, then falls back to a
+        // purely numeric comparison (leading zeros stripped from both sides) so
+        // the match still succeeds when the account's zero-padding differs
+        // between the source xlsx and the Client Profile record.
+        // Match a trade log row / baseline account against REGISTERED clients only
+        // (Client Profiles) -- unregistered clients never appear in the Portfolio.
+        // Tries an exact normalized string match first, then falls back to a
+        // purely numeric comparison (leading zeros stripped from both sides) so
+        // the match still succeeds when the account's zero-padding differs
+        // between the source xlsx and the Client Profile record.
+        function findRegisteredClientForPortfolio(accCode, name) {
+            const std = findRegisteredClientForDebt(accCode, name);
+            if (std) return std;
+            if (!allClients || allClients.length === 0) return null;
+            const numNorm = s => String(s || '').replace(/[^0-9]/g, '').replace(/^0+/, '');
+            const accNum = numNorm(accCode);
+            if (!accNum) return null;
+            return allClients.find(c => numNorm(c.tradingAccount) === accNum) || null;
+        }
+
+        // FIX (09-08-2026): Vtrade's raw trade log rows for Futures do NOT carry
+        // the contract month in the symbol column (e.g. a LOTCHEM-JUL sell is
+        // logged simply as stock "LOTCHEM" + market "FUT" -- no "-JUL"). The
+        // Portfolio baseline, however, is keyed per-month (e.g. "LOTCHEM-JUL").
+        // Without resolving the month, a full sell of a future position never
+        // matched the baseline's month-suffixed key, so the position kept
+        // showing as still held even after being fully sold.
+        //
+        // resolveFuturesSymbols() walks the baseline + every Trade Log entry in
+        // date order (same order/rules as computeClientPortfolios) and, for
+        // every Futures trade whose raw symbol has no month suffix, attaches
+        // the month of that client's currently-open contract for that base
+        // symbol onto the trade object as `_resolvedFutSymbol` (in-memory only
+        // -- nothing is written back to Firestore). If a trade's raw symbol
+        // already includes a month suffix, that is trusted as-is. If a client
+        // has no currently-open contract for that base symbol (e.g. a brand
+        // new Futures buy with no prior baseline/trade history), the month
+        // truly cannot be determined from the data available, so it is left
+        // unresolved (falls back to the bare symbol, same as before this fix).
+        // Manual, order-number-scoped correction for a Vtrade mislabeling issue:
+        // these two specific Futures sell orders for account 035045 come through
+        // tagged as "LOTCHEM-JULB" even though they are actually closing the
+        // plain "LOTCHEM-JUL" contract, so the sell never matched the open
+        // position and it kept showing as still held. Only these exact order
+        // numbers are affected -- every other trade (including any genuine
+        // "...B" contract, for this or any other client) resolves exactly as
+        // before, untouched.
+        const FUTURES_SYMBOL_OVERRIDES = {
+            'B035002879': 'LOTCHEM-JUL',
+            'B035002889': 'LOTCHEM-JUL'
+        };
+
+        function resolveFuturesSymbols() {
+            const baseOf = s => String(s || '').trim().replace(/-[A-Z]{3,4}B?$/, '');
+            // FIX (09-08-2026 v2): Vtrade sometimes appends a lowercase "b" to the raw
+            // symbol of a sell-side Futures row (e.g. "LOTCHEM-JULb"), which is NOT the
+            // same thing as the legitimate uppercase "B" contract-type flag seen
+            // elsewhere in real data (e.g. "LOTCHEM-AUGB" is a genuinely distinct
+            // instrument from "LOTCHEM-AUG"). Left as-is, "LOTCHEM-JULb" was treated as
+            // a totally different symbol from the baseline's "LOTCHEM-JUL", so the sell
+            // never reduced that position and the stock kept showing as still held even
+            // after being fully sold. This strips ONLY a trailing lowercase "b"
+            // (case-sensitive match) so it normalises back to the same symbol as the
+            // rest of that contract's trades -- any genuine uppercase "B" flag is left
+            // untouched.
+            const normalizeSym = s => String(s || '').trim().replace(/-([A-Z]{3,4})b$/, '-$1');
+            const openFutures = {}; // clientId -> { BASE: { symbol, qty } }
+            function mapFor(clientId) {
+                if (!openFutures[clientId]) openFutures[clientId] = {};
+                return openFutures[clientId];
+            }
+
+            PORTFOLIO_BASELINE.forEach(([acc, sym, qty, type]) => {
+                if (type !== 'F') return;
+                const client = findRegisteredClientForPortfolio(acc, '');
+                if (!client) return;
+                const map = mapFor(client.id);
+                const base = baseOf(sym);
+                const prevQty = map[base] ? map[base].qty : 0;
+                map[base] = { symbol: sym, qty: prevQty + qty };
+            });
+
+            Object.keys(allTradeLogEntries).sort().forEach(date => {
+                if (date <= PORTFOLIO_BASELINE_DATE) return;
+                const entry = allTradeLogEntries[date];
+                const trades = (entry && Array.isArray(entry.trades)) ? entry.trades : [];
+                trades.forEach(t => {
+                    if (!t) return;
+                    const isFuture = String(t.market || '').trim().toUpperCase().startsWith('FUT');
+                    if (!isFuture) { t._resolvedFutSymbol = null; return; }
+                    const qty = parseFloat(t.quantity) || 0;
+                    if (qty <= 0) { t._resolvedFutSymbol = null; return; }
+                    const client = findRegisteredClientForPortfolio(t.account, t.clientName);
+                    if (!client) { t._resolvedFutSymbol = null; return; }
+                    const map = mapFor(client.id);
+
+                    // ADDED: targeted order-number override (see FUTURES_SYMBOL_OVERRIDES
+                    // above) -- only those exact orders skip normal resolution below;
+                    // every other trade resolves exactly as before.
+                    const overrideSymbol = t.orderNo ? FUTURES_SYMBOL_OVERRIDES[String(t.orderNo).trim()] : null;
+
+                    let resolvedSymbol;
+                    if (overrideSymbol) {
+                        resolvedSymbol = overrideSymbol;
+                    } else {
+                        const rawSym = normalizeSym(t.rawSymbol || t.stockName || '');
+                        const base = baseOf(rawSym);
+                        const hasMonth = rawSym !== base && rawSym !== '';
+                        if (hasMonth) {
+                            resolvedSymbol = rawSym; // already fully specified
+                        } else if (map[base]) {
+                            resolvedSymbol = map[base].symbol; // reuse the client's currently open contract's month
+                        } else {
+                            resolvedSymbol = base; // month unknown -- can't resolve from available data
+                        }
+                    }
+                    t._resolvedFutSymbol = resolvedSymbol;
+
+                    const base = baseOf(resolvedSymbol);
+                    const delta = (String(t.side).toLowerCase() === 'sell') ? -qty : qty;
+                    const newQty = (map[base] ? map[base].qty : 0) + delta;
+                    if (newQty > 0) {
+                        map[base] = { symbol: resolvedSymbol, qty: newQty };
+                    } else {
+                        delete map[base]; // fully closed -- next trade on this base is a fresh, unknown-month position
+                    }
+                });
+            });
+        }
+
+        // Builds { clientId: { client, regular:{sym:qty}, futures:{sym:qty}, lastTx:{sym:{date,side,qty}}, newSyms:Set } }
+        // -- i.e. each client's CURRENTLY AVAILABLE holding per symbol, Regular
+        // and Futures separately. Starts from the 28-07-2026 baseline snapshot,
+        // then applies every Trade Log entry saved after it in date order (buys
+        // add qty, sells subtract qty). Because this function re-reads the live
+        // allTradeLogEntries object every time it's called, and the Firestore
+        // trade_log_entries/clients listeners call cpRefreshIfActive() on every
+        // update, the Portfolio always shows what's actually left with the
+        // client the moment a new Trade Log is uploaded and saved -- no manual
+        // refresh needed while the section is open.
+        function computeClientPortfolios() {
+            resolveFuturesSymbols(); // FIX (09-08-2026): resolve month suffix for Futures trades first
+            const portfolios = {};
+            function bucketFor(client) {
+                if (!portfolios[client.id]) {
+                    portfolios[client.id] = { client, regular: {}, futures: {}, lastTx: {}, newSyms: new Set(), adjustments: {}, baseRegular: {}, baseFutures: {} };
+                }
+                return portfolios[client.id];
+            }
+
+            PORTFOLIO_BASELINE.forEach(([acc, sym, qty, type]) => {
+                const client = findRegisteredClientForPortfolio(acc, '');
+                if (!client) return; // unregistered -- skip entirely
+                const p = bucketFor(client);
+                const bucket = type === 'F' ? p.futures : p.regular;
+                bucket[sym] = (bucket[sym] || 0) + qty;
+            });
+
+            Object.keys(allTradeLogEntries).sort().forEach(date => {
+                if (date <= PORTFOLIO_BASELINE_DATE) return; // baseline already covers up to this date
+                const entry = allTradeLogEntries[date];
+                const trades = (entry && Array.isArray(entry.trades)) ? entry.trades : [];
+                trades.forEach(t => {
+                    if (!t) return;
+                    const qty = parseFloat(t.quantity) || 0;
+                    if (qty <= 0) return;
+                    const client = findRegisteredClientForPortfolio(t.account, t.clientName);
+                    if (!client) return; // unregistered / house trade -- skip
+                    const isFuture = String(t.market || '').trim().toUpperCase().startsWith('FUT');
+                    // FIX (09-08-2026): use the resolved month-suffixed symbol for Futures
+                    // so trades match the baseline's per-month keys correctly.
+                    const sym = (isFuture ? (t._resolvedFutSymbol || t.rawSymbol || t.stockName) : t.stockName || '').trim();
+                    if (!sym) return;
+                    const p = bucketFor(client);
+                    const bucket = isFuture ? p.futures : p.regular;
+                    const before = bucket[sym] || 0;
+                    const delta = (String(t.side).toLowerCase() === 'sell') ? -qty : qty;
+                    bucket[sym] = before + delta;
+                    p.lastTx[sym] = { date, side: t.side, qty };
+                    if (before === 0 && delta > 0) p.newSyms.add((isFuture ? 'F:' : 'A:') + sym);
+                });
+            });
+
+            // Snapshot the fully auto-calculated (baseline + trade log) values before
+            // any manual correction is applied, so the Edit modal can always show and
+            // compute against the true auto-calculated figure, however it's opened.
+            Object.values(portfolios).forEach(p => {
+                p.baseRegular = { ...p.regular };
+                p.baseFutures = { ...p.futures };
+            });
+
+            // ADDED: apply manual Client Portfolio corrections on top of the
+            // auto-calculated figures. Each correction is a list of individual
+            // Buy/Sell entries (see cpAdjDelta) -- like adding missed/incorrect
+            // trades by hand -- so the net effect permanently offsets the balance
+            // while any later genuine buy/sell trade for that symbol still applies
+            // normally on top of it. This never touches PORTFOLIO_BASELINE or
+            // allTradeLogEntries -- the underlying trade data is left untouched.
+            Object.values(allPortfolioAdjustments || {}).forEach(adj => {
+                if (!adj || !adj.clientId || !adj.symbol) return;
+                const client = allClients.find(c => c.id === adj.clientId);
+                if (!client) return;
+                const p = bucketFor(client);
+                const bucket = adj.isFuture ? p.futures : p.regular;
+                bucket[adj.symbol] = (bucket[adj.symbol] || 0) + cpAdjDelta(adj);
+                p.adjustments[(adj.isFuture ? 'F:' : 'A:') + adj.symbol] = adj;
+            });
+
+            return portfolios;
+        }
+
+        // Net qty effect of a saved correction doc. Sums individual Buy/Sell
+        // entries (current format: adj.corrections = [{type:'buy'|'sell', qty, ...}]).
+        // Falls back to the older single `delta` field for any correction saved
+        // before this Buy/Sell-entry format existed, so nothing already saved breaks.
+        function cpAdjDelta(adj) {
+            if (adj && Array.isArray(adj.corrections)) {
+                return adj.corrections.reduce((sum, c) => {
+                    const q = parseFloat(c.qty) || 0;
+                    return sum + (String(c.type).toLowerCase() === 'sell' ? -q : q);
+                }, 0);
+            }
+            return parseFloat(adj && adj.delta) || 0;
+        }
+
+        // Short combined summary of a correction's Buy/Sell entries + notes, for the
+        // "Corrected" badge tooltip. Falls back to the older single `note` field.
+        function cpAdjNoteSummary(adj) {
+            if (adj && Array.isArray(adj.corrections) && adj.corrections.length) {
+                return adj.corrections.map(c => {
+                    const sideLabel = String(c.type).toLowerCase() === 'sell' ? 'Sell' : 'Buy';
+                    return `${sideLabel} ${Number(c.qty).toLocaleString()}${c.note ? ' (' + c.note + ')' : ''}`;
+                }).join('; ');
+            }
+            return adj && adj.note ? adj.note : '';
+        }
+
+        // Small escaping helpers for the Client Portfolio "Edit" feature -- keep
+        // symbols/notes safe when interpolated into inline onclick JS strings or
+        // HTML title attributes.
+        function cpEscJs(s) { return String(s || '').replace(/\\/g, '\\\\').replace(/'/g, "\\'"); }
+        function cpEscAttr(s) { return String(s || '').replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;'); }
+
+        function cpFmtTx(tx) {
+            if (!tx) return `<span class="text-slate-400">Baseline (28-07-2026)</span>`;
+            const sideLabel = String(tx.side).toLowerCase() === 'sell' ? 'Sold' : 'Bought';
+            return `${sideLabel} ${Number(tx.qty).toLocaleString()} on ${tx.date}`;
+        }
+
+        // Renders one holdings table: Symbol | Current Qty | Status | Last Activity.
+        // Every symbol the client has ever held stays here -- a fully sold-out
+        // symbol just shows Qty 0 with a "Sold" tag, it is not moved elsewhere.
+        function cpRenderPortfolioTable(title, rows, emptyMsg) {
+            if (rows.length === 0) return `<h4 class="font-semibold text-slate-700 mt-4 mb-2">${title}</h4><p class="text-sm text-slate-400 mb-2">${emptyMsg}</p>`;
+            return `
+                <h4 class="font-semibold text-slate-700 mt-4 mb-2">${title} <span class="text-xs font-normal text-slate-400">(${rows.length})</span></h4>
+                <div class="overflow-x-auto mb-2">
+                    <table class="w-full text-left text-sm">
+                        <thead class="border-b text-slate-500 uppercase text-xs">
+                            <tr><th class="p-2">Symbol</th><th class="p-2 text-right">Current Qty</th><th class="p-2">Status</th><th class="p-2">Last Activity</th></tr>
+                        </thead>
+                        <tbody>${rows.join('')}</tbody>
+                    </table>
+                </div>`;
+        }
+
+        function cpHeaderHtml(clientId, client) {
+            return `
+                <div class="flex items-center gap-3 flex-wrap mb-4 pb-4 border-b">
+                    <span class="text-xs font-semibold text-slate-500 uppercase">Client</span>
+                    <span class="px-3 py-1 border rounded-lg font-mono font-semibold text-slate-700">${client.tradingAccount || 'N/A'}</span>
+                    <button onclick="renderClientPortfolioFor('${clientId}')" class="px-3 py-1 bg-indigo-600 text-white rounded-lg text-sm font-semibold hover:bg-indigo-700"><i class="fas fa-sync-alt mr-1"></i>Refresh</button>
+                    <span class="font-semibold text-slate-800">${client.name}</span>
+                </div>`;
+        }
+
+        function renderClientPortfolioFor(clientId) {
+            const area = document.getElementById('cp-result-area');
+            if (!area) return;
+            if (!clientId) {
+                area.innerHTML = '<p class="text-center text-slate-400 py-8">Search for a registered client above to view their portfolio.</p>';
+                return;
+            }
+            const portfolios = computeClientPortfolios();
+            const p = portfolios[clientId];
+            const client = allClients.find(c => c.id === clientId);
+            if (!client) {
+                area.innerHTML = '<p class="text-center text-slate-400 py-8">Client not found.</p>';
+                return;
+            }
+            if (!p) {
+                area.innerHTML = cpHeaderHtml(clientId, client) +
+                    `<p class="text-center text-slate-400 py-8">No portfolio data found for <strong>${client.name}</strong> (${client.tradingAccount || 'N/A'}).</p>`;
+                return;
+            }
+
+            // Only currently-available holdings are shown -- fully sold-out symbols
+            // (qty <= 0) are skipped, UNLESS a manual correction is active on them
+            // (then it's still shown, with a "Corrected" tag, so the correction stays
+            // visible/manageable instead of silently disappearing).
+            const regularRows = [], futuresRows = [];
+            const buildRow = (sym, qty, isFuture) => {
+                const adjKey = (isFuture ? 'F:' : 'A:') + sym;
+                const adj = p.adjustments[adjKey];
+                if (adj && adj.hidden) return; // row manually deleted by user via double-click popup
+                if (qty <= 0 && !adj) return; // sold out and never manually corrected -- don't list it
+                const tx = p.lastTx[sym];
+                const isNew = p.newSyms.has(adjKey);
+                const statusBadge = isNew
+                    ? `<span class="text-xs font-semibold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full">Newly Added</span>`
+                    : `<span class="text-xs font-semibold text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded-full">Holding</span>`;
+                const adjNotes = adj ? cpAdjNoteSummary(adj) : '';
+                const correctedBadge = adj
+                    ? `<span class="text-xs font-semibold text-amber-600 bg-amber-50 px-2 py-0.5 rounded-full ml-1" title="${cpEscAttr(adjNotes || 'Manually corrected')}"><i class="fas fa-user-edit mr-1"></i>Corrected</span>`
+                    : '';
+                const symJs = cpEscJs(sym);
+                const row = `<tr class="border-b cursor-pointer hover:bg-slate-50" ondblclick="openPortfolioEditModal('${clientId}','${symJs}',${isFuture},${qty})" title="Quantity change ya row delete karne ke liye double-click karein"><td class="p-2 font-semibold text-slate-800">${sym}</td><td class="p-2 text-right font-mono">${Number(qty).toLocaleString()}</td><td class="p-2">${statusBadge}${correctedBadge}</td><td class="p-2 text-xs text-slate-500">${cpFmtTx(tx)}</td></tr>`;
+                if (isFuture) futuresRows.push(row); else regularRows.push(row);
+            };
+            Object.keys(p.regular).forEach(sym => buildRow(sym, p.regular[sym], false));
+            Object.keys(p.futures).forEach(sym => buildRow(sym, p.futures[sym], true));
+
+            area.innerHTML = cpHeaderHtml(clientId, client) +
+                cpRenderPortfolioTable('Regular Holdings', regularRows, 'No regular stock holdings.') +
+                cpRenderPortfolioTable('Futures Positions', futuresRows, 'No futures positions.');
+        }
+
+        // ── Client Portfolio row Quantity Adjustment / Delete (double-click) ────
+        // Double-clicking any row in Regular Holdings / Futures Positions opens a
+        // popup to either change that stock's quantity -- which adds a Buy/Sell
+        // correction entry on top of the auto-calculated figure (see cpAdjDelta),
+        // same underlying mechanism as before, so the real Trade Log / baseline
+        // data is never touched -- or delete the entire row (marks it hidden).
+        let cpEditContext = null; // { clientId, symbol, isFuture, baseQty }
+
+        function cpAdjKey(clientId, isFuture, symbol) {
+            return `${clientId}__${isFuture ? 'F' : 'A'}__${String(symbol || '').trim().replace(/[^A-Za-z0-9.\-]/g, '_')}`;
+        }
+
+        // Opens the popup pre-filled for the row that was double-clicked.
+        function openPortfolioEditModal(clientId, symbol, isFuture, currentQty) {
+            const client = allClients.find(c => c.id === clientId);
+            if (!client) return;
+            const portfolios = computeClientPortfolios();
+            const p = portfolios[clientId];
+            const baseQty = p ? ((isFuture ? p.baseFutures : p.baseRegular)[symbol] || 0) : 0;
+            cpEditContext = { clientId, symbol, isFuture, baseQty };
+
+            document.getElementById('cp-edit-client-label').textContent = `${client.name} (${client.tradingAccount || 'N/A'})`;
+            document.getElementById('cp-edit-symbol-label').textContent = `${symbol} (${isFuture ? 'Futures' : 'Regular'})`;
+            document.getElementById('cp-edit-current-qty').textContent = Number(currentQty).toLocaleString();
+            document.getElementById('cp-edit-qty-input').value = currentQty;
+            document.getElementById('portfolio-edit-modal').style.display = 'flex';
+        }
+
+        document.getElementById('cp-edit-cancel-btn').addEventListener('click', () => {
+            document.getElementById('portfolio-edit-modal').style.display = 'none';
+        });
+
+        // Saves the new quantity: the difference from the current (auto-calculated
+        // + existing corrections) quantity is added as one Buy (increase) or Sell
+        // (decrease) correction entry -- the real Trade Log / baseline stays untouched.
+        document.getElementById('cp-edit-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            if (!cpEditContext) return;
+            const { clientId, symbol, isFuture, baseQty } = cpEditContext;
+            const newQty = parseFloat(document.getElementById('cp-edit-qty-input').value);
+            if (isNaN(newQty) || newQty < 0) { showMessage('Quantity Zaroori Hai', 'Sahi quantity darj karein (0 ya us se zyada).'); return; }
+
+            const key = cpAdjKey(clientId, isFuture, symbol);
+            const existing = allPortfolioAdjustments[key];
+            const currentQty = baseQty + cpAdjDelta(existing);
+            const diff = newQty - currentQty;
+            if (diff === 0) { document.getElementById('portfolio-edit-modal').style.display = 'none'; return; }
+
+            const corrections = (existing && Array.isArray(existing.corrections)) ? existing.corrections.slice() : [];
+            corrections.push({ type: diff > 0 ? 'buy' : 'sell', qty: Math.abs(diff), note: '', date: new Date().toISOString().slice(0, 10) });
+
+            try {
+                showLoading();
+                await db.collection(`users/${currentUserId}/portfolio_adjustments`).doc(key).set({
+                    clientId, symbol, isFuture, corrections, hidden: false,
+                    updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                });
+                document.getElementById('portfolio-edit-modal').style.display = 'none';
+            } catch (err) {
+                console.error('Portfolio quantity update error:', err);
+                showMessage('Error', 'Quantity update nahi ho saki: ' + err.message);
+            } finally {
+                hideLoading();
+            }
+        });
+
+        // Deletes the entire row from the Client Portfolio view (marks it hidden).
+        // The underlying Trade Log / baseline data is never touched -- this only
+        // hides the row from this display.
+        document.getElementById('cp-edit-delete-row-btn').addEventListener('click', async () => {
+            if (!cpEditContext) return;
+            const { clientId, symbol, isFuture } = cpEditContext;
+            if (!confirm(`"${symbol}" ki row delete karni hai?\n\nYe sirf is row ko portfolio view se hatayega -- Trade Log / baseline data safe rahega.`)) return;
+            const key = cpAdjKey(clientId, isFuture, symbol);
+            const existing = allPortfolioAdjustments[key];
+            const corrections = (existing && Array.isArray(existing.corrections)) ? existing.corrections : [];
+            try {
+                showLoading();
+                await db.collection(`users/${currentUserId}/portfolio_adjustments`).doc(key).set({
+                    clientId, symbol, isFuture, corrections, hidden: true,
+                    updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                });
+                document.getElementById('portfolio-edit-modal').style.display = 'none';
+            } catch (err) {
+                console.error('Portfolio row delete error:', err);
+                showMessage('Error', 'Row delete nahi ho saki: ' + err.message);
+            } finally {
+                hideLoading();
+            }
+        });
+
+        function cpRefreshIfActive() {
+            const section = document.getElementById('client-portfolio');
+            if (section && section.classList.contains('active')) {
+                const clientId = document.getElementById('cp-client-id').value;
+                if (clientId) renderClientPortfolioFor(clientId);
+            }
+        }
+
+        (function initClientPortfolioSearch() {
+            const searchInput = document.getElementById('cp-client-search');
+            const suggestionsBox = document.getElementById('cp-client-suggestions');
+            const clearBtn = document.getElementById('cp-clear-btn');
+            if (!searchInput || !suggestionsBox) return;
+
+            function renderSuggestions(term) {
+                const searchTerm = (term || '').trim().toLowerCase();
+                if (!searchTerm) { suggestionsBox.classList.add('hidden'); suggestionsBox.innerHTML = ''; return; }
+                const matches = allClients
+                    .filter(c => (c.name || '').toLowerCase().includes(searchTerm) || (c.tradingAccount || '').toLowerCase().includes(searchTerm))
+                    .sort((a, b) => (a.name || '').localeCompare(b.name || ''))
+                    .slice(0, 20);
+                if (matches.length === 0) {
+                    suggestionsBox.innerHTML = '<div class="px-4 py-3 text-sm text-slate-400">No matching registered client found.</div>';
+                    suggestionsBox.classList.remove('hidden');
+                    return;
+                }
+                suggestionsBox.innerHTML = matches.map(c => `
+                    <div class="cp-suggestion-item px-4 py-2 text-sm cursor-pointer hover:bg-indigo-50 border-b border-slate-100 last:border-b-0" data-id="${c.id}" data-label="${c.name} (${c.tradingAccount || 'N/A'})">
+                        <span class="font-semibold text-slate-800">${c.name}</span>
+                        <span class="text-slate-400 text-xs ml-1">${c.tradingAccount || 'N/A'}</span>
+                    </div>
+                `).join('');
+                suggestionsBox.classList.remove('hidden');
+                suggestionsBox.querySelectorAll('.cp-suggestion-item').forEach(item => {
+                    item.addEventListener('click', () => {
+                        document.getElementById('cp-client-id').value = item.dataset.id;
+                        searchInput.value = item.dataset.label;
+                        suggestionsBox.classList.add('hidden');
+                        suggestionsBox.innerHTML = '';
+                        renderClientPortfolioFor(item.dataset.id);
+                    });
+                });
+            }
+
+            searchInput.addEventListener('input', () => {
+                document.getElementById('cp-client-id').value = '';
+                renderSuggestions(searchInput.value);
+            });
+            searchInput.addEventListener('focus', () => {
+                if (searchInput.value.trim()) renderSuggestions(searchInput.value);
+            });
+            document.addEventListener('click', (e) => {
+                if (e.target !== searchInput && !suggestionsBox.contains(e.target)) {
+                    suggestionsBox.classList.add('hidden');
+                }
+            });
+            if (clearBtn) clearBtn.addEventListener('click', () => {
+                searchInput.value = '';
+                document.getElementById('cp-client-id').value = '';
+                renderClientPortfolioFor('');
+            });
+
+            document.querySelectorAll('#main-nav .nav-btn').forEach(btn => {
+                if (btn.dataset.section === 'client-portfolio') {
+                    btn.addEventListener('click', cpRefreshIfActive);
+                }
+            });
+        })();
+        // ─── END CLIENT PORTFOLIO MODULE ────────────────────────────────────────────
 
         // ─── PLACER EDIT MODULE ───────────────────────────────────────────────────
         (function() {
@@ -11834,7 +12828,7 @@
             const list = document.getElementById('couriers-list');
             if (!list) return;
             if (allCouriers.length === 0) {
-                list.innerHTML = `<tr><td colspan="9" class="p-4 text-center text-slate-400">No courier records found.</td></tr>`;
+                list.innerHTML = `<tr><td colspan="11" class="p-4 text-center text-slate-400">No courier records found.</td></tr>`;
                 return;
             }
             const sorted = [...allCouriers].sort((a, b) => new Date(b.date) - new Date(a.date));
@@ -11853,6 +12847,17 @@
                         ? ` <a href="${trackUrl}" target="_blank" rel="noopener" class="text-indigo-600 hover:underline text-xs whitespace-nowrap"><i class="fas fa-external-link-alt"></i> Track</a>`
                         : '')
                     : '<span class="text-slate-400">N/A</span>';
+                const paymentByCell = c.paymentResponsibility === 'Client'
+                    ? `<span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-amber-100 text-amber-700">Paid by Client</span>`
+                    : c.paymentResponsibility === 'Branch'
+                        ? `<span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-sky-100 text-sky-700">Paid by Branch</span>`
+                        : '<span class="text-slate-400">N/A</span>';
+                const isPaymentDone = !!c.paymentCompleted;
+                const paymentStatusCell = `<label class="inline-flex items-center gap-2 cursor-pointer">
+                        <input type="checkbox" class="w-4 h-4 accent-emerald-600" ${isPaymentDone ? 'checked' : ''}
+                               onchange="courierTogglePaymentStatus('${c.id}', this.checked)" ${isSharedView ? 'disabled' : ''}>
+                        <span class="text-xs font-semibold ${isPaymentDone ? 'text-emerald-600' : 'text-amber-600'}">${isPaymentDone ? 'Paid' : 'Pending'}</span>
+                    </label>`;
                 return `
                 <tr class="border-b hover:bg-slate-50">
                     <td class="p-2">${dirBadge}</td>
@@ -11861,6 +12866,8 @@
                     <td class="p-2 text-sm">${c.senderName || 'N/A'}</td>
                     <td class="p-2 text-sm">${c.receiverName || 'N/A'}</td>
                     <td class="p-2 text-sm">${c.documentType || 'N/A'}</td>
+                    <td class="p-2 text-sm">${paymentByCell}</td>
+                    <td class="p-2 text-sm">${paymentStatusCell}</td>
                     <td class="p-2 text-sm">${reasonCell}</td>
                     <td class="p-2 text-sm">${trackingCell}</td>
                     <td class="p-2 text-sm actions-header">
@@ -11870,6 +12877,18 @@
                 </tr>`;
             }).join('');
         }
+
+        // Toggles a courier record's payment status (Paid / Pending) without touching its other fields.
+        window.courierTogglePaymentStatus = async function(id, checked) {
+            if (!currentUserId || isSharedView) return;
+            try {
+                await db.collection(`users/${currentUserId}/couriers`).doc(id).update({
+                    paymentCompleted: checked
+                });
+            } catch (e) {
+                showMessage('Error', 'Payment status update nahi hui: ' + e.message);
+            }
+        };
 
         // Keep the "Track" link in the Add Courier form in sync with the entered tracking number/service.
         function refreshCourierTrackingLink() {
@@ -11935,6 +12954,7 @@
             document.getElementById('courier-sender-name').value = c.senderName || '';
             document.getElementById('courier-receiver-name').value = c.receiverName || '';
             document.getElementById('courier-document-type').value = c.documentType || '';
+            document.getElementById('courier-payment-responsibility').value = c.paymentResponsibility || '';
             document.getElementById('courier-reason-sending').value = c.reasonForSending || '';
             document.getElementById('courier-reason-receiving').value = c.reasonForReceiving || '';
             document.getElementById('courier-tracking-service').value = c.courierService || '';
@@ -11968,6 +12988,9 @@
             const directionEl = form.querySelector('input[name="courier-direction"]:checked');
             if (!directionEl) return showMessage('Error', 'Please select courier direction (In or Out).');
 
+            const paymentResponsibilityVal = form['courier-payment-responsibility'].value;
+            if (!paymentResponsibilityVal) return showMessage('Error', 'Please select payment responsibility (Paid by Client or Paid by Branch).');
+
             const courierData = {
                 direction: directionEl.value,
                 date: form['courier-date'].value,
@@ -11975,6 +12998,7 @@
                 senderName: form['courier-sender-name'].value.trim(),
                 receiverName: form['courier-receiver-name'].value.trim(),
                 documentType: form['courier-document-type'].value.trim(),
+                paymentResponsibility: paymentResponsibilityVal,
                 reasonForSending: form['courier-reason-sending'].value.trim(),
                 reasonForReceiving: form['courier-reason-receiving'].value.trim(),
                 courierService: form['courier-tracking-service'].value,
@@ -12037,7 +13061,7 @@
             const fmt = (d) => new Date(d).toLocaleDateString('en-PK', { day: '2-digit', month: 'short', year: 'numeric' });
 
             const rows = filtered.length === 0
-                ? `<tr><td colspan="8" style="text-align:center;padding:20px;color:#888;">No records found for this date range.</td></tr>`
+                ? `<tr><td colspan="10" style="text-align:center;padding:20px;color:#888;">No records found for this date range.</td></tr>`
                 : filtered.map((c, i) => {
                     const isIn = c.direction === 'In';
                     const dir = isIn
@@ -12045,6 +13069,15 @@
                         : `<span style="display:inline-block;padding:2px 8px;border-radius:20px;background:#e0e7ff;color:#3730a3;font-size:11px;font-weight:700;">▲ Out</span>`;
                     const bg = i % 2 === 0 ? '#ffffff' : '#f8fafc';
                     const reasonText = courierReasonText(c) || 'N/A';
+                    const isPaymentDone = !!c.paymentCompleted;
+                    const paymentStatusBadge = isPaymentDone
+                        ? `<span style="display:inline-block;padding:2px 8px;border-radius:20px;background:#d1fae5;color:#065f46;font-size:11px;font-weight:700;">Paid</span>`
+                        : `<span style="display:inline-block;padding:2px 8px;border-radius:20px;background:#fef3c7;color:#92400e;font-size:11px;font-weight:700;">Pending</span>`;
+                    const paymentByText = c.paymentResponsibility === 'Client'
+                        ? 'Paid by Client'
+                        : c.paymentResponsibility === 'Branch'
+                            ? 'Paid by Branch'
+                            : 'N/A';
                     return `<tr style="background:${bg};">
                         <td style="padding:8px 10px;border-bottom:1px solid #e2e8f0;">${i+1}</td>
                         <td style="padding:8px 10px;border-bottom:1px solid #e2e8f0;">${dir}</td>
@@ -12053,6 +13086,8 @@
                         <td style="padding:8px 10px;border-bottom:1px solid #e2e8f0;">${c.senderName || 'N/A'}</td>
                         <td style="padding:8px 10px;border-bottom:1px solid #e2e8f0;">${c.receiverName || 'N/A'}</td>
                         <td style="padding:8px 10px;border-bottom:1px solid #e2e8f0;">${c.documentType || 'N/A'}</td>
+                        <td style="padding:8px 10px;border-bottom:1px solid #e2e8f0;">${paymentStatusBadge}</td>
+                        <td style="padding:8px 10px;border-bottom:1px solid #e2e8f0;">${paymentByText}</td>
                         <td style="padding:8px 10px;border-bottom:1px solid #e2e8f0;">${reasonText}</td>
                     </tr>`;
                   }).join('');
@@ -12105,6 +13140,8 @@
     <th>Sender</th>
     <th>Receiver</th>
     <th>Doc Type</th>
+    <th style="width:80px;">Payment Status</th>
+    <th>Remarks</th>
     <th>Reason</th>
   </tr></thead>
   <tbody>${rows}</tbody>
@@ -13157,6 +14194,7 @@ ${(d.totalDeductions > 0) ? `
             { id: 'analytics',       label: 'Analytics',        icon: 'fa-chart-bar',      defaultOn: false },
             { id: 'trade-log',       label: 'Trade Log',        icon: 'fa-chart-line',     defaultOn: false },
             { id: 'vtrade-trade-log',label: 'Vtrade Trade Log', icon: 'fa-table',           defaultOn: false },
+            { id: 'client-portfolio',label: 'Client Portfolio', icon: 'fa-briefcase',       defaultOn: true  },
             { id: 'backup',          label: 'Backup & Restore', icon: 'fa-database',        defaultOn: false },
             { id: 'utility-bills',   label: 'Utility Bills',    icon: 'fa-bolt',            defaultOn: false },
             { id: 'debts',           label: 'Debts',            icon: 'fa-file-invoice-dollar', defaultOn: false },
@@ -14111,7 +15149,7 @@ ${(d.totalDeductions > 0) ? `
                         });
                         form.reset();
                     } catch (err) {
-                        showMessage('Error', 'Task add nahi hua: ' + err.message);
+                        showMessage('Error', 'Failed to add task: ' + err.message);
                     } finally {
                         if (submitBtn) submitBtn.disabled = false;
                     }
@@ -14144,7 +15182,7 @@ ${(d.totalDeductions > 0) ? `
             if (!tbody) return;
             const tasks = tmFilteredTasks();
             if (tasks.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="6" class="p-4 text-center text-slate-500">Koi task nahi mila.</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="6" class="p-4 text-center text-slate-500">No tasks found.</td></tr>';
             } else {
                 tbody.innerHTML = tasks.map((t, i) => {
                     const info = tmStatusInfo(t);
@@ -14195,7 +15233,7 @@ ${(d.totalDeductions > 0) ? `
             if (!list) return;
             const tasks = allTasks.filter(t => tmStatusInfo(t).key !== 'closed');
             if (tasks.length === 0) {
-                list.innerHTML = '<div class="tm-notif-row" style="color:#94a3b8;">Koi pending task nahi hai.</div>';
+                list.innerHTML = '<div class="tm-notif-row" style="color:#94a3b8;">No pending tasks.</div>';
                 return;
             }
             tasks.sort((a, b) => (a.deadline || '9999').localeCompare(b.deadline || '9999'));
@@ -14217,7 +15255,7 @@ ${(d.totalDeductions > 0) ? `
             tmActiveTaskId = taskId;
             document.getElementById('task-detail-title').textContent = task.title;
             document.getElementById('task-detail-desc').textContent = task.description || '';
-            document.getElementById('task-detail-deadline').textContent = task.deadline ? ('Deadline: ' + tmFormatDate(task.deadline)) : 'Koi deadline set nahi.';
+            document.getElementById('task-detail-deadline').textContent = task.deadline ? ('Deadline: ' + tmFormatDate(task.deadline)) : 'No deadline set.';
             document.getElementById('task-detail-progress-range').value = task.progress || 0;
             document.getElementById('task-detail-progress-value').textContent = (task.progress || 0) + '%';
             document.getElementById('task-detail-note-input').value = '';
@@ -14234,7 +15272,7 @@ ${(d.totalDeductions > 0) ? `
             const history = document.getElementById('task-detail-history');
             if (history) {
                 if (!task.followUps || task.followUps.length === 0) {
-                    history.innerHTML = '<div class="text-xs text-slate-400">Abhi tak koi follow-up nahi.</div>';
+                    history.innerHTML = '<div class="text-xs text-slate-400">No follow-ups yet.</div>';
                 } else {
                     history.innerHTML = task.followUps.slice().reverse().map(f => `
                         <div class="tm-followup-entry">
@@ -14264,7 +15302,7 @@ ${(d.totalDeductions > 0) ? `
                     followUps: firebase.firestore.FieldValue.arrayUnion(entry)
                 });
             } catch (err) {
-                showMessage('Error', 'Progress update nahi hua: ' + err.message);
+                showMessage('Error', 'Failed to update progress: ' + err.message);
             }
         }
 
@@ -14284,18 +15322,18 @@ ${(d.totalDeductions > 0) ? `
                 }
                 tmCloseDetailModal();
             } catch (err) {
-                showMessage('Error', 'Task status update nahi hua: ' + err.message);
+                showMessage('Error', 'Failed to update task status: ' + err.message);
             }
         }
 
         async function tmDeleteTask() {
             if (!tmActiveTaskId || !currentUserId || isSharedView) return;
-            if (!confirm('Kya aap is task ko delete karna chahtay hain?')) return;
+            if (!confirm('Are you sure you want to delete this task?')) return;
             try {
                 await db.collection(`users/${currentUserId}/tasks`).doc(tmActiveTaskId).delete();
                 tmCloseDetailModal();
             } catch (err) {
-                showMessage('Error', 'Task delete nahi hua: ' + err.message);
+                showMessage('Error', 'Failed to delete task: ' + err.message);
             }
         }
 
@@ -14308,7 +15346,7 @@ ${(d.totalDeductions > 0) ? `
             if (lastNotified === today) return; // already notified today
             const openCount = allTasks.filter(t => tmStatusInfo(t).key !== 'closed').length;
             if (openCount === 0) { localStorage.setItem(TASK_NOTIF_LAST_KEY, today); return; }
-            const msg = `Aapke ${openCount} pending task${openCount > 1 ? 's' : ''} hain jo abhi close nahi huay.`;
+            const msg = `You have ${openCount} pending task${openCount > 1 ? 's' : ''} that ${openCount > 1 ? 'are' : 'is'} not yet closed.`;
             if ('Notification' in window) {
                 if (Notification.permission === 'granted') {
                     new Notification('Task Manager — Pending Tasks', { body: msg });
@@ -14334,8 +15372,8 @@ ${(d.totalDeductions > 0) ? `
                         <div style="font-weight:700;font-size:0.88rem;margin-bottom:4px;">Pending Tasks</div>
                         <div style="font-size:0.78rem;color:rgba(255,255,255,0.8);margin-bottom:10px;">${msg}</div>
                         <div style="display:flex;gap:8px;">
-                            <button onclick="document.getElementById('task-reminder-toast').remove();showSection('task-manager');" style="padding:6px 14px;background:#0071e3;color:#fff;border:none;border-radius:6px;font-size:0.75rem;font-weight:700;cursor:pointer;">Dekhein</button>
-                            <button onclick="document.getElementById('task-reminder-toast').remove();" style="padding:6px 14px;background:rgba(255,255,255,0.12);color:#fff;border:none;border-radius:6px;font-size:0.75rem;cursor:pointer;">Bad Mein</button>
+                            <button onclick="document.getElementById('task-reminder-toast').remove();showSection('task-manager');" style="padding:6px 14px;background:#0071e3;color:#fff;border:none;border-radius:6px;font-size:0.75rem;font-weight:700;cursor:pointer;">View</button>
+                            <button onclick="document.getElementById('task-reminder-toast').remove();" style="padding:6px 14px;background:rgba(255,255,255,0.12);color:#fff;border:none;border-radius:6px;font-size:0.75rem;cursor:pointer;">Later</button>
                         </div>
                     </div>
                 </div>`;
@@ -14563,7 +15601,7 @@ ${(d.totalDeductions > 0) ? `
             if (totalBadge) totalBadge.textContent = `${badgeLabel}: PKR ${totalDebt.toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2})}`;
 
             if (filtered.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="8" class="p-4 text-center text-slate-500">Koi debt nahi mili.</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="8" class="p-4 text-center text-slate-500">No debts found.</td></tr>';
                 return;
             }
 
@@ -14620,7 +15658,7 @@ ${(d.totalDeductions > 0) ? `
             if (!input) return;
             const newAmount = parseFloat(input.value);
             if (isNaN(newAmount) || newAmount < 0) {
-                showMessage('Error', 'Sahi amount dalen.');
+                showMessage('Error', 'Enter a valid amount.');
                 return;
             }
             try {
@@ -14630,20 +15668,20 @@ ${(d.totalDeductions > 0) ? `
                 });
                 debtEditingId = null;
             } catch (e) {
-                showMessage('Error', 'Debt update nahi hua: ' + e.message);
+                showMessage('Error', 'Debt update failed: ' + e.message);
             }
         };
 
         window.debtMarkCleared = async function(id) {
             if (!currentUserId || isSharedView) return;
-            if (!confirm('Is client ka debt clear mark karna hai (amount 0 ho jayega)?')) return;
+            if (!confirm("Mark this client's debt as cleared (amount will become 0)?")) return;
             try {
                 await db.collection(`users/${currentUserId}/debts`).doc(id).update({
                     debtAmount: 0,
                     lastUpdated: new Date().toISOString()
                 });
             } catch (e) {
-                showMessage('Error', 'Debt clear nahi hua: ' + e.message);
+                showMessage('Error', 'Debt clear failed: ' + e.message);
             }
         };
 
@@ -14664,7 +15702,7 @@ ${(d.totalDeductions > 0) ? `
                     lastUpdated: new Date().toISOString()
                 });
             } catch (e) {
-                showMessage('Error', 'Clean Debt status update nahi hui: ' + e.message);
+                showMessage('Error', 'Clean Debt status update failed: ' + e.message);
             }
         };
 
@@ -14706,13 +15744,13 @@ ${(d.totalDeductions > 0) ? `
                 <div class="meta">${subtitle} &mdash; Generated: ${dateStr}</div>
                 <table>
                     <thead><tr><th>#</th><th>Account Number</th><th>Client Name</th><th>Contact</th><th class="amt">Debt Amount (PKR)</th><th>Last Updated</th></tr></thead>
-                    <tbody>${rowsHtml || '<tr><td colspan="6" style="text-align:center;">Koi record nahi mila.</td></tr>'}</tbody>
+                    <tbody>${rowsHtml || '<tr><td colspan="6" style="text-align:center;">No records found.</td></tr>'}</tbody>
                     <tfoot><tr><td colspan="4">Total</td><td class="amt">PKR ${total.toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2})}</td><td></td></tr></tfoot>
                 </table>
             </body></html>`;
 
             const w = window.open('', '_blank');
-            if (!w) { showMessage('Error', 'Print window open nahi hui. Popup blocker check karen.'); return; }
+            if (!w) { showMessage('Error', 'Print window did not open. Check your popup blocker.'); return; }
             w.document.open();
             w.document.write(html);
             w.document.close();
@@ -14722,7 +15760,7 @@ ${(d.totalDeductions > 0) ? `
         window.debtClearAll = async function() {
             if (!currentUserId || isSharedView) return;
             if (!allDebts || allDebts.length === 0) return;
-            if (!confirm(`Kya aap waqai SAB (${allDebts.length}) debt entries delete karna chahte hain?\n\nYe action wapis nahi ho sakta.`)) return;
+            if (!confirm(`Are you sure you want to delete ALL (${allDebts.length}) debt entries?\n\nThis action cannot be undone.`)) return;
             try {
                 const batch = db.batch();
                 allDebts.forEach(d => {
@@ -14730,7 +15768,7 @@ ${(d.totalDeductions > 0) ? `
                 });
                 await batch.commit();
             } catch (e) {
-                showMessage('Error', 'Clear All nahi hua: ' + e.message);
+                showMessage('Error', 'Clear All failed: ' + e.message);
             }
         };
 
@@ -14754,7 +15792,7 @@ ${(d.totalDeductions > 0) ? `
                     const previewPanel = document.getElementById('debt-preview-panel');
                     const parsed = parseDebtBulkText(text);
                     if (parsed.length === 0) {
-                        statusEl.textContent = 'Koi valid entry parse nahi hui. Text format check karen.';
+                        statusEl.textContent = 'No valid entries were parsed. Check the text format.';
                         statusEl.className = 'mt-3 text-sm font-medium text-rose-600';
                         statusEl.classList.remove('hidden');
                         previewPanel.classList.add('hidden');
@@ -14771,7 +15809,7 @@ ${(d.totalDeductions > 0) ? `
                     const matchedCount = debtParsedEntries.filter(p => p.match).length;
                     const skippedCount = debtParsedEntries.length - matchedCount;
                     document.getElementById('debt-preview-summary').textContent =
-                        `${debtParsedEntries.length} entries parse hui hain — ${matchedCount} registered client se matched, ${skippedCount} skip ho jayengi (registered nahi).`;
+                        `${debtParsedEntries.length} entries parsed — ${matchedCount} matched to registered clients, ${skippedCount} will be skipped (not registered).`;
                     document.getElementById('debt-preview-tbody').innerHTML = debtParsedEntries.map((p, i) => {
                         const statusCell = p.match
                             ? `<span class="text-emerald-700 font-medium text-xs"><i class="fas fa-check-circle mr-1"></i>Matched: ${p.match.name}</span>`
@@ -14832,12 +15870,12 @@ ${(d.totalDeductions > 0) ? `
                         debtParsedEntries = [];
                         const statusEl = document.getElementById('debt-parse-status');
                         statusEl.textContent = skippedCount > 0
-                            ? `${toSave.length} debts save ho gayi hain. ${skippedCount} entries skip hui (registered client nahi mila).`
-                            : `${toSave.length} debts successfully save ho gayi hain.`;
+                            ? `${toSave.length} debts saved. ${skippedCount} entries skipped (registered client not found).`
+                            : `${toSave.length} debts saved successfully.`;
                         statusEl.className = 'mt-3 text-sm font-medium text-emerald-600';
                         statusEl.classList.remove('hidden');
                     } catch (e) {
-                        showMessage('Error', 'Bulk save nahi hua: ' + e.message);
+                        showMessage('Error', 'Bulk save failed: ' + e.message);
                     }
                 });
             }
@@ -14858,9 +15896,9 @@ ${(d.totalDeductions > 0) ? `
                 if (match) {
                     debtAccInput.value = match.tradingAccount;
                     debtNameInput.value = match.name;
-                    statusEl.innerHTML = `<span class="text-emerald-600"><i class="fas fa-check-circle mr-1"></i>Registered client mila: ${match.name} (${match.tradingAccount})</span>`;
+                    statusEl.innerHTML = `<span class="text-emerald-600"><i class="fas fa-check-circle mr-1"></i>Registered client found: ${match.name} (${match.tradingAccount})</span>`;
                 } else {
-                    statusEl.innerHTML = `<span class="text-rose-500"><i class="fas fa-times-circle mr-1"></i>Yeh registered client nahi mila. Pehle Client Profiles mein register karen.</span>`;
+                    statusEl.innerHTML = `<span class="text-rose-500"><i class="fas fa-times-circle mr-1"></i>This is not a registered client. Register them in Client Profiles first.</span>`;
                 }
             }
             if (debtAccInput) debtAccInput.addEventListener('blur', debtTryAutoMatch);
@@ -14876,7 +15914,7 @@ ${(d.totalDeductions > 0) ? `
                     if ((!accountNumber && !clientName) || isNaN(debtAmount)) return;
                     const match = findRegisteredClientForDebt(accountNumber, clientName);
                     if (!match) {
-                        showMessage('Error', 'Yeh client registered nahi hai. Sirf registered clients (Client Profiles) ka debt add ho sakta hai.');
+                        showMessage('Error', 'This client is not registered. Only registered clients (Client Profiles) can have a debt added.');
                         return;
                     }
                     try {
@@ -14894,7 +15932,7 @@ ${(d.totalDeductions > 0) ? `
                         const statusEl = document.getElementById('debt-client-match-status');
                         if (statusEl) statusEl.textContent = '';
                     } catch (err) {
-                        showMessage('Error', 'Debt entry save nahi hui: ' + err.message);
+                        showMessage('Error', 'Debt entry save failed: ' + err.message);
                     }
                 });
             }
