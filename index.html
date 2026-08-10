@@ -15850,6 +15850,7 @@ ${(d.totalDeductions > 0) ? `
                     try {
                         const batch = db.batch();
                         const nowIso = new Date().toISOString();
+                        const matchedIds = new Set(toSave.map(entry => entry.match.id));
                         toSave.forEach(entry => {
                             // Keyed by the registered client's own document id, so re-uploading the
                             // same client's data later always updates this same debt record.
@@ -15862,6 +15863,16 @@ ${(d.totalDeductions > 0) ? `
                                 lastUpdated: nowIso,
                                 source: 'bulk'
                             }, { merge: true });
+                        });
+                        // The pasted Trial Balance is the latest full snapshot of outstanding
+                        // debts. Any previously bulk-imported debt record that is no longer
+                        // present in this new snapshot is stale (that client's debt is not on
+                        // the latest data) and must be removed here, so old records never
+                        // persist alongside the freshly saved entries.
+                        (allDebts || []).forEach(d => {
+                            if (d.source === 'bulk' && !matchedIds.has(d.id)) {
+                                batch.delete(db.collection(`users/${currentUserId}/debts`).doc(d.id));
+                            }
                         });
                         await batch.commit();
                         document.getElementById('debt-preview-panel').classList.add('hidden');
