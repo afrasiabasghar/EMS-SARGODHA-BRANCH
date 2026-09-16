@@ -2545,6 +2545,38 @@
                             </div>
                         </div>
                         
+                        <!-- ─── RECENT PAYMENTS CARD ───────────────────────────────
+                             Shows the payments recorded under Commission ->
+                             "Record Received Payment (DR)" for the most recent month
+                             that has any such payment. Read-only view of the existing
+                             commission_received data. -->
+                        <div id="dashboard-recent-payments-card" class="card p-6 mt-6">
+                            <div class="flex items-start justify-between flex-wrap gap-3">
+                                <div>
+                                    <h3 class="text-xl font-semibold"><i class="fas fa-money-bill-wave mr-2 text-emerald-600"></i>Recent Payments</h3>
+                                    <p id="recent-payments-subheading" class="text-sm text-slate-500 mt-1">Last Month Payment</p>
+                                </div>
+                                <div class="text-right">
+                                    <p style="color:#94a3b8;font-size:0.7rem;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:2px;">Total Paid</p>
+                                    <p id="recent-payments-total" class="text-2xl font-bold" style="color:#1f9d55;">PKR 0</p>
+                                </div>
+                            </div>
+                            <div class="overflow-x-auto overflow-y-auto max-h-72 mt-4">
+                                <table class="w-full text-left table-auto">
+                                    <thead class="border-b-2 sticky top-0 bg-white">
+                                        <tr class="text-slate-600 uppercase text-sm">
+                                            <th class="p-2">Date</th>
+                                            <th class="p-2">Description</th>
+                                            <th class="p-2 text-right">Amount (DR)</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="recent-payments-list">
+                                        <tr><td colspan="3" class="p-4 text-center text-slate-500">No payment recorded yet.</td></tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
                         <!-- Responsive Grid for charts: Stacks on mobile, two columns on large screens -->
                         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
                             <div class="card p-6">
@@ -4902,7 +4934,7 @@
                             <button class="an-tab-btn active" onclick="analyticsSwitchTab('overview')" id="an-tab-overview" data-admin-hide-tab><i class="fas fa-gauge-high"></i> Overview</button>
                             <button class="an-tab-btn" onclick="analyticsSwitchTab('sessions')" id="an-tab-sessions" data-admin-hide-tab><i class="fas fa-history"></i> Session History</button>
                             <button class="an-tab-btn" onclick="analyticsSwitchTab('pagetime')" id="an-tab-pagetime" data-admin-hide-tab><i class="fas fa-hourglass-half"></i> Page Activity</button>
-                            <button class="an-tab-btn" onclick="analyticsSwitchTab('shared')" id="an-tab-shared"><i class="fas fa-share-alt"></i> Shared Visitors</button>
+                            <button class="an-tab-btn" onclick="analyticsSwitchTab('activities'); adminActivityLogLoad();" id="an-tab-activities"><i class="fas fa-user-pen"></i> Admin's Activities</button>
                         </div>
 
                         <!-- Overview Tab (Admin activity only — never shows the owner/backend's own login) -->
@@ -5014,29 +5046,49 @@
                             </div>
                         </div>
 
-                        <!-- Shared Visitors Tab -->
-                        <div class="an-tab-panel" id="an-panel-shared">
+                        <!-- Admin's Activities Tab -->
+                        <div class="an-tab-panel" id="an-panel-activities">
                             <div class="settings-card">
                                 <div class="settings-card-header">
-                                    <i class="fas fa-share-alt" style="color:#9cc6fb;"></i>
-                                    <h3>Shared Frontend Visitors</h3>
+                                    <i class="fas fa-user-pen" style="color:#9cc6fb;"></i>
+                                    <h3>Admin's Activities</h3>
                                 </div>
                                 <div class="settings-card-body" style="padding:0;">
-                                    <div id="analytics-shared-visitors-summary" style="padding:14px 20px 10px;font-family:-apple-system,BlinkMacSystemFont,'Inter',sans-serif;font-size:0.83rem;color:#475569;border-bottom:1px solid #f1f5f9;">
-                                        Loading visitor data…
+                                    <div style="display:flex;flex-wrap:wrap;gap:10px;align-items:center;padding:14px 20px;border-bottom:1px solid #f1f5f9;">
+                                        <input type="text" id="aa-search" data-admin-searchable placeholder="Search admin, section, details…" style="flex:1 1 240px;min-width:200px;padding:8px 12px;border:1px solid #e2e8f0;border-radius:9999px;font-size:0.82rem;font-family:-apple-system,BlinkMacSystemFont,'Inter',sans-serif;">
+                                        <select id="aa-filter-admin" data-admin-searchable style="padding:8px 12px;border:1px solid #e2e8f0;border-radius:9999px;font-size:0.82rem;font-family:-apple-system,BlinkMacSystemFont,'Inter',sans-serif;">
+                                            <option value="">All Admins</option>
+                                        </select>
+                                        <select id="aa-filter-section" data-admin-searchable style="padding:8px 12px;border:1px solid #e2e8f0;border-radius:9999px;font-size:0.82rem;font-family:-apple-system,BlinkMacSystemFont,'Inter',sans-serif;">
+                                            <option value="">All Sections</option>
+                                        </select>
+                                        <select id="aa-filter-action" data-admin-searchable style="padding:8px 12px;border:1px solid #e2e8f0;border-radius:9999px;font-size:0.82rem;font-family:-apple-system,BlinkMacSystemFont,'Inter',sans-serif;">
+                                            <option value="">All Actions</option>
+                                            <option value="Added">Added</option>
+                                            <option value="Updated">Updated</option>
+                                            <option value="Saved">Saved</option>
+                                            <option value="Deleted">Deleted</option>
+                                            <option value="Bulk">Bulk</option>
+                                        </select>
+                                        <button id="aa-refresh-btn" data-admin-searchable onclick="adminActivityLogLoad(true)" style="padding:8px 16px;border:none;border-radius:9999px;background:#0071e3;color:#fff;font-size:0.82rem;font-weight:600;cursor:pointer;font-family:-apple-system,BlinkMacSystemFont,'Inter',sans-serif;"><i class="fas fa-rotate mr-1"></i> Refresh</button>
                                     </div>
-                                    <div style="overflow-x:auto;max-height:520px;overflow-y:auto;">
+                                    <div id="aa-summary" style="padding:12px 20px 10px;font-family:-apple-system,BlinkMacSystemFont,'Inter',sans-serif;font-size:0.83rem;color:#475569;border-bottom:1px solid #f1f5f9;">
+                                        Loading activity records…
+                                    </div>
+                                    <div style="overflow-x:auto;max-height:560px;overflow-y:auto;">
                                         <table style="width:100%;border-collapse:collapse;font-family:-apple-system,BlinkMacSystemFont,'Inter',sans-serif;font-size:0.82rem;">
                                             <thead>
                                                 <tr style="background:linear-gradient(90deg,#f8fafc,#f2f6fb);border-bottom:2px solid #eef4fc;">
                                                     <th style="padding:10px 16px;text-align:left;font-weight:700;color:#475569;letter-spacing:0.04em;text-transform:uppercase;font-size:0.72rem;">#</th>
-                                                    <th style="padding:10px 16px;text-align:left;font-weight:700;color:#475569;letter-spacing:0.04em;text-transform:uppercase;font-size:0.72rem;">Visited At</th>
-                                                    <th style="padding:10px 16px;text-align:left;font-weight:700;color:#475569;letter-spacing:0.04em;text-transform:uppercase;font-size:0.72rem;">Time Elapsed Since Visit</th>
-                                                    <th style="padding:10px 16px;text-align:left;font-weight:700;color:#475569;letter-spacing:0.04em;text-transform:uppercase;font-size:0.72rem;">Referrer</th>
+                                                    <th style="padding:10px 16px;text-align:left;font-weight:700;color:#475569;letter-spacing:0.04em;text-transform:uppercase;font-size:0.72rem;">Date &amp; Time</th>
+                                                    <th style="padding:10px 16px;text-align:left;font-weight:700;color:#475569;letter-spacing:0.04em;text-transform:uppercase;font-size:0.72rem;">Admin</th>
+                                                    <th style="padding:10px 16px;text-align:left;font-weight:700;color:#475569;letter-spacing:0.04em;text-transform:uppercase;font-size:0.72rem;">Action</th>
+                                                    <th style="padding:10px 16px;text-align:left;font-weight:700;color:#475569;letter-spacing:0.04em;text-transform:uppercase;font-size:0.72rem;">Section</th>
+                                                    <th style="padding:10px 16px;text-align:left;font-weight:700;color:#475569;letter-spacing:0.04em;text-transform:uppercase;font-size:0.72rem;">Details</th>
                                                 </tr>
                                             </thead>
-                                            <tbody id="analytics-shared-visitors-tbody">
-                                                <tr><td colspan="4" style="text-align:center;padding:24px;color:#94a3b8;">No shared-link visits recorded yet.</td></tr>
+                                            <tbody id="aa-tbody">
+                                                <tr><td colspan="6" style="text-align:center;padding:24px;color:#94a3b8;">No activity recorded yet.</td></tr>
                                             </tbody>
                                         </table>
                                     </div>
@@ -6327,6 +6379,7 @@
         let isAdminSession = false; // True when logged in via an Admin account (Share Frontend login)
         let currentAdminPermissions = null; // { [sectionId]: { visible, edit } } for the logged-in admin
         let currentAdminId = null;
+        let currentAdminName = ''; // display name of the logged-in admin, used by the Admin's Activities audit log
         let pendingShareOwnerId = null; // owner uid from ?share= link, used by the admin login form
         let allAdmins = [];
         let editingAdminId = null;
@@ -6868,7 +6921,7 @@
             const dataHandlers = {
                 complaints: data => { allComplaints = data; renderComplaints(); updateDashboard(); },
                 daily_commissions: data => { allDailyCommissions = data; renderCommissionSection(); updateDashboard(); if (typeof bpRefreshIfActive === 'function') bpRefreshIfActive(); },
-                commission_received: data => { allCommissionReceived = data; renderCommissionSection(); },
+                commission_received: data => { allCommissionReceived = data; renderCommissionSection(); renderRecentPaymentsCard(); },
                 expenses: data => { allExpenses = data; renderExpenses(); },
                 clients: data => { allClients = data; renderProfiles(); updateDashboard(); updateClientDatalist(); if (typeof cpRefreshIfActive === 'function') cpRefreshIfActive(); if (typeof bpRefreshIfActive === 'function') bpRefreshIfActive(); },
                 employees: data => { allEmployees = data; renderEmployees(); updateDashboard(); },
@@ -7007,6 +7060,58 @@
         });
 
         // --- DASHBOARD MODULE ---
+        // ─── RECENT PAYMENTS CARD (Dashboard) ─────────────────────────────────
+        // Lists only the payments entered under Commission -> "Record Received
+        // Payment (DR)" (the commission_received records), limited to the most
+        // recent month that actually has such a payment. Nothing else feeds this
+        // card and no data is modified by it.
+        function renderRecentPaymentsCard() {
+            const listEl = document.getElementById('recent-payments-list');
+            const subEl = document.getElementById('recent-payments-subheading');
+            const totalEl = document.getElementById('recent-payments-total');
+            if (!listEl || !subEl || !totalEl) return;
+
+            const payments = (allCommissionReceived || []).filter(r => r && r.date);
+            if (payments.length === 0) {
+                subEl.textContent = 'Last Month Payment';
+                totalEl.textContent = 'PKR 0';
+                listEl.innerHTML = '<tr><td colspan="3" class="p-4 text-center text-slate-500">No payment recorded yet.</td></tr>';
+                return;
+            }
+
+            // Month of the most recently dated DR payment
+            const monthKeyOf = dateStr => {
+                const d = new Date(dateStr);
+                return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+            };
+            const latestDate = payments.reduce((max, r) => (new Date(r.date) > new Date(max) ? r.date : max), payments[0].date);
+            const latestKey = monthKeyOf(latestDate);
+
+            const monthPayments = payments
+                .filter(r => monthKeyOf(r.date) === latestKey)
+                .sort((a, b) => new Date(b.date) - new Date(a.date));
+
+            const monthLabel = new Date(latestDate).toLocaleString('en-US', { month: 'long', year: 'numeric' });
+            subEl.textContent = `Last Month Payment — ${monthLabel}`;
+
+            const total = monthPayments.reduce((sum, r) => sum + (parseFloat(r.amount) || 0), 0);
+            totalEl.textContent = `PKR ${total.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`;
+
+            const esc = s => String(s === null || s === undefined ? '' : s)
+                .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+
+            listEl.innerHTML = monthPayments.map(r => {
+                const dt = new Date(r.date);
+                const dateTxt = isNaN(dt) ? esc(r.date) : dt.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+                const amt = (parseFloat(r.amount) || 0).toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 });
+                return `<tr class="border-b hover:bg-slate-50">
+                    <td class="p-2 whitespace-nowrap">${dateTxt}</td>
+                    <td class="p-2">${esc(r.description || 'Payment Received')}</td>
+                    <td class="p-2 text-right font-semibold" style="color:#1f9d55;">PKR ${amt}</td>
+                </tr>`;
+            }).join('');
+        }
+
         function updateDashboard() {
             const totalClientsCount = allClients.filter(c => !c.isClosed).length;
             const now = new Date();
@@ -7243,6 +7348,8 @@
             renderDashTrend('total-commission-trend', monthGrossCommission, prevMonthGrossCommission, 'total-commission-spark', totalCommissionSeries);
             renderDashTrend('ho-deduction-trend', monthHODeduction, prevMonthHODeduction, 'ho-deduction-spark', hoDeductionSeries);
             renderDashTrend('total-tax-trend', monthTaxDeduction, prevMonthTaxDeduction, 'total-tax-spark', totalTaxSeries);
+
+            renderRecentPaymentsCard();
 
             const complaintStatusData = { Pending: 0, Done: 0 };
             activeComplaints.forEach(c => {
@@ -7953,21 +8060,85 @@
 
         // ─── WEEKLY ROLLOVER COMMISSION (Futures) ──────────────────────────────
         // For a selected Friday: finds every registered client's Futures
-        // position that is still open going into Friday (i.e. it was already
-        // held as of Thursday's close and wasn't sold on Friday). A position
-        // opened fresh on Friday itself is excluded, since it hasn't rolled
-        // over the week. Commission on the rollover quantity uses the same
-        // CommissionService logic as normal buying. This only READS existing
-        // Trade Log / baseline data — nothing is written until the user
-        // clicks "Add to Commission Generator System".
+        // position in the CURRENTLY RUNNING contract month that is still open
+        // going into Friday (i.e. it was already held as of Thursday's close
+        // and wasn't sold on Friday). A position opened fresh on Friday itself
+        // is excluded, since it hasn't rolled over the week. Commission on the
+        // rollover quantity uses the same CommissionService logic as normal
+        // buying. This only READS existing Trade Log / baseline data — nothing
+        // is written until the user clicks "Add to Commission Generator System".
+        //
+        // FIX (16-09-2026): two faults are corrected here.
+        //   1. EARLIER MONTHS' CONTRACTS WERE SHOWING. The old code carried
+        //      every Futures line forward forever, so expired contracts from
+        //      previous months (e.g. the 28-07-2026 baseline's "SSGC-JUL",
+        //      "TPL-JUL", "BOP-AUG" …) kept appearing on every Friday of every
+        //      later month. A Futures contract only lives for its own month, so
+        //      only the contract month of the selected Friday can ever roll
+        //      over; every other month is now excluded outright.
+        //   2. ALREADY-SOLD POSITIONS WERE STILL SHOWING. The old code matched
+        //      buys and sells using `_resolvedFutSymbol` from
+        //      resolveFuturesSymbols(), whose FIFO fallback closes the
+        //      EARLIEST-opened contract first. With a stale, never-expired
+        //      earlier-month position still sitting in that map, an unlabelled
+        //      sell of (say) BOP got attributed to the stale BOP-JUL instead of
+        //      the live BOP-SEP, so the live position never got reduced and kept
+        //      being charged rollover after the client had actually sold it.
+        //      Rollover now resolves symbols on its own, scoped to the running
+        //      contract only, so a buy and its sell always match and net to zero.
+        // Nothing outside this function is touched: resolveFuturesSymbols(),
+        // the Client Portfolio, the Trade Log and all stored data behave exactly
+        // as before.
+        const FUT_MONTH_CODES = ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC'];
+
+        // Contract month running on a given date -- simply that date's own month
+        // ('2026-09-18' -> 'SEP').
+        function rolloverContractMonth(dateStr) {
+            const d = new Date(dateStr + 'T00:00:00');
+            return FUT_MONTH_CODES[d.getMonth()];
+        }
+
+        // First day of the running contract's life = the day after the previous
+        // month's expiry (PSX Futures expire on the last Friday of the month),
+        // as YYYY-MM-DD. A Futures row dated before this belongs to an earlier
+        // contract and can never be part of this month's rollover.
+        function rolloverContractStartDate(fridayDate) {
+            const d = new Date(fridayDate + 'T00:00:00');
+            const prevExpiry = new Date(d.getFullYear(), d.getMonth(), 0); // last day of previous month
+            while (prevExpiry.getDay() !== 5) prevExpiry.setDate(prevExpiry.getDate() - 1); // walk back to last Friday
+            prevExpiry.setDate(prevExpiry.getDate() + 1);
+            const y = prevExpiry.getFullYear();
+            const m = String(prevExpiry.getMonth() + 1).padStart(2, '0');
+            const day = String(prevExpiry.getDate()).padStart(2, '0');
+            return `${y}-${m}-${day}`;
+        }
+
+        // Month code carried by a Futures symbol ('BOP-SEP' -> 'SEP',
+        // 'LOTCHEM-SEPB' -> 'SEP'), or '' when the symbol carries no month.
+        function rolloverSymbolMonth(sym) {
+            const m = String(sym || '').trim().toUpperCase().match(/-([A-Z]{3})B?$/);
+            return (m && FUT_MONTH_CODES.includes(m[1])) ? m[1] : '';
+        }
+
+        // Base symbol without its month suffix ('BOP-SEP' -> 'BOP'). Symbols with
+        // no recognised month suffix are returned unchanged.
+        function rolloverBaseSymbol(sym) {
+            const s = String(sym || '').trim();
+            return rolloverSymbolMonth(s) ? s.replace(/-[A-Z]{3}B?$/i, '') : s;
+        }
+
         function computeWeeklyRolloverCommission(fridayDate) {
             if (!fridayDate) return [];
-            resolveFuturesSymbols(); // make sure every Futures trade has its resolved month symbol
+            resolveFuturesSymbols(); // keep the rest of the app's resolved symbols in sync
 
-            const thu = new Date(fridayDate + 'T00:00:00');
-            thu.setDate(thu.getDate() - 1);
+            const monthCode = rolloverContractMonth(fridayDate);       // e.g. 'SEP'
+            const contractStart = rolloverContractStartDate(fridayDate); // e.g. '2026-08-30'
+            // Vtrade sometimes appends a lowercase "b" to a sell-side Futures
+            // symbol ("LOTCHEM-SEPb"); strip it so it matches the buy side. A
+            // genuine uppercase "B" contract flag is left untouched.
+            const normalizeSym = s => String(s || '').trim().replace(/-([A-Z]{3,4})b$/, '-$1');
 
-            const thuQty = {};   // clientId -> { symbol: qty }  -- open as of Thursday close
+            const held = {};     // clientId -> { symbol: qty }  -- open as of Thursday close (running month only)
             const friSell = {};  // clientId -> { symbol: qty }  -- sold on Friday itself
             const lastRate = {}; // clientId -> { symbol: rate } -- most recent known rate before Friday
             const clientOf = {}; // clientId -> client object
@@ -7977,12 +8148,15 @@
                 map[clientId][sym] = (map[clientId][sym] || 0) + delta;
             }
 
+            // Baseline snapshot: only contracts of the running month can still be
+            // open; anything from an earlier month has already expired.
             PORTFOLIO_BASELINE.forEach(([acc, sym, qty, type]) => {
                 if (type !== 'F') return;
+                if (rolloverSymbolMonth(sym) !== monthCode) return;
                 const client = findRegisteredClientForPortfolio(acc, '');
                 if (!client) return;
                 clientOf[client.id] = client;
-                bump(thuQty, client.id, sym, qty);
+                bump(held, client.id, String(sym).trim(), qty);
             });
 
             Object.keys(allTradeLogEntries).sort().forEach(date => {
@@ -7997,32 +8171,53 @@
                     if (qty <= 0) return;
                     const client = findRegisteredClientForPortfolio(t.account, t.clientName);
                     if (!client) return;
-                    const sym = (t._resolvedFutSymbol || t.rawSymbol || t.stockName || '').trim();
-                    if (!sym) return;
+
+                    const overrideSymbol = t.orderNo ? FUTURES_SYMBOL_OVERRIDES[String(t.orderNo).trim()] : null;
+                    const rawSym = normalizeSym(overrideSymbol || t.rawSymbol || t.stockName || '');
+                    if (!rawSym) return;
+
+                    // Resolve the contract this row belongs to, scoped to the
+                    // running month only.
+                    const symMonth = rolloverSymbolMonth(rawSym);
+                    let sym;
+                    if (symMonth) {
+                        if (symMonth !== monthCode) return; // another month's contract -- cannot roll over into this Friday
+                        sym = rawSym;
+                    } else {
+                        // No month on the row (Vtrade often sends it bare). Inside
+                        // the running contract's own date window it can only be
+                        // this month's contract; before that window it belongs to
+                        // an already-expired contract and is ignored.
+                        if (date < contractStart) return;
+                        sym = `${rolloverBaseSymbol(rawSym)}-${monthCode}`;
+                    }
+
                     clientOf[client.id] = client;
                     const isSell = String(t.side).toLowerCase() === 'sell';
                     const rate = parseFloat(t.rate) || 0;
 
                     if (date < fridayDate) {
-                        bump(thuQty, client.id, sym, isSell ? -qty : qty);
+                        bump(held, client.id, sym, isSell ? -qty : qty);
                         if (rate > 0) { if (!lastRate[client.id]) lastRate[client.id] = {}; lastRate[client.id][sym] = rate; }
                     } else if (isSell) {
                         // date === fridayDate
                         bump(friSell, client.id, sym, qty);
                     }
-                    // Friday buys are intentionally NOT added to thuQty -- a
+                    // Friday buys are intentionally NOT added to `held` -- a
                     // position opened on Friday itself never rolled over.
                 });
             });
 
             const items = [];
-            Object.keys(thuQty).forEach(clientId => {
+            Object.keys(held).forEach(clientId => {
                 const client = clientOf[clientId];
-                Object.keys(thuQty[clientId]).forEach(sym => {
-                    const heldFromThursday = thuQty[clientId][sym] || 0;
+                if (!client) return;
+                Object.keys(held[clientId]).forEach(sym => {
+                    const heldFromThursday = held[clientId][sym] || 0;
+                    if (heldFromThursday <= 0) return; // fully sold before Friday
                     const soldOnFriday = (friSell[clientId] && friSell[clientId][sym]) || 0;
                     const rolloverQty = Math.max(heldFromThursday - soldOnFriday, 0);
-                    if (rolloverQty <= 0) return;
+                    if (rolloverQty <= 0) return; // sold out on Friday -- no rollover
                     const rate = (lastRate[clientId] && lastRate[clientId][sym]) || 0;
                     const { commissionPerStock, totalStockCommission } = CommissionService.calculateCommission(rate, rolloverQty);
                     items.push({
@@ -15616,6 +15811,7 @@ ${(d.totalDeductions > 0) ? `
                 isAdminSession = true;
                 currentAdminPermissions = adminData.permissions || {};
                 currentAdminId = adminId;
+                currentAdminName = adminData.displayName || adminData.username || 'Admin';
                 currentUserId = ownerId;
                 isSharedView = true; // recalculated per-section by showSection below
 
@@ -15631,9 +15827,9 @@ ${(d.totalDeductions > 0) ? `
                 // Overview / Session History / Page Activity are owner-only views of
                 // OTHER admins' login & page activity — an admin session never sees
                 // them, even if the owner has granted this admin visibility on the
-                // Analytics section. Only Shared Visitors remains for admins.
+                // Analytics section. Only Admin's Activities remains for admins.
                 document.querySelectorAll('[data-admin-hide-tab]').forEach(el => el.style.display = 'none');
-                if (typeof analyticsSwitchTab === 'function') analyticsSwitchTab('shared');
+                if (typeof analyticsSwitchTab === 'function') analyticsSwitchTab('activities');
 
                 applyAdminSidebarFilter(currentAdminPermissions);
 
@@ -16967,7 +17163,7 @@ ${(d.totalDeductions > 0) ? `
             document.querySelectorAll('#main-nav .nav-btn').forEach(btn => {
                 if (btn.dataset.section === 'analytics') {
                     btn.addEventListener('click', () => {
-                        analyticsLoadSharedVisitors();
+                        adminActivityLogLoad(); // Admin's Activities (system-wide audit log)
                         adminActivityLoadSessions(); // loads Overview + Session History + Page Activity (admin data only)
                     });
                 }
@@ -16980,6 +17176,438 @@ ${(d.totalDeductions > 0) ? `
                 }
             });
         });
+        // ─── ADMIN'S ACTIVITIES (SYSTEM-WIDE AUDIT LOG) ────────────────────────
+        // Records every create / update / delete that happens anywhere in the
+        // system — Complaints, Commission, CGS Calculator, Expenses, Debts,
+        // Affiliate Program, Task Manager, Client Profiles, HR & Employees,
+        // Couriers, Phone Directory, Records, Trade Log, Vtrade Trade Log,
+        // Client Portfolio, Utility Bills, Admins, Settings, Backup & Restore —
+        // together with WHO did it.
+        //
+        // Actor naming:
+        //   • Owner / backend session            -> "Super Admin"
+        //   • Admin created from the backend     -> that admin's own name
+        //
+        // How it captures everything without touching any existing feature:
+        // instead of editing all ~190 save/delete call sites (which would risk
+        // breaking working data flows), it wraps the Firestore write methods
+        // themselves (add / set / update / delete / batch). Every write the app
+        // already performs is passed straight through untouched — the wrapper
+        // only writes an extra audit record alongside it. No existing data is
+        // read, changed or removed by this module.
+        //
+        // Firestore layout:
+        //   users/{ownerId}/admin_activities/{autoId}
+        //       at, atLocal, action, actionLabel, section, collection, docId,
+        //       path, actorType, actorId, actorName, summary, fields, count
+        const AA_COLLECTION = 'admin_activities';
+        const AA_MAX_ROWS = 300;
+
+        // Firestore collection -> the section it belongs to in the sidebar
+        const AA_SECTION_MAP = {
+            complaints: 'Complaints',
+            daily_commissions: 'Commission',
+            commission_received: 'Commission',
+            cgs_entries: 'CGS Calculator',
+            expenses: 'Expenses',
+            petty_cash: 'Expenses',
+            monthly_expenses: 'Expenses',
+            debts: 'Debts',
+            affiliate_agents: 'Affiliate Program',
+            affiliate_transactions: 'Affiliate Program',
+            tasks: 'Task Manager',
+            clients: 'Client Profiles',
+            client_payments: 'Client Profiles',
+            clientDeposits: 'Client Profiles',
+            employees: 'HR & Employees',
+            employee_performance: 'HR & Employees',
+            couriers: 'Couriers',
+            phone_directory: 'Phone Directory',
+            clientAgreements: 'Records',
+            employeeAgreements: 'Records',
+            branchAgreements: 'Records',
+            clientRecordings: 'Records',
+            trade_log_entries: 'Trade Log',
+            portfolio_adjustments: 'Client Portfolio',
+            utility_bills: 'Utility Bills',
+            other_bills: 'Utility Bills',
+            admins: 'Admins'
+        };
+
+        // Field names worth showing first in the Details column
+        const AA_PRIORITY_FIELDS = ['name', 'clientName', 'displayName', 'username', 'title', 'taskName', 'subject',
+            'accountNumber', 'tradingAccount', 'account', 'stockName', 'symbol', 'type', 'billType', 'category',
+            'status', 'description', 'purpose', 'amount', 'debtAmount', 'total', 'totalAmount', 'commission',
+            'date', 'month', 'dueDate'];
+
+        let _aaHooked = false;
+        let _aaQueue = [];
+        let _aaFlushTimer = null;
+        const _aaBatchOps = (typeof WeakMap !== 'undefined') ? new WeakMap() : null;
+        // Untouched originals — the audit record itself is written through these,
+        // so logging can never log itself.
+        let _aaOrigColAdd = null, _aaOrigDocSet = null, _aaOrigDocUpdate = null, _aaOrigDocDelete = null;
+        let _aaOrigBatchSet = null, _aaOrigBatchUpdate = null, _aaOrigBatchDelete = null, _aaOrigBatchCommit = null;
+
+        function aaSkipPath(path) {
+            if (!path || typeof db === 'undefined' || !currentUserId) return true;
+            if (path.indexOf('/' + AA_COLLECTION) !== -1) return true;          // never log the log
+            if (path.indexOf('public_dashboards') === 0) {
+                return path.split('/').indexOf('admins') === -1;                  // only Admins changes matter here
+            }
+            return false;
+        }
+
+        function aaSectionFor(path) {
+            const parts = String(path || '').split('/').filter(Boolean);
+            if (parts.length === 2 && parts[0] === 'users') return 'Settings';    // users/{uid} = appearance settings
+            for (let i = parts.length - 1; i >= 0; i--) {
+                if (AA_SECTION_MAP[parts[i]]) return AA_SECTION_MAP[parts[i]];
+            }
+            return 'System';
+        }
+
+        function aaCollectionFor(path) {
+            const parts = String(path || '').split('/').filter(Boolean);
+            if (parts.length === 2 && parts[0] === 'users') return 'account_settings';
+            return parts.length >= 2 ? parts[parts.length - 2] : (parts[0] || '—');
+        }
+
+        function aaDocIdFor(path) {
+            const parts = String(path || '').split('/').filter(Boolean);
+            return parts.length ? parts[parts.length - 1] : '';
+        }
+
+        function aaActor() {
+            if (typeof isAdminSession !== 'undefined' && isAdminSession) {
+                return {
+                    actorType: 'admin',
+                    actorId: currentAdminId || '',
+                    actorName: currentAdminName || 'Admin'
+                };
+            }
+            return { actorType: 'super', actorId: 'owner', actorName: 'Super Admin' };
+        }
+
+        // Flattens a written object into a small, safe set of readable fields.
+        // Long strings (image data URLs etc.) and nested arrays/objects are
+        // reduced to short descriptors so the log stays light.
+        function aaFields(data) {
+            const out = {};
+            if (!data || typeof data !== 'object') return out;
+            let n = 0;
+            Object.keys(data).forEach(k => {
+                if (n >= 12) return;
+                const v = data[k];
+                if (v === null || v === undefined) return;
+                let val;
+                if (Array.isArray(v)) val = '[' + v.length + ' items]';
+                else if (typeof v === 'object') val = '[object]';
+                else if (typeof v === 'string') val = v.length > 120 ? v.slice(0, 120) + '…' : v;
+                else val = String(v);
+                if (val === '') return;
+                out[k] = val;
+                n++;
+            });
+            return out;
+        }
+
+        function aaSummary(fields, docId) {
+            const picked = [];
+            AA_PRIORITY_FIELDS.forEach(k => {
+                if (picked.length < 3 && Object.prototype.hasOwnProperty.call(fields, k)) picked.push(k + ': ' + fields[k]);
+            });
+            if (picked.length === 0) {
+                Object.keys(fields).slice(0, 3).forEach(k => picked.push(k + ': ' + fields[k]));
+            }
+            if (picked.length === 0 && docId) picked.push('Record: ' + docId);
+            return picked.join(' • ');
+        }
+
+        // Queue + flush. Several writes of the same kind fired together (bulk
+        // upload, backup restore, clear-all) are collapsed into ONE record with
+        // a count, so a single action never floods the log.
+        function aaQueue(actionLabel, path, data) {
+            try {
+                if (aaSkipPath(path)) return;
+                const fields = aaFields(data);
+                const docId = aaDocIdFor(path);
+                _aaQueue.push({
+                    actionLabel,
+                    section: aaSectionFor(path),
+                    collection: aaCollectionFor(path),
+                    docId,
+                    path,
+                    fields,
+                    summary: aaSummary(fields, docId)
+                });
+                if (_aaFlushTimer) clearTimeout(_aaFlushTimer);
+                _aaFlushTimer = setTimeout(aaFlush, 1200);
+            } catch (e) { /* logging must never break a save */ }
+        }
+
+        function aaFlush() {
+            const items = _aaQueue;
+            _aaQueue = [];
+            _aaFlushTimer = null;
+            if (!items.length) return;
+            const groups = {};
+            items.forEach(it => {
+                const key = it.actionLabel + '|' + it.section + '|' + it.collection;
+                (groups[key] = groups[key] || []).push(it);
+            });
+            Object.keys(groups).forEach(key => {
+                const g = groups[key];
+                if (g.length < 3) {
+                    g.forEach(it => aaWrite(it, 1));
+                } else {
+                    const first = g[0];
+                    aaWrite({
+                        actionLabel: 'Bulk ' + first.actionLabel,
+                        section: first.section,
+                        collection: first.collection,
+                        docId: '',
+                        path: first.path,
+                        fields: first.fields,
+                        summary: g.length + ' records — e.g. ' + g.slice(0, 2).map(x => x.summary).filter(Boolean).join(' | ')
+                    }, g.length);
+                }
+            });
+        }
+
+        function aaWrite(item, count) {
+            try {
+                if (typeof db === 'undefined' || !currentUserId) return;
+                const actor = aaActor();
+                const entry = {
+                    at: firebase.firestore.FieldValue.serverTimestamp(),
+                    atLocal: new Date().toISOString(),
+                    actionLabel: item.actionLabel,
+                    section: item.section,
+                    collection: item.collection,
+                    docId: item.docId || '',
+                    path: item.path || '',
+                    summary: item.summary || '',
+                    fields: item.fields || {},
+                    count: count || 1,
+                    actorType: actor.actorType,
+                    actorId: actor.actorId,
+                    actorName: actor.actorName,
+                    device: (navigator.userAgent || '—').slice(0, 180)
+                };
+                const col = db.collection('users/' + currentUserId + '/' + AA_COLLECTION);
+                const add = _aaOrigColAdd || col.add;
+                const res = add.call(col, entry);
+                if (res && res.catch) res.catch(() => {});
+            } catch (e) { /* never block the app */ }
+        }
+
+        // Wraps the Firestore write methods once. Every original call is passed
+        // through unchanged and its return value handed straight back, so app
+        // behaviour and stored data are exactly as before.
+        function aaInstallHooks() {
+            if (_aaHooked) return;
+            try {
+                if (typeof db === 'undefined' || !db) return;
+                const colRef = db.collection('users');
+                const docRef = colRef.doc('_aa_probe');
+                const batchRef = db.batch();
+                const ColProto = Object.getPrototypeOf(colRef);
+                const DocProto = Object.getPrototypeOf(docRef);
+                const BatchProto = Object.getPrototypeOf(batchRef);
+
+                _aaOrigColAdd = ColProto.add;
+                _aaOrigDocSet = DocProto.set;
+                _aaOrigDocUpdate = DocProto.update;
+                _aaOrigDocDelete = DocProto.delete;
+                _aaOrigBatchSet = BatchProto.set;
+                _aaOrigBatchUpdate = BatchProto.update;
+                _aaOrigBatchDelete = BatchProto.delete;
+                _aaOrigBatchCommit = BatchProto.commit;
+
+                ColProto.add = function (data) {
+                    const p = _aaOrigColAdd.apply(this, arguments);
+                    try {
+                        const basePath = this.path;
+                        if (p && p.then && !aaSkipPath(basePath)) {
+                            p.then(ref => aaQueue('Added', basePath + '/' + (ref && ref.id ? ref.id : ''), data)).catch(() => {});
+                        }
+                    } catch (e) {}
+                    return p;
+                };
+                DocProto.set = function (data) {
+                    const p = _aaOrigDocSet.apply(this, arguments);
+                    try { aaQueue('Saved', this.path, data); } catch (e) {}
+                    return p;
+                };
+                DocProto.update = function (data) {
+                    const p = _aaOrigDocUpdate.apply(this, arguments);
+                    try { aaQueue('Updated', this.path, (arguments.length === 1 && data && typeof data === 'object') ? data : null); } catch (e) {}
+                    return p;
+                };
+                DocProto.delete = function () {
+                    const p = _aaOrigDocDelete.apply(this, arguments);
+                    try { aaQueue('Deleted', this.path, null); } catch (e) {}
+                    return p;
+                };
+
+                if (_aaBatchOps) {
+                    const track = (batch, label, ref, data) => {
+                        try {
+                            if (!ref || !ref.path || aaSkipPath(ref.path)) return;
+                            const list = _aaBatchOps.get(batch) || [];
+                            list.push({ label, path: ref.path, data });
+                            _aaBatchOps.set(batch, list);
+                        } catch (e) {}
+                    };
+                    BatchProto.set = function (ref, data) { try { track(this, 'Saved', ref, data); } catch (e) {} return _aaOrigBatchSet.apply(this, arguments); };
+                    BatchProto.update = function (ref, data) { try { track(this, 'Updated', ref, data); } catch (e) {} return _aaOrigBatchUpdate.apply(this, arguments); };
+                    BatchProto.delete = function (ref) { try { track(this, 'Deleted', ref, null); } catch (e) {} return _aaOrigBatchDelete.apply(this, arguments); };
+                    BatchProto.commit = function () {
+                        const p = _aaOrigBatchCommit.apply(this, arguments);
+                        try {
+                            const list = _aaBatchOps.get(this) || [];
+                            _aaBatchOps.delete(this);
+                            list.forEach(op => aaQueue(op.label, op.path, op.data));
+                        } catch (e) {}
+                        return p;
+                    };
+                }
+                _aaHooked = true;
+            } catch (e) {
+                console.warn('Admin activity logging not installed:', e);
+            }
+        }
+        aaInstallHooks();
+        window.addEventListener('beforeunload', () => { try { if (_aaQueue.length) aaFlush(); } catch (e) {} });
+
+        // ─── Admin's Activities viewer ────────────────────────────────────────
+        let _aaRows = [];
+
+        function aaActionColor(label) {
+            const l = String(label || '');
+            if (l.indexOf('Deleted') !== -1) return '#e11d48';
+            if (l.indexOf('Added') !== -1) return '#059669';
+            if (l.indexOf('Updated') !== -1) return '#0071e3';
+            return '#7c3aed';
+        }
+
+        function aaEsc(s) {
+            return String(s === null || s === undefined ? '' : s)
+                .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+        }
+
+        function adminActivityLogLoad(force) {
+            const sum = document.getElementById('aa-summary');
+            const tbody = document.getElementById('aa-tbody');
+            if (!sum || !tbody) return;
+            if (typeof db === 'undefined' || !currentUserId) {
+                sum.textContent = 'Sign in required to load activity records.';
+                return;
+            }
+            if (_aaRows.length && !force) { aaRenderRows(); return; }
+            sum.textContent = 'Loading activity records…';
+            db.collection('users/' + currentUserId + '/' + AA_COLLECTION)
+                .orderBy('at', 'desc')
+                .limit(AA_MAX_ROWS)
+                .get()
+                .then(snap => {
+                    _aaRows = snap.docs.map(doc => {
+                        const x = doc.data() || {};
+                        const when = x.at && x.at.toDate ? x.at.toDate().toISOString() : (x.atLocal || null);
+                        return {
+                            when,
+                            actorName: x.actorName || '—',
+                            actorType: x.actorType || '',
+                            actionLabel: x.actionLabel || '—',
+                            section: x.section || '—',
+                            collection: x.collection || '',
+                            summary: x.summary || '',
+                            docId: x.docId || '',
+                            count: x.count || 1
+                        };
+                    });
+                    aaFillFilters();
+                    aaRenderRows();
+                })
+                .catch(err => {
+                    sum.textContent = 'Could not load activity records.';
+                    console.warn('Admin activity log load error:', err);
+                });
+        }
+
+        function aaFillFilters() {
+            const adminSel = document.getElementById('aa-filter-admin');
+            const secSel = document.getElementById('aa-filter-section');
+            if (adminSel) {
+                const prev = adminSel.value;
+                const names = Array.from(new Set(_aaRows.map(r => r.actorName))).sort();
+                adminSel.innerHTML = '<option value="">All Admins</option>' + names.map(n => `<option value="${aaEsc(n)}">${aaEsc(n)}</option>`).join('');
+                adminSel.value = prev;
+            }
+            if (secSel) {
+                const prev = secSel.value;
+                const secs = Array.from(new Set(_aaRows.map(r => r.section))).sort();
+                secSel.innerHTML = '<option value="">All Sections</option>' + secs.map(s => `<option value="${aaEsc(s)}">${aaEsc(s)}</option>`).join('');
+                secSel.value = prev;
+            }
+        }
+
+        function aaRenderRows() {
+            const sum = document.getElementById('aa-summary');
+            const tbody = document.getElementById('aa-tbody');
+            if (!sum || !tbody) return;
+            const q = (document.getElementById('aa-search')?.value || '').trim().toLowerCase();
+            const fAdmin = document.getElementById('aa-filter-admin')?.value || '';
+            const fSec = document.getElementById('aa-filter-section')?.value || '';
+            const fAct = document.getElementById('aa-filter-action')?.value || '';
+
+            const rows = _aaRows.filter(r => {
+                if (fAdmin && r.actorName !== fAdmin) return false;
+                if (fSec && r.section !== fSec) return false;
+                if (fAct && String(r.actionLabel).indexOf(fAct) === -1) return false;
+                if (q) {
+                    const hay = (r.actorName + ' ' + r.actionLabel + ' ' + r.section + ' ' + r.collection + ' ' + r.summary + ' ' + r.docId).toLowerCase();
+                    if (hay.indexOf(q) === -1) return false;
+                }
+                return true;
+            });
+
+            if (!_aaRows.length) {
+                sum.innerHTML = '<span style="color:#94a3b8;">No activity has been recorded yet.</span>';
+                tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:24px;color:#94a3b8;">No activity recorded yet.</td></tr>';
+                return;
+            }
+            const admins = new Set(rows.map(r => r.actorName));
+            sum.innerHTML = `<span style="color:#4f46e5;font-weight:700;">${rows.length}</span> activit${rows.length !== 1 ? 'ies' : 'y'} shown (latest ${_aaRows.length} records) • <span style="font-weight:600;">${admins.size}</span> user${admins.size !== 1 ? 's' : ''}`;
+
+            if (!rows.length) {
+                tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:24px;color:#94a3b8;">No activity matches these filters.</td></tr>';
+                return;
+            }
+            tbody.innerHTML = rows.map((r, i) => {
+                const isSuper = r.actorType === 'super';
+                const badge = `<span style="display:inline-block;padding:2px 8px;border-radius:9999px;font-size:0.7rem;font-weight:700;background:${isSuper ? '#eef2ff' : '#ecfdf5'};color:${isSuper ? '#4338ca' : '#047857'};">${aaEsc(r.actorName)}</span>`;
+                const countTxt = r.count > 1 ? ` <span style="color:#94a3b8;">(${r.count})</span>` : '';
+                return `<tr style="border-bottom:1px solid #f1f5f9;${i % 2 !== 0 ? 'background:#fafbff;' : ''}">
+                    <td style="padding:10px 14px;color:#94a3b8;font-size:0.78rem;font-weight:600;">${rows.length - i}</td>
+                    <td style="padding:10px 14px;color:var(--text-primary);font-weight:500;font-size:0.83rem;white-space:nowrap;">${aaEsc(analyticsFmtDate(r.when))}</td>
+                    <td style="padding:10px 14px;">${badge}</td>
+                    <td style="padding:10px 14px;font-weight:700;font-size:0.8rem;color:${aaActionColor(r.actionLabel)};">${aaEsc(r.actionLabel)}${countTxt}</td>
+                    <td style="padding:10px 14px;color:#475569;font-size:0.83rem;">${aaEsc(r.section)}</td>
+                    <td style="padding:10px 14px;color:#475569;font-size:0.82rem;word-break:break-word;">${aaEsc(r.summary) || '<span style="color:#94a3b8;">—</span>'}</td>
+                </tr>`;
+            }).join('');
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            ['aa-search', 'aa-filter-admin', 'aa-filter-section', 'aa-filter-action'].forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.addEventListener(id === 'aa-search' ? 'input' : 'change', aaRenderRows);
+            });
+        });
+        // ─── END ADMIN'S ACTIVITIES ───────────────────────────────────────────
+
         // ─── END ANALYTICS MODULE ──────────────────────────────────────────
 
         // ─── BACKUP MODULE ────────────────────────────────────────────────────────
