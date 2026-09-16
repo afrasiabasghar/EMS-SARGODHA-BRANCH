@@ -5180,7 +5180,7 @@
                             <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
                                 <div>
                                     <label class="block text-sm font-semibold text-slate-700 mb-1">View Date</label>
-                                    <input type="date" id="tl-view-date" class="w-full px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                                    <input type="date" id="tl-view-date" data-admin-searchable class="w-full px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-indigo-500">
                                 </div>
                                 <div class="flex items-end">
                                     <button id="tl-load-date-btn" class="w-full bg-indigo-600 text-white px-4 py-2 rounded-full font-semibold hover:bg-indigo-700 animated-btn">
@@ -5274,7 +5274,7 @@
                             <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
                                 <div>
                                     <label class="block text-sm font-semibold text-slate-700 mb-1">Date</label>
-                                    <input type="date" id="vtl-filter-date" class="w-full px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                                    <input type="date" id="vtl-filter-date" data-admin-searchable class="w-full px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-indigo-500">
                                 </div>
                                 <div class="flex items-end">
                                     <button id="vtl-load-btn" class="w-full bg-indigo-600 text-white px-4 py-2 rounded-full font-semibold hover:bg-indigo-700 animated-btn">
@@ -5283,7 +5283,7 @@
                                 </div>
                                 <div>
                                     <label class="block text-sm font-semibold text-slate-700 mb-1">Filter by Client / Placer</label>
-                                    <select id="vtl-client-select" class="w-full px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                                    <select id="vtl-client-select" data-admin-searchable class="w-full px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-indigo-500">
                                         <option value="">All Clients</option>
                                     </select>
                                 </div>
@@ -12247,7 +12247,7 @@
                         : `<span class="text-xs font-semibold text-amber-600 bg-amber-50 px-2 py-0.5 rounded-full">Upload</span>`;
                     // NEW: delete button — only for trade_log_entries data
                     const origIdx = _tlHasEntry ? allTradeLogEntries[date].trades.indexOf(t) : -1;
-                    const deleteBtn = (_tlHasEntry && origIdx >= 0)
+                    const deleteBtn = (_tlHasEntry && origIdx >= 0 && !isSharedView)
                         ? `<button onclick="tlDeleteSingleTrade('${date}', ${origIdx})" title="Delete this entry" style="background:#fee2e2;color:#dc2626;border:none;border-radius:8px;padding:3px 10px;font-size:11px;cursor:pointer;font-weight:600;" onmouseover="this.style.background='#fecaca'" onmouseout="this.style.background='#fee2e2'"><i class="fas fa-trash-alt"></i></button>`
                         : `<span class="text-xs text-slate-300">—</span>`;
                     return `<tr class="border-b hover:bg-slate-50 ${i % 2 !== 0 ? 'bg-slate-50/50' : ''}">
@@ -12267,7 +12267,7 @@
 
             // ── NEW: Delete a single trade entry from trade_log_entries ───────────────
             window.tlDeleteSingleTrade = async function(date, origIdx) {
-                if (!currentUserId) return;
+                if (!currentUserId || isSharedView) return;
                 const entry = allTradeLogEntries[date];
                 if (!entry || !entry.trades || origIdx < 0 || origIdx >= entry.trades.length) {
                     showMessage('Error', 'Entry nahi mili — page reload karein.');
@@ -12292,7 +12292,7 @@
 
             // ── NEW: Delete ALL entries for the currently-selected date ────────────────
             async function tlDeleteAllForDate() {
-                if (!currentUserId) return;
+                if (!currentUserId || isSharedView) return;
                 const date = document.getElementById('tl-view-date').value;
                 if (!date) { showMessage('Info', 'Pehle ek date select karein.'); return; }
                 const fmtDate = new Date(date + 'T00:00:00').toLocaleDateString('en-GB', { weekday:'long', year:'numeric', month:'long', day:'numeric' });
@@ -12390,6 +12390,7 @@
 
             // ── Event: Download this date's trades ────────────────────────────────────
             document.getElementById('tl-download-date-btn').addEventListener('click', () => {
+                if (isSharedView) return;
                 const date = document.getElementById('tl-view-date').value;
                 if (!date) { showMessage('Info', 'Please select a date first.'); return; }
 
@@ -12418,6 +12419,7 @@
 
             // ── Event: Toggle date range picker ───────────────────────────────────────
             document.getElementById('tl-download-range-btn').addEventListener('click', () => {
+                if (isSharedView) return;
                 const picker = document.getElementById('tl-range-picker');
                 picker.classList.toggle('hidden');
             });
@@ -12741,7 +12743,7 @@
                         const account = t.account  || '';
 
                         // NEW: delete button per row (only for trade_log_entries data)
-                        const vtlDelBtn = (typeof t._origIdx !== 'undefined')
+                        const vtlDelBtn = (typeof t._origIdx !== 'undefined' && !isSharedView)
                             ? `<button onclick="vtlDeleteSingleTrade('${date}', ${t._origIdx})" title="Delete this entry" style="background:#fee2e2;color:#dc2626;border:none;border-radius:8px;padding:2px 8px;font-size:11px;cursor:pointer;font-weight:600;" onmouseover="this.style.background='#fecaca'" onmouseout="this.style.background='#fee2e2'"><i class="fas fa-trash-alt"></i></button>`
                             : `<span style="color:#cbd5e1;font-size:11px;">—</span>`;
 
@@ -12938,7 +12940,7 @@
 
             // NEW: Delete a single trade from trade_log_entries for the selected date
             async function vtlDeleteSingleTrade(date, origIdx) {
-                if (!currentUserId) return;
+                if (!currentUserId || isSharedView) return;
                 const entry = allTradeLogEntries[date];
                 if (!entry || !entry.trades || origIdx < 0 || origIdx >= entry.trades.length) {
                     showMessage('Error', 'Entry nahi mili — page reload karein.');
@@ -12966,6 +12968,7 @@
             // accidentally saved under the wrong date (e.g. today's date instead
             // of the intended trade date).
             async function vtlDeleteDateEntries() {
+                if (isSharedView) return;
                 const date = document.getElementById('vtl-filter-date').value;
                 if (!date) {
                     showMessage('Info', 'Please select a date first.');
@@ -13948,6 +13951,7 @@ ${sectionsHtml}
             let _ppTrades = [];
 
             window.vtlOpenPlacerEditPopup = function() {
+                if (isSharedView) return;
                 _ppDate = document.getElementById('vtl-filter-date').value;
                 if (!_ppDate) { showMessage('Info', 'Pehle ek date load karen.'); return; }
 
@@ -15787,13 +15791,14 @@ ${(d.totalDeductions > 0) ? `
                 el.style.display = canEdit ? '' : 'none';
             });
             sectionEl.querySelectorAll('input, select, textarea').forEach(el => {
-                el.disabled = el.hasAttribute('data-admin-searchable') ? false : !canEdit;
+                el.disabled = (el.hasAttribute('data-admin-searchable') || /^bp-/.test(el.id || '')) ? false : !canEdit;
             });
             sectionEl.querySelectorAll('button').forEach(el => {
                 const cls = el.className || '';
                 const oc = el.getAttribute('onclick') || '';
                 const txt = el.textContent || '';
-                if (el.hasAttribute('data-admin-searchable') || /subtab|tab-btn/i.test(cls) || /print|export|download|showtab|preview/i.test(oc) || /print|export|download|preview/i.test(txt)) { el.disabled = false; return; }
+                if (['tl-download-date-btn', 'tl-download-range-btn', 'tl-delete-date-btn'].includes(el.id)) { el.disabled = !canEdit; return; }
+                if (el.hasAttribute('data-admin-searchable') || /subtab|tab-btn|bp-period-btn/i.test(cls) || /^bp-/.test(el.id || '') || /print|export|download|showtab|preview/i.test(oc) || /print|export|download|preview/i.test(txt)) { el.disabled = false; return; }
                 el.disabled = !canEdit;
             });
             if (!canEdit) {
