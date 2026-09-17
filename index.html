@@ -1956,6 +1956,21 @@
         </div>
     </div>
     
+    <div id="admin-backup-password-modal" class="modal-overlay">
+        <div class="modal-content card">
+            <h3 class="text-xl font-bold mb-2">Verify Access</h3>
+            <p class="text-slate-600 mb-4">Please enter your admin login password to access Backup & Restore.</p>
+            <form id="admin-backup-password-form">
+                <input type="password" id="admin-backup-password-input" placeholder="Your Password" required
+                       class="w-full px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-indigo-500 mb-4">
+                <div class="flex justify-center gap-4">
+                    <button type="button" id="cancel-admin-backup-password-btn" class="bg-slate-300 text-slate-800 px-6 py-2 rounded-full font-semibold hover:bg-slate-400">Cancel</button>
+                    <button type="submit" class="bg-indigo-600 text-white px-6 py-2 rounded-full font-semibold hover:bg-indigo-700">Confirm</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <!-- OE Add/Edit Expense Modal -->
     <div id="oe-add-modal" class="modal-overlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:200;display:none;align-items:center;justify-content:center;padding:20px;">
         <div class="card p-6" style="width:100%;max-width:480px;max-height:90vh;overflow-y:auto;">
@@ -4253,7 +4268,7 @@
                                 <h3>Backup &amp; Restore</h3>
                             </div>
                             <div class="settings-card-body">
-                                <p style="font-size:0.78rem;color:#64748b;margin-bottom:14px;font-family:-apple-system,BlinkMacSystemFont,'Inter',sans-serif;">Apna poora system data export (download) karen ya pehle se downloaded backup se restore karen. Full backup section ke liye sidebar mein <strong>Backup &amp; Restore</strong> par click karen.</p>
+                                <p style="font-size:0.78rem;color:#64748b;margin-bottom:14px;font-family:-apple-system,BlinkMacSystemFont,'Inter',sans-serif;">Export (download) your entire system data, or restore from a previously downloaded backup. For the full backup section, click <strong>Backup &amp; Restore</strong> in the sidebar.</p>
                                 <div style="display:flex;gap:12px;flex-wrap:wrap;">
                                     <button onclick="backupRequestPassword(()=>showSection('backup'))" class="sv-save-btn" style="background:#1f9d55;box-shadow:0 1px 3px rgba(0,0,0,0.15);">
                                         <i class="fas fa-download"></i> Go to Backup Section
@@ -4327,8 +4342,8 @@
 
                         <!-- Info note -->
                         <div style="background:rgba(20,124,229,0.07);border-left:4px solid #0071e3;border-radius:0 12px 12px 0;padding:14px 18px;margin-bottom:24px;font-size:0.85rem;color:var(--text-primary);font-family:-apple-system,BlinkMacSystemFont,'Inter',sans-serif;line-height:1.6;">
-                            <strong><i class="fas fa-shield-alt mr-2" style="color:#0071e3;"></i>Backup kya hai?</strong><br>
-                            Yahan se aap apna poora system data (complaints, commission, expenses, clients, employees, couriers) ek JSON file ke tor par download (export) kar saktay hain. Agar kabhi system crash ho ya data kharab ho jaye to usi JSON file ko yahan upload (import) kar ke system wahan se continue kar saktay hain jahan chhora tha.
+                            <strong><i class="fas fa-shield-alt mr-2" style="color:#0071e3;"></i>What is a backup?</strong><br>
+                            From here you can download (export) your entire system data (complaints, commission, expenses, clients, employees, couriers) as a JSON file. If the system ever crashes or data gets corrupted, you can upload (import) that same JSON file here to pick up exactly where you left off.
                         </div>
 
                         <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:24px;">
@@ -4340,7 +4355,7 @@
                                     <h3>Export Data (Download Backup)</h3>
                                 </div>
                                 <div class="settings-card-body">
-                                    <p style="font-size:0.8rem;color:#64748b;margin-bottom:16px;font-family:-apple-system,BlinkMacSystemFont,'Inter',sans-serif;">Apna poora Firestore data ek JSON file mein download karen. Yeh file safe jagah rakhein.</p>
+                                    <p style="font-size:0.8rem;color:#64748b;margin-bottom:16px;font-family:-apple-system,BlinkMacSystemFont,'Inter',sans-serif;">Download your entire Firestore data as a JSON file. Keep this file somewhere safe.</p>
                                     <div id="backup-export-collections" style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:18px;font-size:0.78rem;color:var(--text-primary);font-family:-apple-system,BlinkMacSystemFont,'Inter',sans-serif;">
                                         <span><i class="fas fa-check-circle mr-1" style="color:#1f9d55;"></i> Complaints</span>
                                         <span><i class="fas fa-check-circle mr-1" style="color:#1f9d55;"></i> Daily Commissions</span>
@@ -4362,21 +4377,21 @@
                             </div>
 
                             <!-- Import Card -->
-                            <div class="settings-card">
+                            <div class="settings-card" id="backup-import-card">
                                 <div class="settings-card-header">
                                     <i class="fas fa-file-import" style="color:#9cc6fb;"></i>
                                     <h3>Import Data (Restore Backup)</h3>
                                 </div>
                                 <div class="settings-card-body">
-                                    <p style="font-size:0.8rem;color:#64748b;margin-bottom:8px;font-family:-apple-system,BlinkMacSystemFont,'Inter',sans-serif;">Pehle se downloaded JSON backup file upload karen. <strong style="color:#ff3b30;">Warning: yeh action existing data ke sath merge karega — duplicate entries ho sakti hain agar same data pehle se exist karta ho.</strong></p>
+                                    <p style="font-size:0.8rem;color:#64748b;margin-bottom:8px;font-family:-apple-system,BlinkMacSystemFont,'Inter',sans-serif;">Upload a previously downloaded JSON backup file. <strong style="color:#ff3b30;">Warning: this action will merge with your existing data — duplicate entries may occur if the same data already exists.</strong></p>
                                     <div style="border:2px dashed #e2e8f0;border-radius:10px;padding:22px 16px;text-align:center;background:#f8fafc;margin-bottom:14px;cursor:pointer;transition:all .2s;" id="backup-drop-zone"
                                         ondragover="event.preventDefault();this.style.borderColor='#0071e3';this.style.background='rgba(20,124,229,0.05)'"
                                         ondragleave="this.style.borderColor='';this.style.background=''"
                                         ondrop="backupHandleDrop(event)">
                                         <i class="fas fa-cloud-upload-alt" style="font-size:2rem;color:#94a3b8;margin-bottom:8px;display:block;"></i>
-                                        <p style="font-size:0.82rem;color:#94a3b8;font-family:-apple-system,BlinkMacSystemFont,'Inter',sans-serif;margin-bottom:8px;">JSON backup file yahan drag karo ya neeche se select karo</p>
+                                        <p style="font-size:0.82rem;color:#94a3b8;font-family:-apple-system,BlinkMacSystemFont,'Inter',sans-serif;margin-bottom:8px;">Drag your JSON backup file here, or select it below</p>
                                         <label style="display:inline-flex;align-items:center;gap:6px;padding:8px 18px;background:#0071e3;color:#fff;border-radius:8px;font-size:0.8rem;font-weight:600;cursor:pointer;font-family:-apple-system,BlinkMacSystemFont,'Inter',sans-serif;">
-                                            <i class="fas fa-folder-open"></i> File Choose Karo
+                                            <i class="fas fa-folder-open"></i> Choose File
                                             <input type="file" id="backup-import-file" accept=".json" style="display:none;" onchange="backupHandleFileSelect(this)">
                                         </label>
                                     </div>
@@ -4397,11 +4412,11 @@
                                 <h3>Weekly Backup Reminder</h3>
                             </div>
                             <div class="settings-card-body">
-                                <p style="font-size:0.8rem;color:#64748b;margin-bottom:14px;font-family:-apple-system,BlinkMacSystemFont,'Inter',sans-serif;">Har 6-7 din baad ek reminder notification show hogi ke backup download kar lein. Reminder last backup download ki date se count hota hai.</p>
+                                <p style="font-size:0.8rem;color:#64748b;margin-bottom:14px;font-family:-apple-system,BlinkMacSystemFont,'Inter',sans-serif;">A reminder notification will show every 6-7 days to download a backup. The reminder is counted from the date of your last backup download.</p>
                                 <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;">
                                     <div>
                                         <div class="settings-label">Last Backup Download</div>
-                                        <div class="settings-desc" id="backup-last-date-display">Koi backup abhi tak download nahi kiya gaya</div>
+                                        <div class="settings-desc" id="backup-last-date-display">No backup has been downloaded yet</div>
                                     </div>
                                     <button onclick="backupMarkDownloaded()" class="sv-save-btn" style="background:#147ce5;box-shadow:0 1px 3px rgba(0,0,0,0.15);margin-top:0;">
                                         <i class="fas fa-check"></i> Mark as Downloaded Today
@@ -6380,6 +6395,7 @@
         let currentAdminPermissions = null; // { [sectionId]: { visible, edit } } for the logged-in admin
         let currentAdminId = null;
         let currentAdminName = ''; // display name of the logged-in admin, used by the Admin's Activities audit log
+        let currentAdminPasswordHash = null; // this admin's own login passwordHash, used to gate Backup & Restore access
         let pendingShareOwnerId = null; // owner uid from ?share= link, used by the admin login form
         let allAdmins = [];
         let editingAdminId = null;
@@ -6624,6 +6640,12 @@
                 const perm = currentAdminPermissions[sectionId] || { edit: false };
                 isSharedView = !perm.edit;
                 applyAdminSectionLock(document.getElementById(sectionId), perm.edit);
+                if (sectionId === 'backup') {
+                    // Admins with Backup & Restore access can only download a
+                    // backup, never upload/restore one — hide that card entirely.
+                    const importCard = document.getElementById('backup-import-card');
+                    if (importCard) importCard.style.display = 'none';
+                }
                 adminActivityTrackPageChange(sectionId); // log this admin's page/section visit
             }
         }
@@ -7017,6 +7039,18 @@
 
             // Start monthly_expenses listener (for OE dashboard graph)
             startMonthlyExpensesListener();
+
+            // Backup & Restore: live Firestore listener so the "last backup" date
+            // stays accurate and in sync across every browser/device (admin & super admin).
+            const backupDateUnsub = db.collection('users').doc(currentUserId).onSnapshot(doc => {
+                const cloudVal = doc.exists ? doc.data().backupLastAt : null;
+                if (cloudVal) {
+                    _backupLastAtCloud = cloudVal;
+                    localStorage.setItem(BACKUP_LAST_DATE_KEY, cloudVal);
+                }
+                backupUpdateLastDateDisplay();
+            }, err => console.warn('Backup last-date listener error:', err));
+            unsubscribeListeners.push(backupDateUnsub);
         }
 
         function stopRealtimeListeners() {
@@ -7057,6 +7091,41 @@
             passwordVerificationModal.style.display = 'none';
             passwordVerificationForm.reset();
             onPasswordVerified = null;
+        });
+
+        // Admin backup password modal — verifies the logged-in admin's own
+        // login password (not the owner's) before unlocking Backup & Restore.
+        const adminBackupPasswordModal = document.getElementById('admin-backup-password-modal');
+        const adminBackupPasswordForm = document.getElementById('admin-backup-password-form');
+        const cancelAdminBackupPasswordBtn = document.getElementById('cancel-admin-backup-password-btn');
+        let onAdminBackupPasswordVerified = null;
+
+        adminBackupPasswordForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const password = document.getElementById('admin-backup-password-input').value;
+            if (!password) return;
+            showLoading();
+            try {
+                const hash = await sha256Hex(password);
+                if (!currentAdminPasswordHash || hash !== currentAdminPasswordHash) {
+                    throw new Error('invalid');
+                }
+                _backupUnlocked = true;
+                if (typeof onAdminBackupPasswordVerified === 'function') onAdminBackupPasswordVerified();
+            } catch (error) {
+                showMessage('Error', 'Incorrect password. Please try again.');
+            } finally {
+                hideLoading();
+                adminBackupPasswordModal.style.display = 'none';
+                adminBackupPasswordForm.reset();
+                onAdminBackupPasswordVerified = null;
+            }
+        });
+
+        cancelAdminBackupPasswordBtn.addEventListener('click', () => {
+            adminBackupPasswordModal.style.display = 'none';
+            adminBackupPasswordForm.reset();
+            onAdminBackupPasswordVerified = null;
         });
 
         // --- DASHBOARD MODULE ---
@@ -15545,9 +15614,13 @@ ${(d.totalDeductions > 0) ? `
         ];
 
         // ─── ADMINS MODULE ──────────────────────────────────────────────────
-        // Sections an owner can assign to an admin account. Settings, Backup,
+        // Sections an owner can assign to an admin account. Settings,
         // Task Manager and Admins itself are always owner-only and never
-        // assignable/visible to an admin session.
+        // assignable/visible to an admin session. Backup & Restore is
+        // assignable: "Visible" = can access the section and download
+        // backups, gated behind the admin's own login password. Restore/
+        // upload is never available to any admin, regardless of "Can Edit"
+        // (see showSection's backup-import-card handling).
         const ADMIN_SECTIONS = [
             { id: 'dashboard',        label: 'Dashboard' },
             { id: 'complaints',       label: 'Complaints' },
@@ -15567,9 +15640,10 @@ ${(d.totalDeductions > 0) ? `
             { id: 'utility-bills',    label: 'Utility Bills' },
             { id: 'debts',            label: 'Debts' },
             { id: 'affiliate',        label: 'Affiliate Program' },
+            { id: 'backup',           label: 'Backup & Restore' },
             { id: 'records',          label: 'Records' },
         ];
-        const ADMIN_ALWAYS_HIDDEN = ['settings', 'backup', 'task-manager', 'admins'];
+        const ADMIN_ALWAYS_HIDDEN = ['settings', 'task-manager', 'admins'];
 
         async function sha256Hex(text) {
             const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(text));
@@ -15817,6 +15891,7 @@ ${(d.totalDeductions > 0) ? `
                 currentAdminPermissions = adminData.permissions || {};
                 currentAdminId = adminId;
                 currentAdminName = adminData.displayName || adminData.username || 'Admin';
+                currentAdminPasswordHash = adminData.passwordHash || null;
                 currentUserId = ownerId;
                 isSharedView = true; // recalculated per-section by showSection below
 
@@ -15843,6 +15918,7 @@ ${(d.totalDeductions > 0) ? `
 
                 startRealtimeListeners();
                 startRecordsListeners();
+                backupCheckWeeklyReminder(); // notify this admin too, if they have Backup & Restore access
                 adminActivityStartSession(ownerId, adminId, adminData); // begin login/page-activity logging for this admin
                 hideLoading();
             } catch (error) {
@@ -17620,6 +17696,7 @@ ${(d.totalDeductions > 0) ? `
         const BACKUP_REMINDER_DAYS = 7;
         let _backupImportParsed = null;
         let _backupUnlocked = false; // session-level unlock flag
+        let _backupLastAtCloud = null; // last backup date synced from Firestore (accurate across browsers/devices)
 
         const BACKUP_COLLECTIONS = [
             'complaints', 'daily_commissions', 'commission_received',
@@ -17630,6 +17707,15 @@ ${(d.totalDeductions > 0) ? `
         // Password protect — uses existing password verification modal
         function backupRequestPassword(onSuccess) {
             if (_backupUnlocked) { onSuccess(); return; }
+            // Admin sessions authenticate via the Admins module, not Firebase
+            // Auth, so the owner-password reauth below doesn't apply to them.
+            // Instead, an admin with Backup & Restore access must enter their
+            // own admin login password before this section unlocks.
+            if (isAdminSession) {
+                onAdminBackupPasswordVerified = onSuccess;
+                adminBackupPasswordModal.style.display = 'flex';
+                return;
+            }
             // Use existing requestPasswordVerification — reauthentication already handled by form submit
             requestPasswordVerification(() => {
                 _backupUnlocked = true;
@@ -17641,7 +17727,7 @@ ${(d.totalDeductions > 0) ? `
         function backupLockSession() { _backupUnlocked = false; }
 
         async function backupExportData() {
-            if (!currentUserId) return showMessage('Error', 'Pehle login karen.');
+            if (!currentUserId) return showMessage('Error', 'Please log in first.');
             const btn = document.getElementById('backup-export-btn');
             const statusEl = document.getElementById('backup-export-status');
             btn.disabled = true;
@@ -17649,7 +17735,7 @@ ${(d.totalDeductions > 0) ? `
             statusEl.style.display = 'block';
             statusEl.style.background = '#eef2ff';
             statusEl.style.color = '#3730a3';
-            statusEl.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Firestore se data fetch ho raha hai...';
+            statusEl.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Fetching data from Firestore...';
 
             try {
                 const backup = { exportedAt: new Date().toISOString(), userId: currentUserId, collections: {} };
@@ -17699,7 +17785,7 @@ ${(d.totalDeductions > 0) ? `
 
         function backupReadFile(file) {
             if (!file.name.endsWith('.json')) {
-                showMessage('Error', 'Sirf .json file upload karen.');
+                showMessage('Error', 'Please upload a .json file only.');
                 return;
             }
             const reader = new FileReader();
@@ -17707,7 +17793,7 @@ ${(d.totalDeductions > 0) ? `
                 try {
                     const data = JSON.parse(e.target.result);
                     if (!data.collections) {
-                        showMessage('Error', 'Invalid backup file — yeh Darson backup file nahi lagti.');
+                        showMessage('Error', "Invalid backup file — this doesn't look like a Darson backup file.");
                         return;
                     }
                     _backupImportParsed = data;
@@ -17727,16 +17813,16 @@ ${(d.totalDeductions > 0) ? `
                     const btn = document.getElementById('backup-import-btn');
                     btn.style.display = 'inline-flex';
                 } catch(err) {
-                    showMessage('Error', 'File parse nahi ho saki: ' + err.message);
+                    showMessage('Error', 'Failed to parse file: ' + err.message);
                 }
             };
             reader.readAsText(file);
         }
 
         async function backupImportData() {
-            if (!currentUserId) return showMessage('Error', 'Pehle login karen.');
-            if (!_backupImportParsed) return showMessage('Error', 'Pehle backup file select karen.');
-            if (!confirm('Kya aap waqai yeh backup restore karna chahtay hain?\n\nYeh action existing Firestore data mein records ADD karega (delete nahi karega). Duplicate entries ho sakti hain.\n\nProceed?')) return;
+            if (!currentUserId) return showMessage('Error', 'Please log in first.');
+            if (!_backupImportParsed) return showMessage('Error', 'Please select a backup file first.');
+            if (!confirm('Are you sure you want to restore this backup?\n\nThis action will ADD records to your existing Firestore data (it will not delete anything). Duplicate entries may occur.\n\nProceed?')) return;
             const btn = document.getElementById('backup-import-btn');
             const statusEl = document.getElementById('backup-import-status');
             btn.disabled = true;
@@ -17744,7 +17830,7 @@ ${(d.totalDeductions > 0) ? `
             statusEl.style.display = 'block';
             statusEl.style.background = '#eef2ff';
             statusEl.style.color = '#3730a3';
-            statusEl.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Data restore ho raha hai...';
+            statusEl.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Restoring data...';
             try {
                 const data = _backupImportParsed;
                 let totalRestored = 0;
@@ -17767,7 +17853,7 @@ ${(d.totalDeductions > 0) ? `
                 }
                 statusEl.style.background = '#d1fae5';
                 statusEl.style.color = '#065f46';
-                statusEl.innerHTML = `<i class="fas fa-check-circle mr-2"></i> ${totalRestored} records successfully restored! Page refresh karen.`;
+                statusEl.innerHTML = `<i class="fas fa-check-circle mr-2"></i> ${totalRestored} records successfully restored! Please refresh the page.`;
                 _backupImportParsed = null;
                 document.getElementById('backup-import-btn').style.display = 'none';
                 document.getElementById('backup-import-preview').style.display = 'none';
@@ -17783,34 +17869,62 @@ ${(d.totalDeductions > 0) ? `
 
         function backupMarkDownloaded() {
             const now = new Date().toISOString();
-            localStorage.setItem(BACKUP_LAST_DATE_KEY, now);
+            localStorage.setItem(BACKUP_LAST_DATE_KEY, now); // instant local cache (offline fallback)
+            _backupLastAtCloud = now;
             backupUpdateLastDateDisplay();
+            // Save to Firestore so the last-backup date is accurate and synced
+            // across every browser/device for admins & the super admin.
+            if (currentUserId) {
+                db.collection('users').doc(currentUserId).set({ backupLastAt: now }, { merge: true }).catch(err => {
+                    console.warn('Backup last-date cloud save error:', err);
+                });
+            }
         }
 
         function backupUpdateLastDateDisplay() {
-            const last = localStorage.getItem(BACKUP_LAST_DATE_KEY);
+            const last = _backupLastAtCloud || localStorage.getItem(BACKUP_LAST_DATE_KEY);
             const el = document.getElementById('backup-last-date-display');
             if (!el) return;
             if (!last) {
-                el.textContent = 'Koi backup abhi tak download nahi kiya gaya';
+                el.textContent = 'No backup has been downloaded yet';
             } else {
                 const d = new Date(last);
                 const daysSince = Math.floor((Date.now() - d.getTime()) / (1000 * 60 * 60 * 24));
-                el.textContent = `${d.toLocaleDateString('en-PK', { day:'2-digit', month:'short', year:'numeric' })} (${daysSince} din pehle)`;
+                el.textContent = `${d.toLocaleDateString('en-PK', { day:'2-digit', month:'short', year:'numeric' })} (${daysSince} days ago)`;
             }
         }
 
         function backupCheckWeeklyReminder() {
-            if (isSharedView) return;
-            const last = localStorage.getItem(BACKUP_LAST_DATE_KEY);
-            if (!last) {
-                // Never backed up — show reminder after 1 minute of session
-                setTimeout(() => backupShowReminderNotification(), 60000);
+            if (isAdminSession) {
+                // Only remind an admin if they were granted Backup & Restore access.
+                if (!currentAdminPermissions || !currentAdminPermissions['backup'] || !currentAdminPermissions['backup'].visible) return;
+            } else if (isSharedView) {
                 return;
             }
-            const daysSince = Math.floor((Date.now() - new Date(last).getTime()) / (1000 * 60 * 60 * 24));
-            if (daysSince >= BACKUP_REMINDER_DAYS) {
-                setTimeout(() => backupShowReminderNotification(daysSince), 8000);
+            // Read the true last-backup date from Firestore (accurate across
+            // browsers/devices) instead of relying only on this browser's localStorage.
+            const runCheck = (last) => {
+                if (!last) {
+                    // Never backed up — show reminder after 1 minute of session
+                    setTimeout(() => backupShowReminderNotification(), 60000);
+                    return;
+                }
+                const daysSince = Math.floor((Date.now() - new Date(last).getTime()) / (1000 * 60 * 60 * 24));
+                if (daysSince >= BACKUP_REMINDER_DAYS) {
+                    setTimeout(() => backupShowReminderNotification(daysSince), 8000);
+                }
+            };
+            if (currentUserId) {
+                db.collection('users').doc(currentUserId).get().then(doc => {
+                    const cloudVal = doc.exists ? doc.data().backupLastAt : null;
+                    if (cloudVal) { _backupLastAtCloud = cloudVal; localStorage.setItem(BACKUP_LAST_DATE_KEY, cloudVal); }
+                    runCheck(cloudVal || localStorage.getItem(BACKUP_LAST_DATE_KEY));
+                }).catch(err => {
+                    console.warn('Backup reminder check error:', err);
+                    runCheck(localStorage.getItem(BACKUP_LAST_DATE_KEY));
+                });
+            } else {
+                runCheck(localStorage.getItem(BACKUP_LAST_DATE_KEY));
             }
         }
 
@@ -17819,16 +17933,16 @@ ${(d.totalDeductions > 0) ? `
             const toast = document.createElement('div');
             toast.id = 'backup-reminder-toast';
             toast.style.cssText = 'position:fixed;bottom:24px;right:24px;z-index:9999;background:#1e1b4b;color:#fff;border-radius:14px;padding:16px 20px;box-shadow:0 8px 32px rgba(30,27,75,0.35);max-width:340px;font-family:\'DM Sans\',sans-serif;border-left:4px solid #f59e0b;animation:pdSlideIn .3s ease;';
-            const msg = daysSince ? `${daysSince} din se backup nahi liya!` : 'Abhi tak koi backup download nahi kiya!';
+            const msg = daysSince ? `No backup taken in ${daysSince} days!` : 'No backup has been downloaded yet!';
             toast.innerHTML = `
                 <div style="display:flex;align-items:flex-start;gap:12px;">
                     <i class="fas fa-bell" style="color:#f59e0b;font-size:1.3rem;flex-shrink:0;margin-top:2px;"></i>
                     <div style="flex:1;">
                         <div style="font-weight:700;font-size:0.88rem;margin-bottom:4px;font-family:'Syne',sans-serif;">⏰ Backup Reminder</div>
-                        <div style="font-size:0.78rem;color:rgba(255,255,255,0.8);margin-bottom:10px;">${msg} System ka backup download kar lein takey data safe rahe.</div>
+                        <div style="font-size:0.78rem;color:rgba(255,255,255,0.8);margin-bottom:10px;">${msg} Download a system backup to keep your data safe.</div>
                         <div style="display:flex;gap:8px;">
-                            <button onclick="document.getElementById('backup-reminder-toast').remove();backupRequestPassword(()=>showSection('backup'));" style="padding:6px 14px;background:#f59e0b;color:#1e1b4b;border:none;border-radius:6px;font-size:0.75rem;font-weight:700;cursor:pointer;font-family:'Syne',sans-serif;">Backup Karo</button>
-                            <button onclick="document.getElementById('backup-reminder-toast').remove();" style="padding:6px 14px;background:rgba(255,255,255,0.12);color:#fff;border:none;border-radius:6px;font-size:0.75rem;cursor:pointer;font-family:'DM Sans',sans-serif;">Bad Mein</button>
+                            <button onclick="document.getElementById('backup-reminder-toast').remove();backupRequestPassword(()=>showSection('backup'));" style="padding:6px 14px;background:#f59e0b;color:#1e1b4b;border:none;border-radius:6px;font-size:0.75rem;font-weight:700;cursor:pointer;font-family:'Syne',sans-serif;">Back Up Now</button>
+                            <button onclick="document.getElementById('backup-reminder-toast').remove();" style="padding:6px 14px;background:rgba(255,255,255,0.12);color:#fff;border:none;border-radius:6px;font-size:0.75rem;cursor:pointer;font-family:'DM Sans',sans-serif;">Later</button>
                         </div>
                     </div>
                 </div>`;
