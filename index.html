@@ -6680,6 +6680,45 @@
         // backfill as well as new daily uploads in real time.
         const TRADE_LOG_COMMISSION_START_DATE = '2026-06-01';
 
+        // Intraday one-side commission, same rule as the CGS Calculator: for each stock
+        // (per day, per client) only the side with MORE quantity is charged, at that
+        // side's weighted-average rate. Prevents buy+sell (and every partial fill) from
+        // being charged separately, which made client totals exceed the House totals.
+        function netIntradayCommissionRows(trades) {
+            const map = {};
+            (trades || []).forEach(t => {
+                if (!t) return;
+                const qty = parseFloat(t.quantity) || 0;
+                const rate = parseFloat(t.rate) || 0;
+                if (qty <= 0 || rate <= 0) return;
+                const name = String(t.stockName || 'N/A').trim();
+                const key = name.toUpperCase();
+                if (!map[key]) map[key] = { name, buy: { q: 0, v: 0 }, sell: { q: 0, v: 0 }, both: { q: 0, v: 0 } };
+                const sd = String(t.side || '').toLowerCase();
+                const bucket = (sd === 'buy' || sd === 'sell') ? sd : 'both';
+                map[key][bucket].q += qty;
+                map[key][bucket].v += qty * rate;
+            });
+            const out = [];
+            Object.keys(map).forEach(key => {
+                const m = map[key];
+                const push = (side, b) => {
+                    if (b.q <= 0) return;
+                    const avg = parseFloat((b.v / b.q).toFixed(2));
+                    if (avg <= 0) return;
+                    const { totalStockCommission } = CommissionService.calculateCommission(avg, b.q);
+                    if (!totalStockCommission) return;
+                    out.push({ stockName: m.name, side, quantity: b.q, rate: avg, totalValue: b.v, commission: totalStockCommission });
+                };
+                if (m.buy.q > 0 || m.sell.q > 0) {
+                    const useBuy = m.buy.q >= m.sell.q;
+                    push(useBuy ? 'buy' : 'sell', useBuy ? m.buy : m.sell);
+                }
+                push('both', m.both);
+            });
+            return out;
+        }
+
         function computeTradeLogClientCommissions() {
             const byClient = {};       // { clientId: { total, byMonth: { 'YYYY-MM': amount } } }
             const activeClientIds = new Set();
@@ -6691,6 +6730,7 @@
                 if (trades.length === 0) return;
                 const monthKey = date.slice(0, 7); // 'YYYY-MM'
 
+                const tradesByClient = {};
                 trades.forEach(t => {
                     if (!t) return;
                     const qty = parseFloat(t.quantity) || 0;
@@ -6709,13 +6749,19 @@
                     });
                     if (!client) return; // house/unmatched trade — skip
 
-                    const { totalStockCommission } = CommissionService.calculateCommission(rate, qty);
-                    if (!totalStockCommission) return;
+                    if (!tradesByClient[client.id]) tradesByClient[client.id] = { client, trades: [] };
+                    tradesByClient[client.id].trades.push(t);
+                });
 
-                    activeClientIds.add(client.id);
-                    if (!byClient[client.id]) byClient[client.id] = { total: 0, byMonth: {} };
-                    byClient[client.id].total += totalStockCommission;
-                    byClient[client.id].byMonth[monthKey] = (byClient[client.id].byMonth[monthKey] || 0) + totalStockCommission;
+                Object.keys(tradesByClient).forEach(cid => {
+                    const { client, trades: clientTrades } = tradesByClient[cid];
+                    netIntradayCommissionRows(clientTrades).forEach(r => {
+                        const totalStockCommission = r.commission;
+                        activeClientIds.add(client.id);
+                        if (!byClient[client.id]) byClient[client.id] = { total: 0, byMonth: {} };
+                        byClient[client.id].total += totalStockCommission;
+                        byClient[client.id].byMonth[monthKey] = (byClient[client.id].byMonth[monthKey] || 0) + totalStockCommission;
+                    });
                 });
             });
 
@@ -10388,6 +10434,7 @@
                 const entry = allTradeLogEntries[date];
                 const trades = (entry && Array.isArray(entry.trades)) ? entry.trades : [];
 
+                const dayClientTrades = [];
                 trades.forEach(t => {
                     if (!t) return;
                     const qty = parseFloat(t.quantity) || 0;
@@ -10405,17 +10452,18 @@
                     );
                     if (!isMatch) return;
 
-                    const { totalStockCommission } = CommissionService.calculateCommission(rate, qty);
-                    if (!totalStockCommission) return;
+                    dayClientTrades.push(t);
+                });
 
+                netIntradayCommissionRows(dayClientTrades).forEach(r => {
                     reportRows.push({
                         date,
-                        stockName: t.stockName || 'N/A',
-                        side: t.side || 'both',
-                        quantity: qty,
-                        rate,
-                        totalValue: qty * rate,
-                        commission: totalStockCommission
+                        stockName: r.stockName || 'N/A',
+                        side: r.side || 'both',
+                        quantity: r.quantity,
+                        rate: r.rate,
+                        totalValue: r.totalValue,
+                        commission: r.commission
                     });
                 });
             });
