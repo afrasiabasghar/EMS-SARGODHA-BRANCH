@@ -3108,7 +3108,7 @@
                                 class="px-6 py-2.5 text-sm font-semibold border-b-2 border-transparent text-slate-500 hover:text-indigo-500 -mb-px">
                                 <i class="fas fa-file-alt mr-2"></i>Saved Reports
                             </button>
-                            <button id="oe-tab-custom-report" onclick="oeShowTab('custom-report')" data-admin-hide="true"
+                            <button id="oe-tab-custom-report" onclick="oeShowTab('custom-report')"
                                 class="px-6 py-2.5 text-sm font-semibold border-b-2 border-transparent text-slate-500 hover:text-indigo-500 -mb-px">
                                 <i class="fas fa-chart-bar mr-2"></i>Custom Report Generator
                             </button>
@@ -15913,14 +15913,14 @@ ${(d.totalDeductions > 0) ? `
                 el.style.display = canEdit ? '' : 'none';
             });
             sectionEl.querySelectorAll('input, select, textarea').forEach(el => {
-                el.disabled = (el.hasAttribute('data-admin-searchable') || /^bp-/.test(el.id || '')) ? false : !canEdit;
+                el.disabled = (el.hasAttribute('data-admin-searchable') || /^bp-/.test(el.id || '') || /^crg-/.test(el.id || '')) ? false : !canEdit;
             });
             sectionEl.querySelectorAll('button').forEach(el => {
                 const cls = el.className || '';
                 const oc = el.getAttribute('onclick') || '';
                 const txt = el.textContent || '';
                 if (['tl-download-date-btn', 'tl-download-range-btn', 'tl-delete-date-btn'].includes(el.id)) { el.disabled = !canEdit; return; }
-                if (el.hasAttribute('data-admin-searchable') || /subtab|tab-btn|bp-period-btn/i.test(cls) || /^bp-/.test(el.id || '') || /print|export|download|showtab|preview/i.test(oc) || /print|export|download|preview/i.test(txt)) { el.disabled = false; return; }
+                if (el.hasAttribute('data-admin-searchable') || el.closest('#oe-pane-custom-report') || /subtab|tab-btn|bp-period-btn/i.test(cls) || /^bp-/.test(el.id || '') || /print|export|download|showtab|preview/i.test(oc) || /print|export|download|preview/i.test(txt)) { el.disabled = false; return; }
                 el.disabled = !canEdit;
             });
             if (!canEdit) {
