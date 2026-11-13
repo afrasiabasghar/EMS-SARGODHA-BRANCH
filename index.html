@@ -5939,7 +5939,25 @@
                         </div>
                     </div>
 
-                    <!-- EDIT MODAL for Phone Directory -->
+                    <!-- Records: Edit Client Recording Modal (password-protected) -->
+    <div id="rec-edit-modal" class="modal-overlay">
+        <div class="modal-content card" style="max-width:560px;width:95%;">
+            <div class="flex items-center justify-between mb-1">
+                <h3 class="text-lg font-bold text-slate-800"><i class="fas fa-edit mr-2 text-indigo-500"></i>Edit Recording</h3>
+                <button type="button" onclick="closeRecordingEditor()" style="background:none;border:none;font-size:1.2rem;cursor:pointer;color:#94a3b8;">&times;</button>
+            </div>
+            <p id="rec-edit-subtitle" class="text-sm text-slate-500 mb-4"></p>
+            <label class="block text-sm font-semibold text-slate-600 mb-1">Google Drive Link(s)</label>
+            <div id="rec-edit-links-container"></div>
+            <button type="button" onclick="recAddLinkRow('rec-edit-links-container')" class="text-indigo-600 text-sm font-semibold hover:underline"><i class="fas fa-plus mr-1"></i>Add another link</button>
+            <div class="flex justify-center gap-4 mt-5">
+                <button type="button" onclick="closeRecordingEditor()" class="bg-slate-300 text-slate-800 px-6 py-2 rounded-full font-semibold hover:bg-slate-400">Cancel</button>
+                <button type="button" onclick="saveRecordingEdit()" class="bg-indigo-600 text-white px-6 py-2 rounded-full font-semibold hover:bg-indigo-700"><i class="fas fa-save mr-2"></i>Save Changes</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- EDIT MODAL for Phone Directory -->
                     <div id="pd-edit-modal">
                         <div class="pd-modal-box">
                             <h3>✏️ Edit Contact</h3>
@@ -6009,6 +6027,21 @@
                 <div id="profile-detail-info-wrapper">
                     <!-- UPDATED: Text color -->
                     <div id="profile-detail-info" class="text-slate-700 text-sm mb-6 bg-white p-6 rounded-lg shadow-sm grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4"></div>
+                    <div id="profile-documents-card" class="bg-white p-4 rounded-lg shadow-sm mb-6">
+                        <div class="flex items-center justify-between mb-2">
+                            <h4 class="font-semibold text-lg">Documents</h4>
+                            <button id="profile-add-doc-btn" type="button" class="px-3 py-1.5 bg-amber-600 hover:bg-amber-700 text-white text-sm font-semibold rounded-full">+ Add Document</button>
+                        </div>
+                        <div id="profile-documents-list"></div>
+                        <div id="profile-add-doc-form" class="hidden mt-3 space-y-2 border-t pt-3">
+                            <input id="profile-doc-label" type="text" placeholder="Document name (e.g. CNIC Front)" class="w-full px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                            <input id="profile-doc-url" type="url" placeholder="Google Drive link (https://...)" class="w-full px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                            <div class="flex gap-2">
+                                <button id="profile-doc-save-btn" type="button" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-semibold rounded-full">Save Document</button>
+                                <button id="profile-doc-cancel-btn" type="button" class="px-4 py-2 bg-slate-200 hover:bg-slate-300 text-slate-700 text-sm font-semibold rounded-full">Cancel</button>
+                            </div>
+                        </div>
+                    </div>
                     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
                         <div class="bg-white p-4 rounded-lg shadow-sm lg:col-span-2">
                             <h4 class="font-semibold text-lg mb-2">Client Payment History</h4>
@@ -10879,6 +10912,7 @@
             
             document.getElementById('profile-detail-info-wrapper').classList.remove('hidden');
             editClientProfileForm.classList.add('hidden');
+            renderProfileDocuments(client);
 
             const clientPayments = allClientPayments.filter(p => p.clientId === clientId);
             const clientPaymentData = {};
@@ -10973,6 +11007,91 @@
 
         // Make showClientProfile globally accessible
         window.showClientProfile = showClientProfile;
+
+        // ── Client Documents (2026-11-14): Drive documents shown inside the
+        // client profile popup. Stored as `documents: [{label, url}]` on the
+        // client doc. Viewing needs a signed-in session (hidden in shared
+        // view); Add/Delete is owner-only, like the recordings Edit/Delete.
+        function afxEscHtml(s) { return String(s ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;'); }
+        function afxEscAttr(s) { return afxEscHtml(s).replace(/'/g, '&#39;'); }
+
+        function renderProfileDocuments(client) {
+            const card = document.getElementById('profile-documents-card');
+            const listEl = document.getElementById('profile-documents-list');
+            const addBtn = document.getElementById('profile-add-doc-btn');
+            const form = document.getElementById('profile-add-doc-form');
+            if (!card || !listEl) return;
+            if (isSharedView) { card.style.display = 'none'; return; }
+            card.style.display = '';
+            const canEdit = !isSharedView && !isAdminSession;
+            if (addBtn) addBtn.style.display = canEdit ? '' : 'none';
+            if (form) form.classList.add('hidden');
+            const docs = Array.isArray(client.documents) ? client.documents : [];
+            if (!docs.length) {
+                listEl.innerHTML = '<p class="text-slate-400 text-sm">No documents added yet.</p>';
+                return;
+            }
+            listEl.innerHTML = docs.map((d, i) => `
+                <div class="flex items-center gap-2 py-2 ${i > 0 ? 'border-t border-slate-100' : ''}">
+                    <i class="fas fa-file-alt text-amber-600"></i>
+                    <a href="${afxEscAttr(d.url)}" target="_blank" rel="noopener" class="text-indigo-600 hover:underline text-sm font-medium flex-1 truncate">${afxEscHtml(d.label || d.url)}</a>
+                    ${canEdit ? `<button type="button" onclick="deleteProfileDocument(${i})" class="text-rose-600 hover:text-rose-800 text-xs font-semibold px-2 py-1">Delete</button>` : ''}
+                </div>`).join('');
+        }
+
+        async function deleteProfileDocument(index) {
+            const clientId = editClientProfileForm.dataset.clientId;
+            const client = allClients.find(c => c.id === clientId);
+            if (!client) return;
+            const docs = Array.isArray(client.documents) ? client.documents.slice() : [];
+            if (!docs[index]) return;
+            if (!confirm(`Delete document "${docs[index].label || docs[index].url}"?`)) return;
+            docs.splice(index, 1);
+            showLoading();
+            try {
+                await db.collection(`users/${currentUserId}/clients`).doc(clientId).update({ documents: docs });
+                client.documents = docs;
+                renderProfileDocuments(client);
+                showMessage('Success', 'Document deleted.');
+            } catch (error) {
+                showMessage('Error', 'Failed to delete document: ' + error.message);
+            } finally {
+                hideLoading();
+            }
+        }
+        window.deleteProfileDocument = deleteProfileDocument;
+
+        document.getElementById('profile-add-doc-btn').addEventListener('click', () => {
+            document.getElementById('profile-add-doc-form').classList.remove('hidden');
+            document.getElementById('profile-doc-label').value = '';
+            document.getElementById('profile-doc-url').value = '';
+            document.getElementById('profile-doc-label').focus();
+        });
+        document.getElementById('profile-doc-cancel-btn').addEventListener('click', () => {
+            document.getElementById('profile-add-doc-form').classList.add('hidden');
+        });
+        document.getElementById('profile-doc-save-btn').addEventListener('click', async () => {
+            const clientId = editClientProfileForm.dataset.clientId;
+            const client = allClients.find(c => c.id === clientId);
+            if (!client) return showMessage('Error', 'Client not found.');
+            const label = document.getElementById('profile-doc-label').value.trim();
+            const url = document.getElementById('profile-doc-url').value.trim();
+            if (!label) return showMessage('Error', 'Please enter a document name.');
+            if (!url || !/^https?:\/\//i.test(url)) return showMessage('Error', 'Please enter a valid document link (starting with http:// or https://).');
+            const docs = Array.isArray(client.documents) ? client.documents.slice() : [];
+            docs.push({ label, url });
+            showLoading();
+            try {
+                await db.collection(`users/${currentUserId}/clients`).doc(clientId).update({ documents: docs });
+                client.documents = docs;
+                renderProfileDocuments(client);
+                showMessage('Success', 'Document added.');
+            } catch (error) {
+                showMessage('Error', 'Failed to add document: ' + error.message);
+            } finally {
+                hideLoading();
+            }
+        });
         
         document.getElementById('edit-profile-btn').addEventListener('click', (e) => {
             const clientId = e.currentTarget.dataset.id;
@@ -16408,7 +16527,7 @@ ${(d.totalDeductions > 0) ? `
                     <td class="p-2">${r.notes || ''}</td>
                     <td class="p-2">
                         ${recordsLinkButtons(recordsGetLinks(r), 'Listen')}
-                        ${(!isSharedView && !isAdminSession) ? `<button onclick="deleteClientRecording('${r.id}')" class="text-rose-600 hover:underline">Delete</button>` : ''}
+                        ${(!isSharedView && !isAdminSession) ? `<button onclick="editClientRecording('${r.id}')" class="text-indigo-600 hover:underline mr-2">Edit</button><button onclick="deleteClientRecording('${r.id}')" class="text-rose-600 hover:underline">Delete</button>` : ''}
                     </td>
                 </tr>
             `).join('');
@@ -16553,6 +16672,65 @@ ${(d.totalDeductions > 0) ? `
             if (!confirm('Delete this recording?')) return;
             db.collection(`users/${currentUserId}/clientRecordings`).doc(id).delete()
                 .catch(err => showMessage('Error', 'Delete failed: ' + err.message));
+        }
+
+        // Edit a recording's Drive links (add / remove / replace links for
+        // that day). Protected by the login password — reuses the app's
+        // password verification modal (Firebase re-authentication), the
+        // same gate used for other sensitive actions.
+        let editingRecordingId = null;
+
+        function editClientRecording(id) {
+            if (!currentUserId || isSharedView || isAdminSession) return;
+            requestPasswordVerification(() => openRecordingEditor(id));
+        }
+
+        function recEditAddRow(link) {
+            const container = document.getElementById('rec-edit-links-container');
+            if (!container) return;
+            const row = document.createElement('div');
+            row.className = 'flex gap-2 mb-2';
+            const safe = String(link || '').replace(/&/g, '&amp;').replace(/"/g, '&quot;');
+            row.innerHTML = `
+                <input type="url" class="rec-link-input flex-1 px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-indigo-500" placeholder="https://drive.google.com/..." value="${safe}">
+                <button type="button" onclick="this.parentElement.remove()" class="px-3 rounded-full border border-rose-200 text-rose-500 hover:bg-rose-50"><i class="fas fa-times"></i></button>
+            `;
+            container.appendChild(row);
+        }
+
+        function openRecordingEditor(id) {
+            const r = allClientRecordings.find(x => x.id === id);
+            if (!r) return;
+            editingRecordingId = id;
+            const sub = document.getElementById('rec-edit-subtitle');
+            if (sub) sub.textContent = `${r.clientName || ''} (${r.accountNumber || ''}) \u2014 ${fmtRecordDate(r.recordDate)}`;
+            const container = document.getElementById('rec-edit-links-container');
+            if (container) container.innerHTML = '';
+            const links = recordsGetLinks(r);
+            if (links.length) links.forEach(recEditAddRow);
+            else recEditAddRow('');
+            document.getElementById('rec-edit-modal').style.display = 'flex';
+        }
+
+        function closeRecordingEditor() {
+            const modal = document.getElementById('rec-edit-modal');
+            if (modal) modal.style.display = 'none';
+            editingRecordingId = null;
+        }
+
+        async function saveRecordingEdit() {
+            if (!editingRecordingId) return;
+            const links = recCollectLinks('rec-edit-links-container');
+            if (links.length === 0) { showMessage('Error', 'Please keep at least one Google Drive link. To remove the whole entry, use Delete.'); return; }
+            showLoading();
+            try {
+                await db.collection(`users/${currentUserId}/clientRecordings`).doc(editingRecordingId).update({
+                    driveLinks: links,
+                    driveLink: firebase.firestore.FieldValue.delete()
+                });
+                closeRecordingEditor();
+            } catch (err) { showMessage('Error', 'Save failed: ' + err.message); }
+            finally { hideLoading(); }
         }
         function deleteClientAgreement(id) {
             if (!currentUserId || isSharedView || isAdminSession) return;
